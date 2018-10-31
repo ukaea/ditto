@@ -12,6 +12,9 @@ class Configuration:
             raise RuntimeError("The configuration file {} does not seem to exist. "
                                "Provide a configuration file".format(self._path_to_configuration_file))
 
+        # Logging
+        self._log_folder_location = None
+
         # S3 client
         self._s3_url = None
         self._s3_access_key = None
@@ -22,6 +25,10 @@ class Configuration:
         self._root_dir = None
 
         self._parse(self._path_to_configuration_file)
+
+    @property
+    def log_folder_location(self):
+        return self._log_folder_location
 
     @property
     def s3_url(self):
@@ -48,6 +55,9 @@ class Configuration:
         config.read(path)
         settings = config["Settings"]
 
+        # Logging
+        self._log_folder_location = self.get_directory(settings, "LogFolderLocation")
+
         # S3 client
         self._s3_url = settings['S3Address']
         self._s3_access_key = settings['S3AccessKey']
@@ -56,3 +66,11 @@ class Configuration:
 
         # Local data
         self._root_dir = os.path.abspath(settings['RootDirectory'])
+
+    @staticmethod
+    def get_directory(settings, key):
+        directory = settings[key]
+        if not os.path.isdir(directory):
+            raise ValueError("The directory {} for {} does not seem to exist. "
+                             "Make sure to create it".format(directory, key))
+        return directory
