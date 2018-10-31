@@ -14,9 +14,6 @@ sudo chown -R minio:minio /opt/minio
 
 sudo cp /vagrant/minio/minio.service /etc/systemd/system/minio.service
 
-export MINIO_ACCESS_KEY=admin
-export MINIO_SECRET_KEY=password
-
 systemctl enable minio && systemctl start minio
 
 systemctl status minio
