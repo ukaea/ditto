@@ -48,5 +48,7 @@ if __name__ == "__main__":
     app = tornado.web.Application([
         (r"/", MainHandler, dict(data_replication_service=data_replication_service)),
     ])
+
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
+
