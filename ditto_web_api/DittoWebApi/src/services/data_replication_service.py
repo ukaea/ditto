@@ -1,11 +1,14 @@
 class DataReplicationService:
     def __init__(self, external_data_service, internal_data_service, logger):
-        self.external_data_service = external_data_service
-        self.internal_data_service = internal_data_service
-        self.logger = logger
+        self._external_data_service = external_data_service
+        self._internal_data_service = internal_data_service
+        self._logger = logger
 
     def retrieve_objects(self):
-        objects = self.external_data_service.get_objects()
+        self._logger.info("Going to find objects")
+        objects = self._external_data_service.get_objects()
+        self._logger.info("Found {} objects".format(len(objects)))
         return objects
+
 
 

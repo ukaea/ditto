@@ -1,7 +1,7 @@
 from minio import Minio
 from DittoWebApi.src.models.bucket import Bucket
 from DittoWebApi.src.models.object import Object
-import json
+
 
 class ExternalDataService:
     def __init__(self, configuration):
@@ -18,7 +18,6 @@ class ExternalDataService:
             objects = self.s3_client.list_objects(bucket.name)
             for obj in objects:
                 obj = Object(obj)
-                j = json.dumps(obj.__dict__)
-                objs.append(j)
+                objs.append(obj.to_dict())
         return objs
 
