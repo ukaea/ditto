@@ -1,0 +1,18 @@
+---
+- name: Install Python 3
+  yum:
+    name: "{{ packages }}"
+    state: present
+  become: true
+  vars:
+    packages:
+    - python36
+    - python36-devel
+    - python36-setuptools
+
+- name: Install Python dependencies
+  pip:
+    requirements: /vagrant/ditto_web_api/requirements.txt
+    virtualenv: /home/vagrant/ditto_web_api/venv
+    virtualenv_command: /usr/bin/python3.6 -m venv
+  become: true
