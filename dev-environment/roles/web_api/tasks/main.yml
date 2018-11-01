@@ -1,0 +1,14 @@
+---
+- name: Create logging directory
+  file:
+    path: /home/vagrant/ditto_web_api/logging
+    state: directory
+    mode: '0777'
+  become: true
+
+- name: Create data directory
+  file:
+    path: /home/vagrant/ditto_web_api/data
+    state: directory
+    mode: '0777'
+  become: true
