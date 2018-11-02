@@ -32,21 +32,21 @@ def setup_logger(log_file_location, level):
 
 if __name__ == "__main__":
     # Read configuration
-    configuration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'configuration.ini'))
-    CONFIGURATION = Configuration(configuration_path)
+    CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'configuration.ini'))
+    CONFIGURATION = Configuration(CONFIGURATION_PATH)
 
     # Set up logging
     LOGGER = setup_logger(CONFIGURATION.log_folder_location, logging.INFO)
     LOGGER.info("Starting DITTO Web API")
 
     # Set up services
-    external_data_service = ExternalDataService(CONFIGURATION)
-    internal_data_service = InternalDataService(CONFIGURATION)
-    data_replication_service = DataReplicationService(external_data_service, internal_data_service, LOGGER)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION)
+    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION)
+    DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE, INTERNAL_DATA_SERVICE, LOGGER)
 
     # Launch app
-    app = tornado.web.Application([
-        (r"/listpresent", ListPresentHandler, dict(data_replication_service=data_replication_service)),
+    APP = tornado.web.Application([
+        (r"/listpresent", ListPresentHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
-    app.listen(8888)
+    APP.listen(8888)
     tornado.ioloop.IOLoop.current().start()
