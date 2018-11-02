@@ -1,6 +1,8 @@
-import unittest
-import mock
 import datetime
+import unittest
+
+import mock
+
 from DittoWebApi.src.models.object import Object
 
 

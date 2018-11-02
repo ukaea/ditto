@@ -11,8 +11,7 @@ class ExternalDataService:
                                 configuration.s3_use_secure)
 
     def get_buckets(self):
-        self._buckets = [Bucket(bucket) for bucket in self._s3_client.list_buckets()]
-        return self._buckets
+        return [Bucket(bucket) for bucket in self._s3_client.list_buckets()]
 
     def get_objects(self, buckets):
         """Passes list of object of Objects up to data replication service"""

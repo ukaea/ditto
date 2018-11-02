@@ -1,3 +1,4 @@
+# pylint: disable=R0913
 import os
 import tempfile
 

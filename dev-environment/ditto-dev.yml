@@ -2,6 +2,7 @@
 - hosts: all
   become_method: sudo
   roles:
+    - setup
     - dev
     - python
     - minio
