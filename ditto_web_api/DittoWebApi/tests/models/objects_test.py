@@ -22,5 +22,5 @@ class TestObjects(unittest.TestCase):
         output = test_object.to_dict()
         # Assert
         assert output == {'object_name': 'test_1.txt', 'bucket_name': 'bucket_1_test', 'is_dir': False, 'size': 100,
-                          'etag': 'test_etag', 'last modified': "15/11/2018"}
+                          'etag': 'test_etag', 'last modified': 1542240000.0}
         self.assertIsInstance(output, dict)

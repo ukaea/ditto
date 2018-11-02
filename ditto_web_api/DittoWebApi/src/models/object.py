@@ -34,7 +34,7 @@ class Object:
 
     @property
     def last_modified(self):
-        return self._last_modified.strftime('%d/%m/%Y')
+        return self._last_modified.timestamp()
 
     def _parse(self, obj):
         self._object_name = obj.object_name
