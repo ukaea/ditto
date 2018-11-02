@@ -19,6 +19,3 @@ class Bucket:
     def _parse(self, buck):
         self._name = buck.name
         self._creation_date = buck.creation_date
-
-
-

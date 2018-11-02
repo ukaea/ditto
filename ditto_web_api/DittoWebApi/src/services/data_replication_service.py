@@ -1,3 +1,4 @@
+
 class DataReplicationService:
     def __init__(self, external_data_service, internal_data_service, logger):
         self._external_data_service = external_data_service
@@ -9,6 +10,3 @@ class DataReplicationService:
         objects = self._external_data_service.get_objects()
         self._logger.info("Found {} objects".format(len(objects)))
         return objects
-
-
-

@@ -18,6 +18,5 @@ class ExternalDataService:
             objects = self.s3_client.list_objects(bucket.name)
             for obj in objects:
                 obj = Object(obj)
-                objs.append(obj.to_dict())
+                objs.append(obj.to_dict)
         return objs
-
