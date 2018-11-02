@@ -1,4 +1,3 @@
-import pytest
 import unittest
 import mock
 import datetime
@@ -6,8 +5,6 @@ from DittoWebApi.src.models.object import Object
 
 
 class TestObjects(unittest.TestCase):
-
-
     def test_minio_object_is_correctly_converted_to_dictionary(self):
         # Arrange
         mock_minio_object = mock.Mock()
@@ -21,6 +18,10 @@ class TestObjects(unittest.TestCase):
         # Act
         output = test_object.to_dict()
         # Assert
-        assert output == {'object_name': 'test_1.txt', 'bucket_name': 'bucket_1_test', 'is_dir': False, 'size': 100,
-                          'etag': 'test_etag', 'last modified': 1542240000.0}
+        assert output == {'object_name': 'test_1.txt',
+                          'bucket_name': 'bucket_1_test',
+                          'is_dir': False,
+                          'size': 100,
+                          'etag': 'test_etag',
+                          'last modified': 1542240000.0}
         self.assertIsInstance(output, dict)

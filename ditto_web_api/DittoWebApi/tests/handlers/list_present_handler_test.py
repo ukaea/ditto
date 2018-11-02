@@ -2,7 +2,6 @@ import mock
 import pytest
 import tornado.web
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
-from DittoWebApi.src.models.object import Object
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
 
 mock_data_replication_service = None

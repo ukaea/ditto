@@ -1,4 +1,3 @@
-import datetime
 class Object:
 
     def __init__(self, minio_object):
@@ -34,7 +33,7 @@ class Object:
 
     @property
     def last_modified(self):
-        return self._last_modified.timestamp()
+        return self._last_modified
 
     def _parse(self, obj):
         self._object_name = obj.object_name
@@ -42,7 +41,7 @@ class Object:
         self._is_dir = obj.is_dir
         self._size = obj.size
         self._etag = obj.etag
-        self._last_modified = obj.last_modified
+        self._last_modified = obj.last_modified.timestamp()
 
     def to_dict(self):
         return {"object_name": self.object_name,
