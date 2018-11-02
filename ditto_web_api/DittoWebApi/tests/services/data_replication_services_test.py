@@ -1,7 +1,10 @@
-import mock
-import pytest
+# pylint: disable=W0201
 import logging
 import unittest
+
+import mock
+import pytest
+
 from DittoWebApi.src.services.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService

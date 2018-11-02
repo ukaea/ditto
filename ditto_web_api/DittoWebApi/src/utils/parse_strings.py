@@ -1,7 +1,7 @@
 def str2bool(string):
-    s = string.lower()
-    if s == "true":
+    lower_str = string.lower()
+    if lower_str == "true":
         return True
-    if s == "false":
+    if lower_str == "false":
         return False
-    raise ValueError("'%s' not recognised as a Boolean. Use 'True' or 'False' (case insensitive)." % string)
+    raise ValueError("'{}' not recognised as a Boolean. Use 'True' or 'False' (case insensitive)." .format(string))
