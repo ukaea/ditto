@@ -5,8 +5,10 @@ class DataReplicationService:
         self._internal_data_service = internal_data_service
         self._logger = logger
 
-    def retrieve_objects(self):
+    def retrieve_object_dicts(self):
         self._logger.info("Going to find objects")
-        objects = self._external_data_service.get_objects()
+        buckets = self._external_data_service.get_buckets()
+        objects = self._external_data_service.get_objects(buckets)
+        object_dicts = [obj.to_dict for obj in objects]
         self._logger.info("Found {} objects".format(len(objects)))
-        return objects
+        return object_dicts

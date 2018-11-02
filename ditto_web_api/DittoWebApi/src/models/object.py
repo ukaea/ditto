@@ -1,4 +1,3 @@
-
 class Object:
 
     def __init__(self, minio_object):
@@ -46,5 +45,9 @@ class Object:
 
     @staticmethod
     def to_dict(self):
-        return {"object_name": self.object_name, "bucket_name": self.bucket_name, "is_dir": self.is_dir,
-                "size": self.size, "etag": self.etag, "last modified": self.last_modified}
+        return {"object_name": self.object_name,
+                "bucket_name": self.bucket_name,
+                "is_dir": self.is_dir,
+                "size": self.size,
+                "etag": self.etag,
+                "last modified": self.last_modified}

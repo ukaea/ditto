@@ -5,18 +5,20 @@ from DittoWebApi.src.models.object import Object
 
 class ExternalDataService:
     def __init__(self, configuration):
-        self.s3_client = Minio(configuration.s3_url,
-                               configuration.s3_access_key,
-                               configuration.s3_secret_key,
-                               configuration.s3_use_secure)
-        self._buckets = self.s3_client.list_buckets()
+        self._s3_client = Minio(configuration.s3_url,
+                                configuration.s3_access_key,
+                                configuration.s3_secret_key,
+                                configuration.s3_use_secure)
 
-    def get_objects(self):
+    def get_buckets(self):
+        self._buckets = [Bucket(bucket) for bucket in self._s3_client.list_buckets()]
+        return self._buckets
+
+    def get_objects(self, buckets):
+        """Passes list of object of Objects up to data replication service"""
         objs = []
-        for bucket in self._buckets:
+        for bucket in buckets:
             bucket = Bucket(bucket)
-            objects = self.s3_client.list_objects(bucket.name)
-            for obj in objects:
-                obj = Object(obj)
-                objs.append(obj.to_dict)
+            objects = self._s3_client.list_objects(bucket.name)
+            objs += [Object(obj) for obj in objects]
         return objs

@@ -1,5 +1,3 @@
-
-
 class Bucket:
 
     def __init__(self, minio_bucket):
