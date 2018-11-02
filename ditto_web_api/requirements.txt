@@ -1,5 +1,8 @@
+flake8
 minio
+pylint
 pytest
+pytest-cov
 pytest-mock
 pytest-tornado
 tornado
