@@ -3,7 +3,7 @@ from logging.handlers import RotatingFileHandler
 import os
 import tornado
 
-from DittoWebApi.src.handlers.main_handler import MainHandler
+from DittoWebApi.src.handlers.list_present import ListPresentHandler
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # Launch app
     app = tornado.web.Application([
-        (r"/", MainHandler, dict(data_replication_service=data_replication_service)),
+        (r"/listpresent", ListPresentHandler, dict(data_replication_service=data_replication_service)),
     ])
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
