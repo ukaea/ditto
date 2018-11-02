@@ -22,3 +22,8 @@ class ExternalDataService:
             objects = self._s3_client.list_objects(bucket.name)
             objs += [Object(obj) for obj in objects]
         return objs
+
+    def upload(self, processed_file, target_bucket):
+        bucket_name = target_bucket.name
+        self._s3_client.put_object(bucket_name, processed_file.name, processed_file.data, processed_file.length)
+
