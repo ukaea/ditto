@@ -1,0 +1,7 @@
+---
+- name: Directory permissions
+  file:
+    path: /home/vagrant/ditto_web_api
+    state: directory
+    mode: '0777'
+  become: true
