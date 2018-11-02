@@ -1,0 +1,9 @@
+[run]
+branch = True
+omit=DittoWebApi/tests/*
+
+[report]
+sort=Cover
+
+[html]
+directory=ditto_web_api_code_coverage_html

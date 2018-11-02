@@ -39,3 +39,21 @@
     group: vagrant
     mode: '0555'
   become: true
+
+- name: Copy .coveragerc
+  copy:
+    src: /vagrant/ditto_web_api/.coveragerc
+    dest: /home/vagrant/ditto_web_api/.coveragerc
+    owner: vagrant
+    group: vagrant
+    mode: '0444'
+  become: true
+
+- name: Copy runCodeCoverage.sh
+  copy:
+    src: /vagrant/ditto_web_api/runCodeCoverage.sh
+    dest: /home/vagrant/ditto_web_api/runCodeCoverage.sh
+    owner: vagrant
+    group: vagrant
+    mode: '0555'
+  become: true
