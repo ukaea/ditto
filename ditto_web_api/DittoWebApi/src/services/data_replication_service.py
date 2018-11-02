@@ -9,6 +9,6 @@ class DataReplicationService:
         self._logger.info("Going to find objects")
         buckets = self._external_data_service.get_buckets()
         objects = self._external_data_service.get_objects(buckets)
-        object_dicts = [obj.to_dict for obj in objects]
+        object_dicts = [obj.to_dict() for obj in objects]
         self._logger.info("Found {} objects in {} buckets".format(len(objects), len(buckets)))
         return object_dicts
