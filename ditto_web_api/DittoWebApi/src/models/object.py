@@ -41,9 +41,8 @@ class Object:
         self._is_dir = obj.is_dir
         self._size = obj.size
         self._etag = obj.etag
-        self._last_modified = obj.last_modified
+        self._last_modified = obj.last_modified.timestamp()
 
-    @staticmethod
     def to_dict(self):
         return {"object_name": self.object_name,
                 "bucket_name": self.bucket_name,
