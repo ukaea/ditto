@@ -1,3 +1,4 @@
+import datetime
 class Object:
 
     def __init__(self, minio_object):
@@ -33,7 +34,7 @@ class Object:
 
     @property
     def last_modified(self):
-        return self._last_modified
+        return self._last_modified.strftime('%d/%m/%Y')
 
     def _parse(self, obj):
         self._object_name = obj.object_name
@@ -43,7 +44,6 @@ class Object:
         self._etag = obj.etag
         self._last_modified = obj.last_modified
 
-    @staticmethod
     def to_dict(self):
         return {"object_name": self.object_name,
                 "bucket_name": self.bucket_name,
