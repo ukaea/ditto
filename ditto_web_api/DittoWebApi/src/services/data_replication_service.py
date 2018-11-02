@@ -14,10 +14,8 @@ class DataReplicationService:
         return object_dicts
 
     def retrieve_list_of_files(self):
+        self._logger.info("Finding files in local directory")
         return self._internal_data_service.find_files()
-
-    def process_file(self, file):
-        return self._internal_data_service.process_file(file)
 
     def upload_at_external(self, processed_file):
         buckets = self._external_data_service.get_buckets()

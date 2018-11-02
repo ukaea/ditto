@@ -10,12 +10,10 @@ class InternalDataService:
         files = []
         for path, subdirs, files in os.walk(self.root_dir):
             for name in files:
-                files.append(os.path.join(path, name))
+                full_file_name = os.path.join(path, name)
+                files.append(File(full_file_name))
         return files
 
-    @staticmethod
-    def process_file(file):
-        return File(file)
 
 
 
