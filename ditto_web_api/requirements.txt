@@ -1,4 +1,6 @@
+flake8
 minio
+pylint
 pytest
 pytest-mock
 pytest-tornado

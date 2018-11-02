@@ -12,3 +12,30 @@
     state: directory
     mode: '0777'
   become: true
+
+- name: Copy .flake8
+  copy:
+    src: /vagrant/ditto_web_api/.flake8
+    dest: /home/vagrant/ditto_web_api/.flake8
+    owner: vagrant
+    group: vagrant
+    mode: '0444'
+  become: true
+
+- name: Copy .pylintrc
+  copy:
+    src: /vagrant/ditto_web_api/.pylintrc
+    dest: /home/vagrant/ditto_web_api/.pylintrc
+    owner: vagrant
+    group: vagrant
+    mode: '0444'
+  become: true
+
+- name: Copy runCodeAnalysis.sh
+  copy:
+    src: /vagrant/ditto_web_api/runCodeAnalysis.sh
+    dest: /home/vagrant/ditto_web_api/runCodeAnalysis.sh
+    owner: vagrant
+    group: vagrant
+    mode: '0555'
+  become: true
