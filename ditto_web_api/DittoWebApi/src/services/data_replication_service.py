@@ -17,7 +17,15 @@ class DataReplicationService:
         self._logger.info("Finding files in local directory")
         return self._internal_data_service.find_files()
 
+    def copy_dir(self):
+        files_to_copy = self.retrieve_list_of_files()
+        for processed_file in files_to_copy:
+            self.upload_at_external(processed_file)
+
     def upload_at_external(self, processed_file):
         buckets = self._external_data_service.get_buckets()
         target_bucket = buckets[0]
         self._external_data_service.upload(processed_file, target_bucket)
+
+
+
