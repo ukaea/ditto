@@ -6,10 +6,10 @@ class InternalDataService:
     def __init__(self, configuration):
         self._root_dir = configuration.root_dir
 
-    def find_files(self, dir_path=None):
+    def find_files(self, dir_path):
         list_of_files = []
         if dir_path:
-            dir_to_search = dir_path
+            dir_to_search = os.path.join(self._root_dir, dir_path)
         else:
             dir_to_search = self._root_dir
         for path, subdirs, files in os.walk(dir_to_search):

@@ -12,14 +12,29 @@ class DataReplicationService:
         self._logger.info("Found {} objects in {} buckets".format(len(objects), len(buckets)))
         return object_dicts
 
-    def retrieve_list_of_file_objects(self, dir_path=None):
+    def get_internal_files(self, dir_path):
         self._logger.info("Finding files in local directory")
         return self._internal_data_service.find_files(dir_path)
 
-    def copy_dir(self, dir_path=None):
-        files_to_copy = self.retrieve_list_of_file_objects(dir_path)
-        self._logger.info("About to copy {} files".format(len(files_to_copy)))
-        buckets = self._external_data_service.get_buckets()
-        target_bucket = buckets[0]
-        for processed_file in files_to_copy:
-            self._external_data_service.upload(processed_file, target_bucket)
+    def copy_dir(self, dir_path):
+        self._logger.debug("Copying for {}".format(dir_path))
+        files_to_copy = self.get_internal_files(dir_path)
+        if len(files_to_copy) == 0:
+            message = "No files found in directory"
+            return message
+        else:
+            buckets = self._external_data_service.get_buckets()
+            target_bucket = buckets[0]
+            if self._external_data_service.does_dir_exists(dir_path, target_bucket.name):
+                message = "Directory already exists"
+                self._logger.warning(message)
+                return message
+            else:
+                self._logger.info("About to copy {} files".format(len(files_to_copy)))
+                data_transferred = 0
+                for processed_file in files_to_copy:
+                    data_transferred += self._external_data_service.upload(processed_file, target_bucket)
+                message = "Copied across {} files totaling {} bytes".format(len(files_to_copy), data_transferred)
+                return message
+
+

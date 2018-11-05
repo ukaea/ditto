@@ -24,8 +24,13 @@ class ExternalDataService:
             objs += [Object(obj) for obj in objects if not obj.is_dir]
         return objs
 
+    def does_dir_exists(self, dir_path, bucket):
+        objects = [obj for obj in self._s3_client.list_objects(bucket, dir_path)]
+        return len(objects) > 0
+
     def upload(self, processed_file, target_bucket):
         bucket_name = target_bucket.name
         with open(processed_file.abs_path, 'rb') as file:
             file_length = os.stat(processed_file.abs_path).st_size
             self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)
+        return file_length

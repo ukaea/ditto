@@ -6,4 +6,4 @@ class CopyDirHandler(tornado.web.RequestHandler):
         self._data_replication_service = data_replication_service
 
     def get(self, dir_path=None):
-        self._data_replication_service.copy_dir(dir_path)
+        self.write(self._data_replication_service.copy_dir(dir_path))
