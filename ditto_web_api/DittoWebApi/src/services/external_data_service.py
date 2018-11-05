@@ -1,4 +1,6 @@
+import os
 from minio import Minio
+from DittoWebApi.src.utils.path_helpers import to_posix
 from DittoWebApi.src.models.bucket import Bucket
 from DittoWebApi.src.models.object import Object
 
@@ -25,4 +27,6 @@ class ExternalDataService:
 
     def upload(self, processed_file, target_bucket):
         bucket_name = target_bucket.name
-        self._s3_client.put_object(bucket_name, processed_file.rel_path, processed_file.data, processed_file.length)
+        with open(processed_file.abs_path, 'rb') as file:
+            file_length = os.stat(processed_file.abs_path).st_size
+            self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)
