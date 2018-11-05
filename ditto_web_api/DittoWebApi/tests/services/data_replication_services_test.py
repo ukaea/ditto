@@ -47,5 +47,3 @@ class DataReplicationServiceTest(unittest.TestCase):
         output = self.test_service.retrieve_object_dicts()
         # Assert
         assert output == []
-
-

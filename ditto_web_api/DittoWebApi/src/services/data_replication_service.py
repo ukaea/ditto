@@ -18,13 +18,8 @@ class DataReplicationService:
 
     def copy_dir(self):
         files_to_copy = self.retrieve_list_of_file_objects()
-        for processed_file in files_to_copy:
-            self.upload_at_external(processed_file)
-
-    def upload_at_external(self, processed_file):
+        self._logger.info("About to copy {} files".format(len(files_to_copy)))
         buckets = self._external_data_service.get_buckets()
         target_bucket = buckets[0]
-        self._external_data_service.upload(processed_file, target_bucket)
-
-
-
+        for processed_file in files_to_copy:
+            self._external_data_service.upload(processed_file, target_bucket)

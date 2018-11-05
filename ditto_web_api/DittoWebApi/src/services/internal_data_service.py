@@ -13,8 +13,3 @@ class InternalDataService:
                 full_file_name = os.path.join(path, name)
                 list_of_files.append(File(full_file_name, self._root_dir))
         return list_of_files
-
-
-
-
-

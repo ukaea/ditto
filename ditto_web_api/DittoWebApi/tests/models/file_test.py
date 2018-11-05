@@ -15,7 +15,6 @@ class TestFiles(unittest.TestCase):
         os.remove(os.path.join("temp_test_dir", "temp_test_file.txt"))
         os.removedirs('temp_test_dir')
 
-
     def test_file_is_read_and_processed_correctly(self):
         file = File(os.path.join("temp_test_dir", "temp_test_file.txt"), os.path.dirname(__file__))
         assert file.file_name == "temp_test_file.txt"
