@@ -3,7 +3,6 @@ import os
 import pytest
 from DittoWebApi.src.models.file import File
 
-import mock
 
 class TestFiles(unittest.TestCase):
     @pytest.fixture(autouse=True)

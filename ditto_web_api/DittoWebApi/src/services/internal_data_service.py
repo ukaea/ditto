@@ -7,12 +7,12 @@ class InternalDataService:
         self._root_dir = configuration.root_dir
 
     def find_files(self):
-        files = []
+        list_of_files = []
         for path, subdirs, files in os.walk(self._root_dir):
             for name in files:
                 full_file_name = os.path.join(path, name)
-                files.append(File(full_file_name, self._root_dir))
-        return files
+                list_of_files.append(File(full_file_name, self._root_dir))
+        return list_of_files
 
 
 
