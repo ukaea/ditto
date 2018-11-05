@@ -1,6 +1,7 @@
 from DittoWebApi.src.utils.path_helpers import to_posix
 import unittest
 
+
 class TestPathHelpers(unittest.TestCase):
     def test_windows_path_converted_to_unix(self):
         path = r"c\test\subdir\file.txt"
