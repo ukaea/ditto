@@ -36,7 +36,7 @@ if __name__ == "__main__":
     CONFIGURATION = Configuration(CONFIGURATION_PATH)
 
     # Set up logging
-    LOGGER = setup_logger(CONFIGURATION.log_folder_location, logging.INFO)
+    LOGGER = setup_logger(CONFIGURATION.log_folder_location, CONFIGURATION.logging_level)
     LOGGER.info("Starting DITTO Web API")
 
     # Set up services
