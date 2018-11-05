@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # Launch app
     APP = tornado.web.Application([
         (r"/listpresent", ListPresentHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/copydir", CopyDirHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
+        (r"/copydir/*", CopyDirHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
     APP.listen(8888)
     tornado.ioloop.IOLoop.current().start()

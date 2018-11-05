@@ -21,8 +21,8 @@ class ExternalDataService:
         objs = []
         for bucket in buckets:
             bucket = Bucket(bucket)
-            objects = self._s3_client.list_objects(bucket.name)
-            objs += [Object(obj) for obj in objects]
+            objects = self._s3_client.list_objects(bucket.name, recursive=True)
+            objs += [Object(obj) for obj in objects if not obj.is_dir]
         return objs
 
     def upload(self, processed_file, target_bucket):
