@@ -9,9 +9,16 @@ from DittoWebApi.src.utils.configurations import Configuration
 
 class SampleConfigurationCreator:
     @staticmethod
-    def create_configuration(log_folder_loc, s3_url, s3_access_key, s3_secret_key, s3_use_secure, root_dir):
+    def create_configuration(log_folder_loc,
+                             logging_level,
+                             s3_url,
+                             s3_access_key,
+                             s3_secret_key,
+                             s3_use_secure,
+                             root_dir):
         template = "[Settings]\n"
         template = SampleConfigurationCreator.add_element_to_temp_file(template, "LogFolderLocation", log_folder_loc)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template, "LoggingLevel", logging_level)
         template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3Address", s3_url)
         template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3AccessKey", s3_access_key)
         template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3SecretKey", s3_secret_key)
@@ -51,6 +58,7 @@ def test_configuration_can_be_read_when_s3_secure():
     # Arrange
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
+                                                                         "INFO",
                                                                          "0.0.0.0:9000",
                                                                          "access",
                                                                          "secret",
@@ -76,6 +84,7 @@ def test_configuration_can_be_read_when_s3_not_secure():
     # Arrange
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
+                                                                         "INFO",
                                                                          "0.0.0.0:9000",
                                                                          "access",
                                                                          "secret",

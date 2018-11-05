@@ -14,6 +14,7 @@ class Configuration:
 
         # Logging
         self._log_folder_location = None
+        self._logging_level = "NOTSET"
 
         # S3 client
         self._s3_url = None
@@ -29,6 +30,10 @@ class Configuration:
     @property
     def log_folder_location(self):
         return self._log_folder_location
+
+    @property
+    def logging_level(self):
+        return self._logging_level
 
     @property
     def s3_url(self):
@@ -57,6 +62,7 @@ class Configuration:
 
         # Logging
         self._log_folder_location = self.get_directory(settings, "LogFolderLocation")
+        self._logging_level = settings["LoggingLevel"]
 
         # S3 client
         self._s3_url = settings['S3Address']
