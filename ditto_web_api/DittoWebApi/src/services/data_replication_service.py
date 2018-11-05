@@ -36,5 +36,3 @@ class DataReplicationService:
                     data_transferred += self._external_data_service.upload(processed_file, target_bucket)
                 message = "Copied across {} files totaling {} bytes".format(len(files_to_copy), data_transferred)
                 return message
-
-
