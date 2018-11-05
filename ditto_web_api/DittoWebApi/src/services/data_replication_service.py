@@ -1,4 +1,3 @@
-
 class DataReplicationService:
     def __init__(self, external_data_service, internal_data_service, logger):
         self._external_data_service = external_data_service
