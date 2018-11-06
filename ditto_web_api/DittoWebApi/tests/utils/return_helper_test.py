@@ -23,3 +23,9 @@ class TestReturnHelper(unittest.TestCase):
                                                        "Files updated": 1,
                                                        "Files skipped": 3,
                                                        "Data transferred (bytes)": 2532}
+
+    def test_default_dict_returned_when_return_dict_called_with_no_args(self):
+        assert return_dict() == {"Files transferred": 0,
+                                 "Files updated": 0,
+                                 "Files skipped": 0,
+                                 "Data transferred (bytes)": 0}
