@@ -20,7 +20,7 @@ class DataReplicationService:
         self._logger.debug("Copying for {}".format(dir_path))
         files_to_copy = self.get_internal_files(dir_path)
         if len(files_to_copy) == 0:
-            message = "No files found in directory ({})".format(dir_path)
+            message = "No files found in directory or directory does not exist ({})".format(dir_path)
             self._logger.warning(message)
             return message
         # route if files have been found
