@@ -37,7 +37,7 @@ class DataReplicationServiceTest(unittest.TestCase):
                                               "last_modified": 2132142421.123123}
         self.mock_external_data_service.get_objects.return_value = [mock_object_1, mock_object_2]
         # Act
-        output = self.test_service.retrieve_object_dicts()
+        output = self.test_service.retrieve_object_dicts(None)
         # Assert
         assert output[0] == {"object_name": "test",
                              "bucket_name": "test_bucket",
@@ -54,6 +54,6 @@ class DataReplicationServiceTest(unittest.TestCase):
     def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
         self.mock_external_data_service.get_objects.return_value = []
         # Act
-        output = self.test_service.retrieve_object_dicts()
+        output = self.test_service.retrieve_object_dicts(None)
         # Assert
         assert output == []
