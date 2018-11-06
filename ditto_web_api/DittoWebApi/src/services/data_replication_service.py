@@ -1,3 +1,6 @@
+from DittoWebApi.src.utils.return_helper import return_dict
+
+
 class DataReplicationService:
     def __init__(self, external_data_service, internal_data_service, logger):
         self._external_data_service = external_data_service
@@ -22,18 +25,19 @@ class DataReplicationService:
         if len(files_to_copy) == 0:
             message = "No files found in directory or directory does not exist ({})".format(dir_path)
             self._logger.warning(message)
-            return message
+            return return_dict(message=message)
         # route if files have been found
         buckets = self._external_data_service.get_buckets()
         target_bucket = buckets[0]
         if self._external_data_service.does_dir_exists(dir_path, target_bucket.name):
-            message = "Directory already exists"
+            skipped_files = len(files_to_copy)
+            message = "Directory already exists, {} files skipped".format(skipped_files)
             self._logger.warning(message)
-            return message
+            return return_dict(files_skipped=skipped_files, message=message)
         # route if directory doesn't already exist
         self._logger.info("About to copy {} files".format(len(files_to_copy)))
         data_transferred = 0
         for processed_file in files_to_copy:
             data_transferred += self._external_data_service.upload(processed_file, target_bucket)
         message = "Copied across {} files totaling {} bytes".format(len(files_to_copy), data_transferred)
-        return message
+        return return_dict(files_transferred=len(files_to_copy), data_transferred=data_transferred, message=message)
