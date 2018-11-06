@@ -39,10 +39,17 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         output = self.test_service.retrieve_object_dicts()
         # Assert
-        assert output[0] == {"object_name": "test", "bucket_name": "test_bucket", "is_dir": False, "size": 100,
-                             "etag": "test_etag", "last_modified": 2132142421.123123}
-        assert output[1] == {"object_name": "test_2", "bucket_name": "test_bucket_2", "is_dir": False, "size": 100,
-                             "etag": "test_etag_2", "last_modified": 2132142421.123123}
+        assert output[0] == {"object_name": "test",
+                             "bucket_name": "test_bucket",
+                             "is_dir": False,
+                             "size": 100,
+                             "etag": "test_etag",
+                             "last_modified": 2132142421.123123}
+        assert output[1] == {"object_name": "test_2",
+                             "bucket_name": "test_bucket_2",
+                             "is_dir": False, "size": 100,
+                             "etag": "test_etag_2",
+                             "last_modified": 2132142421.123123}
 
     def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
         self.mock_external_data_service.get_objects.return_value = []

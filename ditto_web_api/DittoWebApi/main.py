@@ -1,8 +1,7 @@
 import logging
-from logging.handlers import RotatingFileHandler
 import os
 import tornado
-
+from logging.handlers import RotatingFileHandler
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
 from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
