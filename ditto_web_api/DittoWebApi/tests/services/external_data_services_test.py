@@ -16,8 +16,8 @@ class TestExternalDataServices(unittest.TestCase):
         bucket_name_1 = "test-123esj"
         bucket_name_2 = "test--.123esjs"
         # Act
-        valid_1 = external_data_services.valid_bucket(bucket_name_1)
-        valid_2 = external_data_services.valid_bucket(bucket_name_2)
+        valid_1 = external_data_services.is_valid_bucket(bucket_name_1)
+        valid_2 = external_data_services.is_valid_bucket(bucket_name_2)
         # Assert
         self.assertTrue(valid_1)
         self.assertTrue(valid_2)
@@ -38,13 +38,13 @@ class TestExternalDataServices(unittest.TestCase):
         bucket_name_6 = "test-including..ohd-ear"
         bucket_name_7 = "test-a-bucket-name-that-is-way-too-long-to-be-accepted-but-otherwise-would-be-fine"
         # Act
-        valid_1 = external_data_services.valid_bucket(bucket_name_1)
-        valid_2 = external_data_services.valid_bucket(bucket_name_2)
-        valid_3 = external_data_services.valid_bucket(bucket_name_3)
-        valid_4 = external_data_services.valid_bucket(bucket_name_4)
-        valid_5 = external_data_services.valid_bucket(bucket_name_5)
-        valid_6 = external_data_services.valid_bucket(bucket_name_6)
-        valid_7 = external_data_services.valid_bucket(bucket_name_7)
+        valid_1 = external_data_services.is_valid_bucket(bucket_name_1)
+        valid_2 = external_data_services.is_valid_bucket(bucket_name_2)
+        valid_3 = external_data_services.is_valid_bucket(bucket_name_3)
+        valid_4 = external_data_services.is_valid_bucket(bucket_name_4)
+        valid_5 = external_data_services.is_valid_bucket(bucket_name_5)
+        valid_6 = external_data_services.is_valid_bucket(bucket_name_6)
+        valid_7 = external_data_services.is_valid_bucket(bucket_name_7)
         self.assertFalse(valid_1)
         self.assertFalse(valid_2)
         self.assertFalse(valid_3)

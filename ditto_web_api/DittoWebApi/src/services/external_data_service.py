@@ -43,7 +43,7 @@ class ExternalDataService:
     def create_bucket(self, bucket_name):
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
-    def valid_bucket(self, bucket_name):
+    def is_valid_bucket(self, bucket_name):
         if len(bucket_name) > 63:
             return False
         if '..' in bucket_name:

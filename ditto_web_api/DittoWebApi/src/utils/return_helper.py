@@ -6,6 +6,6 @@ def return_dict(files_transferred=0, files_updated=0, files_skipped=0, data_tran
             "Data transferred (bytes)": data_transferred}
 
 
-def return_bucket_message(message, bucket_name):
-    return {"Bucket created": message,
+def return_bucket_message(message, bucket_name=""):
+    return {"Message": message,
             "Name of bucket attempted": bucket_name}
