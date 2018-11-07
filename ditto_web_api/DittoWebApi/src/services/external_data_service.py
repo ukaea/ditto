@@ -11,7 +11,7 @@ class ExternalDataService:
                                 configuration.s3_access_key,
                                 configuration.s3_secret_key,
                                 configuration.s3_use_secure)
-        self._bucket_standard = configuration.Bucket
+        self._bucket_standard = configuration.bucket_standard
 
     def get_buckets(self):
         return [Bucket(bucket) for bucket in self._s3_client.list_buckets()]
@@ -43,6 +43,7 @@ class ExternalDataService:
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
     def valid_bucket(self, bucket_name):
-        if bucket_name.split('-')[0] == self._configuration.BucketStandardisation
+        return bucket_name.split('-')[0] == self._configuration.bucket_standard
+
 
 

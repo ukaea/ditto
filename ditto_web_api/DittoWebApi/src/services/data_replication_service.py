@@ -44,5 +44,6 @@ class DataReplicationService:
             message = "No bucket name provided"
         if self._external_data_service.does_bucket_exist(bucket_name):
             message = "Bucket already exists"
-
-
+        if not self._external_data_service.valid_bucket(bucket_name):
+            message = "Bucket name breaks naming standard"
+        self._external_data_service.create_bucket(bucket_name)
