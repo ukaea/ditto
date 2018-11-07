@@ -44,11 +44,11 @@ class DataReplicationService:
         if not bucket_name:
             message = "No bucket name provided"
             self._logger.warning(message)
-            return return_bucket_message(message, bucket_name)
+            return return_bucket_message(message, "")
         if not self._external_data_service.valid_bucket(bucket_name):
             message = "Bucket name breaks S3 or local naming standard ({})".format(bucket_name)
             self._logger.warning(message)
-            return return_bucket_message(message)
+            return return_bucket_message(message, bucket_name)
         if self._external_data_service.does_bucket_exist(bucket_name):
             message = "Bucket already exists ({})".format(bucket_name)
             self._logger.warning(message)
