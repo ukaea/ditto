@@ -1,5 +1,7 @@
 import os
+import re
 from minio import Minio
+from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.path_helpers import to_posix
 from DittoWebApi.src.models.bucket import Bucket
 from DittoWebApi.src.models.object import Object
@@ -43,7 +45,11 @@ class ExternalDataService:
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
     def valid_bucket(self, bucket_name):
+        if len(bucket_name) > 63:
+            return False
+        if '..' in bucket_name:
+            return False
+        match = re.compile('^[a-z0-9][a-z0-9\\.\\-]+[a-z0-9]$').match(bucket_name)
+        if match is None or match.end() != len(bucket_name):
+            return False
         return bucket_name.split('-')[0] == self._bucket_standard
-
-
-

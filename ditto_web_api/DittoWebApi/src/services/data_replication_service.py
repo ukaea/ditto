@@ -1,4 +1,5 @@
 from DittoWebApi.src.utils.return_helper import return_dict
+from DittoWebApi.src.utils.return_helper import return_bucket_message
 
 
 class DataReplicationService:
@@ -42,12 +43,14 @@ class DataReplicationService:
     def create_bucket(self, bucket_name):
         if not bucket_name:
             message = "No bucket name provided"
-            return message
+            return return_bucket_message(message)
         if not self._external_data_service.valid_bucket(bucket_name):
-            message = "Bucket name breaks naming standard"
-            return message
+            message = "Bucket name breaks S3 or local naming standard"
+            return return_bucket_message(message)
         if self._external_data_service.does_bucket_exist(bucket_name):
             message = "Bucket already exists"
-            return message
+            return return_bucket_message(message)
         self._external_data_service.create_bucket(bucket_name)
-        return "Bucket created!"
+        message = "Bucket Created"
+        return return_bucket_message(message)
+
