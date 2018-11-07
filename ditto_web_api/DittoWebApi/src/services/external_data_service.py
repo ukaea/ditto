@@ -43,7 +43,7 @@ class ExternalDataService:
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
     def valid_bucket(self, bucket_name):
-        return bucket_name.split('-')[0] == self._configuration.bucket_standard
+        return bucket_name.split('-')[0] == self._bucket_standard
 
 
 
