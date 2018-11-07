@@ -3,8 +3,8 @@ import os
 
 class File:
 
-    def __init__(self, file, root_dir):
-        self._file = file
+    def __init__(self, file_path, root_dir):
+        self._file = file_path
         self._name = None
         self._root_dir = root_dir
         self._parse(self._file)
@@ -21,8 +21,8 @@ class File:
     def rel_path(self):
         return self._rel_path
 
-    def _parse(self, f):
-        self._name = f
-        self._abs_path = os.path.abspath(f)
+    def _parse(self, path_to_file):
+        self._name = path_to_file
+        self._abs_path = os.path.abspath(path_to_file)
         self._rel_path = os.path.relpath(self._abs_path, self._root_dir)
-        self._file_name = os.path.split(self._abs_path)[1]
+        self._file_name = os.path.basename(self._abs_path)
