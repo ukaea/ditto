@@ -88,7 +88,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.is_valid_bucket.return_value = False
         bucket_name = "test-1234-"
         response = self.test_service.create_bucket(bucket_name)
-        self.assertEqual(response, {"Message": "Bucket name breaks S3 or local naming standard (random_bucket)",
+        self.assertEqual(response, {"Message": "Bucket name breaks S3 or local naming standard (test-1234-)",
                                     "Name of bucket attempted": "test-1234-"})
 
     def test_create_bucket_return_correct_when_bucket_not_given(self):

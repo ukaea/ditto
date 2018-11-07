@@ -18,14 +18,30 @@ class SampleConfigurationCreator:
                              root_dir,
                              bucket_standard):
         template = "[Settings]\n"
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "LogFolderLocation", log_folder_loc)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "LoggingLevel", logging_level)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3Address", s3_url)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3AccessKey", s3_access_key)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3SecretKey", s3_secret_key)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "S3Secure", s3_use_secure)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "RootDirectory", root_dir)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template, "BucketStandardisation", bucket_standard)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "LogFolderLocation",
+                                                                       log_folder_loc)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "LoggingLevel",
+                                                                       logging_level)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "S3Address",
+                                                                       s3_url)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "S3AccessKey",
+                                                                       s3_access_key)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "S3SecretKey",
+                                                                       s3_secret_key)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "S3Secure",
+                                                                       s3_use_secure)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "RootDirectory",
+                                                                       root_dir)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "BucketStandardisation",
+                                                                       bucket_standard)
         return SampleConfigurationCreator.write_sample_configuration_file(template)
 
     @staticmethod
