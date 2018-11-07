@@ -1,7 +1,8 @@
 import unittest
-from DittoWebApi.src.utils.path_helpers import to_posix
 from pathlib import PureWindowsPath
 from pathlib import PurePosixPath
+from DittoWebApi.src.utils.path_helpers import to_posix
+
 
 class TestPathHelpers(unittest.TestCase):
     def test_windows_path_converted_to_unix(self):

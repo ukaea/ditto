@@ -23,5 +23,5 @@ class TestFiles(unittest.TestCase):
                                                                                              "temp_test_file.txt")))
 
     def test_error_returned_when_root_dir_not_in_file_path(self):
-        with pytest.raises(NameError):
+        with self.assertRaises(NameError):
             File(os.path.join("temp_test_dir", "temp_test_file.txt"), "some_unknown_dir")
