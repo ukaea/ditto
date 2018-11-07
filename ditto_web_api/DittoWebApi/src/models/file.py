@@ -24,5 +24,7 @@ class File:
     def _parse(self, path_to_file):
         self._name = path_to_file
         self._abs_path = os.path.abspath(path_to_file)
+        if os.path.relpath(self._abs_path, self._root_dir)[0:2] == '..':
+            raise NameError("Root directory not in file path")
         self._rel_path = os.path.relpath(self._abs_path, self._root_dir)
         self._file_name = os.path.basename(self._abs_path)

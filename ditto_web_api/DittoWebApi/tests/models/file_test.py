@@ -17,7 +17,11 @@ class TestFiles(unittest.TestCase):
 
     def test_file_is_read_and_processed_correctly(self):
         file = File(os.path.join("temp_test_dir", "temp_test_file.txt"), os.path.dirname(__file__))
-        assert file.file_name == "temp_test_file.txt"
-        assert file.rel_path == os.path.join("temp_test_dir", "temp_test_file.txt")
-        assert file.abs_path == os.path.join(os.path.dirname(__file__), os.path.join("temp_test_dir",
-                                                                                     "temp_test_file.txt"))
+        self.assertEqual(file.file_name, "temp_test_file.txt")
+        self.assertEqual(file.rel_path, os.path.join("temp_test_dir", "temp_test_file.txt"))
+        self.assertEqual(file.abs_path, os.path.join(os.path.dirname(__file__), os.path.join("temp_test_dir",
+                                                                                             "temp_test_file.txt")))
+
+    def test_error_returned_when_root_dir_not_in_file_path(self):
+        with pytest.raises(NameError):
+            File(os.path.join("temp_test_dir", "temp_test_file.txt"), "some_unknown_dir")

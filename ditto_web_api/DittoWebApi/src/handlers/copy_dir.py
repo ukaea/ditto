@@ -1,3 +1,4 @@
+# pylint: disable=W0221,W0223
 import tornado.web
 from DittoWebApi.src.utils.parse_args import extract_dir_path
 
