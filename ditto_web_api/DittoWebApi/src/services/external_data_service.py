@@ -52,3 +52,15 @@ class ExternalDataService:
         if match is None or match.end() != len(bucket_name):
             return False
         return bucket_name.split('-')[0] == self._bucket_standard
+
+    def delete_file(self, file_name, bucket_name):
+        self._s3_client.remove_object(bucket_name, file_name)
+
+    def does_object_exist(self, file_name, bucket_name):
+        objects = [obj for obj in self._s3_client.list_objects(bucket_name)]
+        for obj in objects:
+            if obj.object_name == file_name:
+                return True
+        return False
+
+
