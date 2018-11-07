@@ -1,7 +1,6 @@
 import os
 import re
 from minio import Minio
-from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.path_helpers import to_posix
 from DittoWebApi.src.models.bucket import Bucket
 from DittoWebApi.src.models.object import Object

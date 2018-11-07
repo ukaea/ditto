@@ -43,14 +43,17 @@ class DataReplicationService:
     def create_bucket(self, bucket_name):
         if not bucket_name:
             message = "No bucket name provided"
-            return return_bucket_message(message)
+            self._logger.warning(message)
+            return return_bucket_message(message, bucket_name)
         if not self._external_data_service.valid_bucket(bucket_name):
-            message = "Bucket name breaks S3 or local naming standard"
+            message = "Bucket name breaks S3 or local naming standard ({})".format(bucket_name)
+            self._logger.warning(message)
             return return_bucket_message(message)
         if self._external_data_service.does_bucket_exist(bucket_name):
-            message = "Bucket already exists"
-            return return_bucket_message(message)
+            message = "Bucket already exists ({})".format(bucket_name)
+            self._logger.warning(message)
+            return return_bucket_message(message, bucket_name)
         self._external_data_service.create_bucket(bucket_name)
-        message = "Bucket Created"
-        return return_bucket_message(message)
-
+        message = "Bucket Created: {}".format(bucket_name)
+        self._logger.info(message)
+        return return_bucket_message(message, bucket_name)
