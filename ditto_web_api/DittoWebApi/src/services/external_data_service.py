@@ -11,6 +11,7 @@ class ExternalDataService:
                                 configuration.s3_access_key,
                                 configuration.s3_secret_key,
                                 configuration.s3_use_secure)
+        self._bucket_standard = configuration.Bucket
 
     def get_buckets(self):
         return [Bucket(bucket) for bucket in self._s3_client.list_buckets()]
@@ -34,3 +35,14 @@ class ExternalDataService:
             file_length = os.stat(processed_file.abs_path).st_size
             self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)
         return file_length
+
+    def does_bucket_exist(self, bucket_name):
+        return self._s3_client.bucket_exists(bucket_name)
+
+    def create_bucket(self, bucket_name):
+        self._s3_client.make_bucket(bucket_name, location="eu-west-1")
+
+    def valid_bucket(self, bucket_name):
+        if bucket_name.split('-')[0] == self._configuration.BucketStandardisation
+
+

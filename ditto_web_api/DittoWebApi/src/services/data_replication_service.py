@@ -38,3 +38,11 @@ class DataReplicationService:
             data_transferred += self._external_data_service.upload_file(processed_file, target_bucket)
         message = "Copied across {} files totaling {} bytes".format(len(files_to_copy), data_transferred)
         return return_dict(files_transferred=len(files_to_copy), data_transferred=data_transferred, message=message)
+
+    def create_bucket(self, bucket_name):
+        if not bucket_name:
+            message = "No bucket name provided"
+        if self._external_data_service.does_bucket_exist(bucket_name):
+            message = "Bucket already exists"
+
+

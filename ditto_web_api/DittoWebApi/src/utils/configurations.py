@@ -55,6 +55,10 @@ class Configuration:
     def root_dir(self):
         return self._root_dir
 
+    @property
+    def bucket_standard(self):
+        return self._bucket_standard
+
     def _parse(self, path):
         config = configparser.ConfigParser()
         config.read(path)
@@ -72,6 +76,7 @@ class Configuration:
 
         # Local data
         self._root_dir = os.path.abspath(settings['RootDirectory'])
+        self._bucket_standard = settings['BucketStandardisation']
 
     @staticmethod
     def get_directory(settings, key):
