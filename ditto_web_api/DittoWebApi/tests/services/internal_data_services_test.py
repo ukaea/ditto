@@ -1,37 +1,39 @@
 import unittest
-import os
-import shutil
-import pytest
 import mock
+import pytest
 from DittoWebApi.src.services.internal_data_service import InternalDataService
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
 class TestInternalDataServices(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self):
-        current_dir = os.getcwd()
-        new_dir = os.path.join(current_dir, 'temp_test_dir')
-        os.mkdir(new_dir)
-        yield
-        shutil.rmtree(new_dir)
+        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
+        mock_configuration = mock.Mock()
+        mock_configuration.root_dir = "test_root_dir"
+        self.mock_file_system_helper.join_paths.return_value = "test_root_dir/file_1"
+        self.mock_file_system_helper.find_all_files_in_folder.return_value = ["test_root_dir/file_1.txt",
+                                                                              "test_root_dir/file_2.txt"]
+        self.internal_data_services = InternalDataService(mock_configuration, self.mock_file_system_helper)
 
     def test_files_are_found_in_directories(self):
-        # Arrange
-        current_dir = os.getcwd()
-        new_dir = os.path.join(current_dir, 'temp_test_dir')
-        with open(os.path.join(new_dir, "temp_test_file.txt"), 'w+') as file_1:
-            file_1.write("Testing,Testing,1,2,3!!!")
-        with open(os.path.join(new_dir, "temp2.txt"), "w+") as file_2:
-            file_2.write("safdgvafdjvhjsdvksdvhjsdvkhxjchsdkjfhksadvksdncncjafdsdnkcjxankjcjsacxbnacbdsdal")
-        os.mkdir(os.path.join(new_dir, "sub_dir"))
-        with open(os.path.join(new_dir, "sub_dir", "sub_file.txt"), "w+") as file_3:
-            file_3.write("sffavbabhdb")
-        mock_configuration = mock.Mock()
-        mock_configuration.root_dir = os.path.join(os.getcwd(), 'temp_test_dir')
-        internal_data_services = InternalDataService(mock_configuration)
         # Act
-        files = internal_data_services.find_files(None)
+        file_information = self.internal_data_services.find_files("test_root_dir")
         # Assert
-        self.assertEqual(files[1].file_name, "temp_test_file.txt")
-        self.assertEqual(files[0].file_name, "temp2.txt")
-        self.assertEqual(files[2].file_name, "sub_file.txt")
+        self.mock_file_system_helper.find_all_files_in_folder.assert_called_with("test_root_dir/file_1")
+        assert file_information[0].file_name == "file_1.txt"
+        assert file_information[1].file_name == "file_2.txt"
+
+        assert file_information[0].rel_path == "file_1.txt"
+        assert file_information[1].rel_path == "file_2.txt"
+
+    def test_files_are_found_in_root_directory(self):
+        # Act
+        file_information = self.internal_data_services.find_files(None)
+        # Assert
+        self.mock_file_system_helper.find_all_files_in_folder.assert_called_with("test_root_dir")
+        assert file_information[0].file_name == "file_1.txt"
+        assert file_information[1].file_name == "file_2.txt"
+
+        assert file_information[0].rel_path == "file_1.txt"
+        assert file_information[1].rel_path == "file_2.txt"
