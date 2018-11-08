@@ -2,13 +2,13 @@ import unittest
 import mock
 import pytest
 from DittoWebApi.src.services.internal_data_service import InternalDataService
-from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelpers
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
 class TestInternalDataServices(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.mock_file_system_helper = mock.create_autospec(FileSystemHelpers)
+        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         mock_configuration = mock.Mock()
         mock_configuration.root_dir = "test_root_dir"
         self.mock_file_system_helper.join_paths.return_value = "test_root_dir/file_1"

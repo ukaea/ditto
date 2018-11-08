@@ -1,7 +1,7 @@
 import os
 
 
-class FileSystemHelpers:
+class FileSystemHelper:
     def join_paths(self, directory, file_name):
         return os.path.join(directory, file_name)
 
