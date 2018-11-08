@@ -10,4 +10,5 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
 script:
   - flake8 ./DittoWebApi
+  - pylint ./DittoWebApi
   - pytest ./DittoWebApi
