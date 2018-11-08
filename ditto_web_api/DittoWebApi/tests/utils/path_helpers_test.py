@@ -1,7 +1,7 @@
 import unittest
 from pathlib import PureWindowsPath
 from pathlib import PurePosixPath
-from DittoWebApi.src.utils.path_helpers import to_posix
+from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 
 
 class TestPathHelpers(unittest.TestCase):
