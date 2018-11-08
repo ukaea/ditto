@@ -1,6 +1,7 @@
 import unittest
 import mock
 from DittoWebApi.src.services.external_data_service import ExternalDataService
+from minio import Minio
 
 
 class TestExternalDataServices(unittest.TestCase):
@@ -23,6 +24,7 @@ class TestExternalDataServices(unittest.TestCase):
         self.assertTrue(valid_2)
 
     def test_invalid_bucket_names_are_rejected(self):
+        # Arrange
         mock_configuration = mock.Mock()
         mock_configuration.bucket_standard = "test"
         mock_configuration.s3_url = "example"
@@ -45,6 +47,7 @@ class TestExternalDataServices(unittest.TestCase):
         valid_5 = external_data_services.is_valid_bucket(bucket_name_5)
         valid_6 = external_data_services.is_valid_bucket(bucket_name_6)
         valid_7 = external_data_services.is_valid_bucket(bucket_name_7)
+        # Assert
         self.assertFalse(valid_1)
         self.assertFalse(valid_2)
         self.assertFalse(valid_3)

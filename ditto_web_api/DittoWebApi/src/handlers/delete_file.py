@@ -8,6 +8,6 @@ class DeleteFileHandler(tornado.web.RequestHandler):
     def initialize(self, data_replication_service):
         self._data_replication_service = data_replication_service
 
-    def get(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):
         file_name = extract_primary_arg(args)
         self.write(self._data_replication_service.try_delete_file(file_name))

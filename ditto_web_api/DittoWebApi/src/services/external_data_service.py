@@ -1,6 +1,7 @@
 import os
 import re
 from minio import Minio
+from minio.error import NoSuchKey
 from DittoWebApi.src.utils.path_helpers import to_posix
 from DittoWebApi.src.models.bucket import Bucket
 from DittoWebApi.src.models.object import Object
@@ -57,10 +58,8 @@ class ExternalDataService:
         self._s3_client.remove_object(bucket_name, file_name)
 
     def does_object_exist(self, file_name, bucket_name):
-        objects = [obj for obj in self._s3_client.list_objects(bucket_name)]
-        for obj in objects:
-            if obj.object_name == file_name:
-                return True
-        return False
-
-
+        try:
+            self._s3_client.stat_object(bucket_name, file_name)
+            return True
+        except NoSuchKey:
+            return False
