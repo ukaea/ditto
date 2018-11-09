@@ -112,4 +112,3 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",
                                     "Name of bucket attempted": "test-12345"})
-

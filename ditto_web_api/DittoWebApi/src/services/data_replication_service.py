@@ -68,8 +68,3 @@ class DataReplicationService:
         self._external_data_service.delete_file(file_name, target_bucket_name)
         message = "File {}, successfully deleted from bucket {}".format(file_name, target_bucket_name)
         return message
-
-
-
-
-

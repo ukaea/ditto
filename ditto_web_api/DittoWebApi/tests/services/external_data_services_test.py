@@ -1,7 +1,6 @@
 import unittest
 import mock
 from DittoWebApi.src.services.external_data_service import ExternalDataService
-from minio import Minio
 
 
 class TestExternalDataServices(unittest.TestCase):
