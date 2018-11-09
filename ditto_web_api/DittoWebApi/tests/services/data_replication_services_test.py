@@ -31,14 +31,15 @@ class DataReplicationServiceTest(unittest.TestCase):
                                               "last_modified": 2132142421.123123}
         mock_object_2 = mock.create_autospec(Object)
         mock_object_2.to_dict.return_value = {"object_name": "test_2",
-                                              "bucket_name": "test_bucket_2",
+                                              "bucket_name": "test_bucket",
                                               "is_dir": False, "size": 100,
                                               "etag": "test_etag_2",
                                               "last_modified": 2132142421.123123}
         self.mock_external_data_service.get_objects.return_value = [mock_object_1, mock_object_2]
         # Act
-        output = self.test_service.retrieve_object_dicts(None)
+        output = self.test_service.retrieve_object_dicts("test_bucket", None)
         # Assert
+        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], None)
         assert output[0] == {"object_name": "test",
                              "bucket_name": "test_bucket",
                              "is_dir": False,
@@ -46,16 +47,18 @@ class DataReplicationServiceTest(unittest.TestCase):
                              "etag": "test_etag",
                              "last_modified": 2132142421.123123}
         assert output[1] == {"object_name": "test_2",
-                             "bucket_name": "test_bucket_2",
+                             "bucket_name": "test_bucket",
                              "is_dir": False, "size": 100,
                              "etag": "test_etag_2",
                              "last_modified": 2132142421.123123}
+        assert len(output) == 2
 
     def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
         self.mock_external_data_service.get_objects.return_value = []
         # Act
-        output = self.test_service.retrieve_object_dicts(None)
+        output = self.test_service.retrieve_object_dicts("test_bucket", None)
         # Assert
+        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], None)
         assert output == []
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects_from_sub_dir(self):
