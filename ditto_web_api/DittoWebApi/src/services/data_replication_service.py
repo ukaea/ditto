@@ -1,5 +1,6 @@
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
+from minio.error import InvalidBucketError
 
 
 class DataReplicationService:
@@ -46,11 +47,16 @@ class DataReplicationService:
             self._logger.warning(message)
             return return_bucket_message(message)
         if not self._external_data_service.is_valid_bucket(bucket_name):
-            message = "Bucket name breaks S3 or local naming standard ({})".format(bucket_name)
-            self._logger.warning(message)
+            message = "Bucket breaks local naming standard ({})".format(bucket_name)
+            self._logger.info(message)
             return return_bucket_message(message, bucket_name)
-        if self._external_data_service.does_bucket_exist(bucket_name):
-            message = "Bucket already exists ({})".format(bucket_name)
+        try:
+            if self._external_data_service.does_bucket_exist(bucket_name):
+                message = "Bucket already exists ({})".format(bucket_name)
+                self._logger.warning(message)
+                return return_bucket_message(message, bucket_name)
+        except InvalidBucketError:
+            message = "Bucket name breaks S3 ({})".format(bucket_name)
             self._logger.warning(message)
             return return_bucket_message(message, bucket_name)
         self._external_data_service.create_bucket(bucket_name)

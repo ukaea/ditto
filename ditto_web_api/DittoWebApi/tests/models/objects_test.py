@@ -3,7 +3,7 @@ import unittest
 
 import mock
 
-from DittoWebApi.src.models.object import Object
+from DittoWebApi.src.models.object_information import Object
 
 
 class TestObjects(unittest.TestCase):

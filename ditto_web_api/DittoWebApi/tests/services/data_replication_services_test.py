@@ -5,10 +5,10 @@ import unittest
 import mock
 import pytest
 
-from DittoWebApi.src.services.external_data_service import ExternalDataService
+from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
-from DittoWebApi.src.models.object import Object
+from DittoWebApi.src.models.object_information import Object
 
 
 class DataReplicationServiceTest(unittest.TestCase):

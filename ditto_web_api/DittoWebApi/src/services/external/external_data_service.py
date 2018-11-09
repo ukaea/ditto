@@ -1,18 +1,14 @@
 import os
-import re
-from minio import Minio
 from minio.error import NoSuchKey
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
-from DittoWebApi.src.models.bucket import Bucket
-from DittoWebApi.src.models.object import Object
+from DittoWebApi.src.models.bucket_information import Bucket
+from DittoWebApi.src.models.object_information import Object
+from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
 
 
 class ExternalDataService:
     def __init__(self, configuration):
-        self._s3_client = Minio(configuration.s3_url,
-                                configuration.s3_access_key,
-                                configuration.s3_secret_key,
-                                configuration.s3_use_secure)
+        self._s3_client = MinioAdapter(configuration)
         self._bucket_standard = configuration.bucket_standard
 
     def get_buckets(self):
@@ -45,13 +41,6 @@ class ExternalDataService:
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
     def is_valid_bucket(self, bucket_name):
-        if len(bucket_name) > 63:
-            return False
-        if '..' in bucket_name:
-            return False
-        match = re.compile('^[a-z0-9][a-z0-9\\.\\-]+[a-z0-9]$').match(bucket_name)
-        if match is None or match.end() != len(bucket_name):
-            return False
         return bucket_name.split('-')[0] == self._bucket_standard
 
     def delete_file(self, file_name, bucket_name):

@@ -7,7 +7,7 @@ from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.handlers.create_bucket import CreatBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
-from DittoWebApi.src.services.external_data_service import ExternalDataService
+from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
