@@ -67,48 +67,60 @@ class DataReplicationServiceTest(unittest.TestCase):
                                               "size": 100,
                                               "etag": "test_etag",
                                               "last_modified": 2132142421.123123}
-        mock_object_2 = mock.create_autospec(Object)
-        mock_object_2.to_dict.return_value = {"object_name": "test_2",
-                                              "bucket_name": "test_bucket_2",
-                                              "is_dir": False, "size": 100,
-                                              "etag": "test_etag_2",
-                                              "last_modified": 2132142421.123123}
         self.mock_external_data_service.get_objects.return_value = [mock_object_1]
         # Act
-        output = self.test_service.retrieve_object_dicts("test_dir")
+        output = self.test_service.retrieve_object_dicts("test_bucket", "test_dir")
         # Assert
+        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], "test_dir")
         assert output[0] == {"object_name": "test_dir/test",
                              "bucket_name": "test_bucket",
                              "is_dir": False,
                              "size": 100,
                              "etag": "test_etag",
                              "last_modified": 2132142421.123123}
+        assert len(output) == 1
 
     def test_return_bucket_message_correct_when_bucket_name_invalid(self):
+        # Arrange
         self.mock_external_data_service.is_valid_bucket.return_value = False
         bucket_name = "test-1234-"
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"Message": "Bucket name breaks S3 or local naming standard (test-1234-)",
                                     "Name of bucket attempted": "test-1234-"})
 
     def test_create_bucket_return_correct_when_bucket_not_given(self):
+        # Arrange
         bucket_name = None
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"Message": "No bucket name provided",
                                     "Name of bucket attempted": ""})
 
     def test_create_bucket_return_correct_when_bucket_already_exists(self):
+        # Arrange
         bucket_name = 'test-12345'
         self.mock_external_data_service.is_valid_bucket.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = True
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"Message": "Bucket already exists (test-12345)",
                                     "Name of bucket attempted": "test-12345"})
 
     def test_create_bucket_returns_correctly_when_successful(self):
+        # Arrange
         bucket_name = 'test-12345'
         self.mock_external_data_service.is_valid_bucket.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = False
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_called_once_with(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",
                                     "Name of bucket attempted": "test-12345"})
