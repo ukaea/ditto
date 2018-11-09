@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # Set up services
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION)
-    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper())
+    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE, INTERNAL_DATA_SERVICE, LOGGER)
 
     # Launch app

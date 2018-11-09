@@ -1,5 +1,4 @@
 # pylint: disable=W0221,W0223
-import json
 import tornado.web
 from DittoWebApi.src.utils.parse_args import extract_primary_arg
 
