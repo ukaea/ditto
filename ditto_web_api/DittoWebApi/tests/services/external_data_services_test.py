@@ -1,13 +1,16 @@
+# pylint: disable=W0201, W0212
 import unittest
+import datetime
 import mock
 import pytest
-import datetime
+
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
 from DittoWebApi.src.models.bucket_information import Bucket
 from DittoWebApi.src.models.object_information import Object
 from minio.error import NoSuchKey
+
 
 class TestExternalDataServices(unittest.TestCase):
     @pytest.fixture(autouse=True)
