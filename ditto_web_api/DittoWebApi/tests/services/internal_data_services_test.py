@@ -1,4 +1,5 @@
 # pylint: disable=W0201
+import logging
 import unittest
 import mock
 import pytest
@@ -11,6 +12,7 @@ class TestInternalDataServices(unittest.TestCase):
     def setup(self):
         self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         mock_configuration = mock.Mock()
+        self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
         mock_configuration.root_dir = "test_root_dir"
         self.mock_file_system_helper.join_paths.return_value = "test_root_dir/file_1"
         self.mock_file_system_helper.find_all_files_in_folder.return_value = ["test_root_dir/file_1.txt",
@@ -21,7 +23,9 @@ class TestInternalDataServices(unittest.TestCase):
                                                                        "test_root_dir/file_2.txt"]
         self.mock_file_system_helper.file_name.side_effect = ["file_1.txt",
                                                               "file_2.txt"]
-        self.internal_data_services = InternalDataService(mock_configuration, self.mock_file_system_helper)
+        self.internal_data_services = InternalDataService(mock_configuration,
+                                                          self.mock_file_system_helper,
+                                                          self.mock_logger)
 
     def test_find_files_finds_files_in_a_directories(self):
         # Act
@@ -61,3 +65,9 @@ class TestInternalDataServices(unittest.TestCase):
         assert file_information.abs_path == "test_root_dir/file_1.txt"
         assert file_information.rel_path == "file_1.txt"
         assert file_information.file_name == "file_1.txt"
+
+    def test_logger_is_called_when_find_files_is_run(self):
+        self.internal_data_services.find_files("test_root_dir/file_1")
+        assert self.mock_logger.debug.call_count == 2
+        self.mock_logger.debug.assert_any_call("Finding files in directory test_root_dir/file_1")
+        self.mock_logger.debug.assert_any_call("Found 2 files, converting to file information objects")
