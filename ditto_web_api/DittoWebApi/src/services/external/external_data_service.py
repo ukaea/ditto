@@ -40,9 +40,9 @@ class ExternalDataService:
     def create_bucket(self, bucket_name):
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
-    def is_bucket_valid_locally(self, bucket_name):
+    def does_bucket_match_standard(self, bucket_name):
         length_of_bucket_standard = len(self._bucket_standard)
-        return bucket_name[0:(length_of_bucket_standard + 1)] == (self._bucket_standard + "-")
+        return bucket_name[:(length_of_bucket_standard + 1)] == (self._bucket_standard + "-")
 
     def delete_file(self, file_name, bucket_name):
         self._s3_client.remove_object(bucket_name, file_name)

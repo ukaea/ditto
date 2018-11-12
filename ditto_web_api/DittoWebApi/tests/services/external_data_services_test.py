@@ -107,11 +107,11 @@ class TestExternalDataServices:
         assert result is False
 
     @pytest.mark.parametrize("valid_bucket_name", ["test1234", "TEST-1234", "tes", ""])
-    def test_is_bucket_valid_locally_returns_false_if_bucket_name_does_not_agree_with_local_standards(self, valid_bucket_name):
-        assert self.external_data_services.is_bucket_valid_locally(valid_bucket_name) is False
+    def test_does_bucket_match_standard_catches_invalid_bucket_name(self, valid_bucket_name):
+        assert self.external_data_services.does_bucket_match_standard(valid_bucket_name) is False
 
-    def test_is_bucket_valid_locally_returns_true_if_bucket_name_does_agree_with_local_standards(self):
-        assert self.external_data_services.is_bucket_valid_locally("test-1234") is True
+    def test_does_bucket_match_standard_returns_true_if_bucket_name_does_agree_with_local_standards(self):
+        assert self.external_data_services.does_bucket_match_standard("test-1234") is True
 
     def test_does_object_exist_returns_true_when_object_exists(self):
         # Arrange

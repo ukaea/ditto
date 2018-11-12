@@ -46,7 +46,7 @@ class DataReplicationService:
             message = "No bucket name provided"
             self._logger.warning(message)
             return return_bucket_message(message)
-        if not self._external_data_service.is_bucket_valid_locally(bucket_name):
+        if not self._external_data_service.does_bucket_match_standard(bucket_name):
             message = "Bucket breaks local naming standard ({})".format(bucket_name)
             self._logger.info(message)
             return return_bucket_message(message, bucket_name)
