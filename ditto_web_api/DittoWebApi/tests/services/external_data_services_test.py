@@ -3,12 +3,12 @@ import datetime
 import mock
 import pytest
 
+from minio.error import NoSuchKey
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
 from DittoWebApi.src.models.bucket_information import BucketInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
-from minio.error import NoSuchKey
 
 
 class TestExternalDataServices:
