@@ -1,6 +1,7 @@
 from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
+from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 
 
 class DataReplicationService:
@@ -70,7 +71,7 @@ class DataReplicationService:
         if not self._external_data_service.does_object_exist(file_name, target_bucket_name):
             message = "File {} does not exist in bucket {}".format(file_name, target_bucket_name)
             self._logger.warning(message)
-            return message
+            return return_delete_file_helper(message, file_name, target_bucket_name)
         self._external_data_service.delete_file(file_name, target_bucket_name)
         message = "File {}, successfully deleted from bucket {}".format(file_name, target_bucket_name)
-        return message
+        return return_delete_file_helper(message, file_name, target_bucket_name)

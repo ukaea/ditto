@@ -33,7 +33,7 @@ class MinioAdapter:
     def bucket_exists(self, bucket_name):
         return self._s3_client.bucket_exists(bucket_name)
 
-    def stat_object(self, object_name, bucket_name):
+    def stat_object(self, bucket_name, object_name):
         return self._s3_client.stat_object(bucket_name, object_name)
 
     def remove_object(self, object_name, bucket_name):

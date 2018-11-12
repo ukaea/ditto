@@ -124,7 +124,9 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.try_delete_file(file_name)
         # Assert
-        assert response == "File unknown_file does not exist in bucket some-bucket"
+        assert response == {'Bucket containing file': 'some-bucket',
+                            'File attempted to delete': 'unknown_file',
+                            'Message': 'File unknown_file does not exist in bucket some-bucket'}
 
     def test_try_delete_file_returns_confirmation_message_when_file_does_exist(self):
         # Arrange
@@ -136,4 +138,6 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.try_delete_file(file_name)
         # Assert
-        assert response == "File known_file, successfully deleted from bucket some-bucket"
+        assert response == {'Bucket containing file': 'some-bucket',
+                            'File attempted to delete': 'known_file',
+                            'Message': 'File known_file, successfully deleted from bucket some-bucket'}
