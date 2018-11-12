@@ -3,7 +3,7 @@ import unittest
 
 import mock
 
-from DittoWebApi.src.models.object import Object
+from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 
 
 class TestObjects(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestObjects(unittest.TestCase):
         mock_minio_object.size = 100
         mock_minio_object.etag = "test_etag"
         mock_minio_object.last_modified = datetime.datetime(2018, 11, 15)
-        test_object = Object(mock_minio_object)
+        test_object = S3ObjectInformation(mock_minio_object)
         # Act
         output = test_object.to_dict()
         # Assert
