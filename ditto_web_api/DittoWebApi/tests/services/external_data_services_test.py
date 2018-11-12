@@ -6,8 +6,8 @@ import pytest
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
-from DittoWebApi.src.models.bucket_information import Bucket
-from DittoWebApi.src.models.object_information import Object
+from DittoWebApi.src.models.bucket_information import BucketInformation
+from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from minio.error import NoSuchKey
 
 
@@ -24,21 +24,21 @@ class TestExternalDataServices:
         mock_s3_client = mock.create_autospec(MinioAdapter)
         self.external_data_services._s3_client = mock_s3_client
         # Create mock buckets
-        self.mock_bucket_1 = mock.create_autospec(Bucket)
-        self.mock_bucket_2 = mock.create_autospec(Bucket)
-        self.mock_bucket_1.name = "Bucket_1"
+        self.mock_bucket_1 = mock.create_autospec(BucketInformation)
+        self.mock_bucket_2 = mock.create_autospec(BucketInformation)
+        self.mock_bucket_1.name = "bucket1"
         self.mock_bucket_1.creation_date = "17/11/18"
-        self.mock_bucket_2.name = "Bucket_2"
+        self.mock_bucket_2.name = "bucket2"
         self.mock_bucket_2.creation_date = "10/10/18"
         # Create mock s3 objects
-        self.mock_object_1 = mock.create_autospec(Object)
+        self.mock_object_1 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_1.is_dir = False
         self.mock_object_1.object_name = 'mock_object_1'
         self.mock_object_1.bucket_name = 'mock_bucket_1'
         self.mock_object_1.size = 100
         self.mock_object_1.etag = 'test_etag'
         self.mock_object_1.last_modified = datetime.datetime(2018, 10, 11)
-        self.mock_object_2 = mock.create_autospec(Object)
+        self.mock_object_2 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_2.is_dir = False
         self.mock_object_2.object_name = 'mock_object_2'
         self.mock_object_2.bucket_name = 'mock_bucket_1'

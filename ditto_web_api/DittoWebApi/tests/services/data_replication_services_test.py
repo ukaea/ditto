@@ -8,7 +8,7 @@ import pytest
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
-from DittoWebApi.src.models.object_information import Object
+from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 
 
 class DataReplicationServiceTest(unittest.TestCase):
@@ -22,14 +22,14 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects(self):
         # Arrange
-        mock_object_1 = mock.create_autospec(Object)
+        mock_object_1 = mock.create_autospec(S3ObjectInformation)
         mock_object_1.to_dict.return_value = {"object_name": "test",
                                               "bucket_name": "test_bucket",
                                               "is_dir": False,
                                               "size": 100,
                                               "etag": "test_etag",
                                               "last_modified": 2132142421.123123}
-        mock_object_2 = mock.create_autospec(Object)
+        mock_object_2 = mock.create_autospec(S3ObjectInformation)
         mock_object_2.to_dict.return_value = {"object_name": "test_2",
                                               "bucket_name": "test_bucket_2",
                                               "is_dir": False, "size": 100,
@@ -60,14 +60,14 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects_from_sub_dir(self):
         # Arrange
-        mock_object_1 = mock.create_autospec(Object)
+        mock_object_1 = mock.create_autospec(S3ObjectInformation)
         mock_object_1.to_dict.return_value = {"object_name": "test_dir/test",
                                               "bucket_name": "test_bucket",
                                               "is_dir": False,
                                               "size": 100,
                                               "etag": "test_etag",
                                               "last_modified": 2132142421.123123}
-        mock_object_2 = mock.create_autospec(Object)
+        mock_object_2 = mock.create_autospec(S3ObjectInformation)
         mock_object_2.to_dict.return_value = {"object_name": "test_2",
                                               "bucket_name": "test_bucket_2",
                                               "is_dir": False, "size": 100,
