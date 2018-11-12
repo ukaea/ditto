@@ -1,5 +1,4 @@
 # pylint: disable=W0201, W0212
-import unittest
 import datetime
 import mock
 import pytest
@@ -12,7 +11,7 @@ from DittoWebApi.src.models.object_information import Object
 from minio.error import NoSuchKey
 
 
-class TestExternalDataServices(object):
+class TestExternalDataServices:
     @pytest.fixture(autouse=True)
     def setup(self):
         mock_configuration = mock.create_autospec(Configuration)
@@ -73,13 +72,15 @@ class TestExternalDataServices(object):
         assert results[1].name == self.mock_bucket_2.name
         assert results[1].creation_date == self.mock_bucket_2.creation_date
 
+        assert len(results) == 2
+
     def test_get_buckets_returns_empty_list_when_none_exist(self):
         # Arrange
         self.external_data_services._s3_client.list_buckets.return_value = []
         # Act
         result = self.external_data_services.get_buckets()
         # Assert
-        assert result is False
+        assert result == []
 
     def test_get_objects_returns_no_objects_when_none_exist(self):
         # Arrange
@@ -93,12 +94,13 @@ class TestExternalDataServices(object):
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
         self.external_data_services._s3_client.list_objects.return_value = [self.mock_object_1, self.mock_object_2]
-        buckets = [self.mock_bucket_1, self.mock_bucket_2]
+        buckets = [self.mock_bucket_1]
         # Act
         result = self.external_data_services.get_objects(buckets, None)
         # Assert
         assert result[0].object_name == "mock_object_1"
         assert result[1].object_name == "mock_object_2"
+        assert len(result) == 2
 
     def test_does_dir_exist_returns_true_if_item_is_in_directory(self):
         # Arrange
@@ -118,9 +120,9 @@ class TestExternalDataServices(object):
         # Assert
         assert result is False
 
-    @pytest.mark.parametrize("valid_bucket_names", ["test1234", "TEST-1234", "", "tes"])
-    def test_valid_bucket_returns_false_if_bucket_name_does_not_agree_with_local_standards(self, valid_bucket_names):
-        assert self.external_data_services.is_valid_bucket(valid_bucket_names) is False
+    @pytest.mark.parametrize("valid_bucket_name", ["test1234", "TEST-1234", "tes", ""])
+    def test_valid_bucket_returns_false_if_bucket_name_does_not_agree_with_local_standards(self, valid_bucket_name):
+        assert self.external_data_services.is_valid_bucket(valid_bucket_name) is False
 
     def test_valid_bucket_returns_true_if_bucket_name_does_agree_with_local_standards(self):
         assert self.external_data_services.is_valid_bucket("test-1234") is True
