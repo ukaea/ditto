@@ -1,4 +1,4 @@
-from DittoWebApi.src.models.fileinformation import FileInformation
+from DittoWebApi.src.models.file_information import FileInformation
 
 
 class InternalDataService:
