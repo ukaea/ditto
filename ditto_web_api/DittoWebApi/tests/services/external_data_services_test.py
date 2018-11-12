@@ -130,13 +130,20 @@ class TestExternalDataServices:
         assert result is False
 
     def test_delete_file_returns_true_when_successful(self):
+        # Arrange
         self.external_data_services._s3_client.remove_object.return_value = True
         file_name = "some_file"
         bucket_name = "some_bucket"
-        assert self.external_data_services.delete_file(file_name, bucket_name) is True
+        # Act
+        response = self.external_data_services.delete_file(file_name, bucket_name)
+        assert response is True
 
     def test_delete_file_returns_false_when_unsuccessful(self):
+        # Arrange
         self.external_data_services._s3_client.remove_object.return_value = False
         file_name = "some_file"
         bucket_name = "some_bucket"
-        assert self.external_data_services.delete_file(file_name, bucket_name) is False
+        # Act
+        response = self.external_data_services.delete_file(file_name, bucket_name)
+        # Assert
+        assert response is False
