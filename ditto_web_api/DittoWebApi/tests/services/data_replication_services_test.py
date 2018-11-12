@@ -5,6 +5,7 @@ import unittest
 import mock
 import pytest
 
+from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.services.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
@@ -127,3 +128,44 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.create_bucket.assert_called_once_with(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",
                                     "Name of bucket attempted": "test-12345"})
+
+    def test_copy_dir_does_not_upload_if_no_local_files_found(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        self.mock_internal_data_service.find_files.return_value = []
+        # Act
+        self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        self.mock_external_data_service.upload_file.assert_not_called()
+
+    def test_copy_dir_does_not_upload_if_no_s3_dir_already_exists(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        self.mock_internal_data_service.find_files.return_value = [
+            FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
+        ]
+        self.mock_external_data_service.does_dir_exist.return_value = True
+        # Act
+        self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        self.mock_external_data_service.upload_file.assert_not_called()
+
+    def test_copy_dir_uploads_single_file_in_new_dir(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        self.mock_internal_data_service.find_files.return_value = [
+            FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
+        ]
+        self.mock_external_data_service.does_dir_exist.return_value = False
+        self.mock_external_data_service.upload_file.return_value = 42
+        # Act
+        response = self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        self.mock_external_data_service.upload_file.assert_called_once()
+        assert response["Files transferred"] == 1
+        assert response["Data transferred (bytes)"] == 42
+
+
