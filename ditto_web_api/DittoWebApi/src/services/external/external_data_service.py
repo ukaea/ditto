@@ -44,10 +44,10 @@ class ExternalDataService:
         length_of_bucket_standard = len(self._bucket_standard)
         return bucket_name[:(length_of_bucket_standard + 1)] == (self._bucket_standard + "-")
 
-    def delete_file(self, file_name, bucket_name):
+    def delete_file(self, bucket_name, file_name):
         self._s3_client.remove_object(bucket_name, file_name)
 
-    def does_object_exist(self, file_name, bucket_name):
+    def does_object_exist(self, bucket_name, file_name):
         try:
             self._s3_client.stat_object(bucket_name, file_name)
             return True
