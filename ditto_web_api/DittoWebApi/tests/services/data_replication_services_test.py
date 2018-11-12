@@ -9,6 +9,7 @@ from DittoWebApi.src.services.external.external_data_service import ExternalData
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
+from DittoWebApi.src.models.bucket_information import BucketInformation
 
 
 class DataReplicationServiceTest(unittest.TestCase):
@@ -112,3 +113,27 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",
                                     "Name of bucket attempted": "test-12345"})
+
+    def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):
+        # Arrange
+        file_name = "unknown_file"
+        mock_bucket = mock.create_autospec(BucketInformation)
+        mock_bucket.name = "some-bucket"
+        self.mock_external_data_service.get_buckets.return_value = [mock_bucket]
+        self.mock_external_data_service.does_object_exist.return_value = False
+        # Act
+        response = self.test_service.try_delete_file(file_name)
+        # Assert
+        assert response == "File unknown_file does not exist in bucket some-bucket"
+
+    def test_try_delete_file_returns_confirmation_message_when_file_does_exist(self):
+        # Arrange
+        file_name = "known_file"
+        mock_bucket = mock.create_autospec(BucketInformation)
+        mock_bucket.name = "some-bucket"
+        self.mock_external_data_service.get_buckets.return_value = [mock_bucket]
+        self.mock_external_data_service.does_object_exist.return_value = True
+        # Act
+        response = self.test_service.try_delete_file(file_name)
+        # Assert
+        assert response == "File known_file, successfully deleted from bucket some-bucket"
