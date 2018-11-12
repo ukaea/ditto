@@ -12,7 +12,7 @@ from DittoWebApi.src.models.object_information import Object
 from minio.error import NoSuchKey
 
 
-class TestExternalDataServices(unittest.TestCase):
+class TestExternalDataServices(object):
     @pytest.fixture(autouse=True)
     def setup(self):
         mock_configuration = mock.create_autospec(Configuration)
@@ -24,12 +24,14 @@ class TestExternalDataServices(unittest.TestCase):
         self.external_data_services = ExternalDataService(mock_configuration)
         mock_s3_client = mock.create_autospec(MinioAdapter)
         self.external_data_services._s3_client = mock_s3_client
+        # Create mock buckets
         self.mock_bucket_1 = mock.create_autospec(Bucket)
         self.mock_bucket_2 = mock.create_autospec(Bucket)
         self.mock_bucket_1.name = "Bucket_1"
         self.mock_bucket_1.creation_date = "17/11/18"
         self.mock_bucket_2.name = "Bucket_2"
         self.mock_bucket_2.creation_date = "10/10/18"
+        # Create mock s3 objects
         self.mock_object_1 = mock.create_autospec(Object)
         self.mock_object_1.is_dir = False
         self.mock_object_1.object_name = 'mock_object_1'
@@ -45,30 +47,19 @@ class TestExternalDataServices(unittest.TestCase):
         self.mock_object_2.etag = 'test_etag'
         self.mock_object_2.last_modified = datetime.datetime(2018, 8, 10)
 
-    def test_valid_bucket_names_are_accepted_by_is_valid_bucket(self):
-        # Arrange
-        bucket_name_1 = "test-123esj"
-        bucket_name_2 = "test--.123esjs"
+    @pytest.mark.parametrize("bucket_name", ["test-123esj", "test--.123esjs"])
+    def test_valid_bucket_names_are_accepted_by_is_valid_bucket(self, bucket_name):
         # Act
-        valid_1 = self.external_data_services.is_valid_bucket(bucket_name_1)
-        valid_2 = self.external_data_services.is_valid_bucket(bucket_name_2)
+        valid = self.external_data_services.is_valid_bucket(bucket_name)
         # Assert
-        assert valid_1
-        assert valid_2
+        assert valid is True
 
-    def test_invalid_bucket_names_are_rejected_by_is_valid_bucket(self):
-        # Arrange
-        bucket_name_1 = "test123esj--in-wrong-place"
-        bucket_name_2 = "badstart-112e2"
-        bucket_name_3 = ""
+    @pytest.mark.parametrize("bucket_name", ["test123esj--in-wrong-place", "badstart-112e2", ""])
+    def test_invalid_bucket_names_are_rejected_by_is_valid_bucket(self, bucket_name):
         # Act
-        valid_1 = self.external_data_services.is_valid_bucket(bucket_name_1)
-        valid_2 = self.external_data_services.is_valid_bucket(bucket_name_2)
-        valid_3 = self.external_data_services.is_valid_bucket(bucket_name_3)
+        valid = self.external_data_services.is_valid_bucket(bucket_name)
         # Assert
-        assert not valid_1
-        assert not valid_2
-        assert not valid_3
+        assert valid is False
 
     def test_get_buckets_returns_list_of_buckets_when_they_exist(self):
         # Arrange
@@ -83,53 +74,69 @@ class TestExternalDataServices(unittest.TestCase):
         assert results[1].creation_date == self.mock_bucket_2.creation_date
 
     def test_get_buckets_returns_empty_list_when_none_exist(self):
-        # Act
+        # Arrange
         self.external_data_services._s3_client.list_buckets.return_value = []
+        # Act
+        result = self.external_data_services.get_buckets()
         # Assert
-        assert not self.external_data_services.get_buckets()
+        assert result is False
 
     def test_get_objects_returns_no_objects_when_none_exist(self):
         # Arrange
         self.external_data_services._s3_client.list_objects.return_value = []
         buckets = [self.mock_bucket_1, self.mock_bucket_2]
+        # Act
+        result = self.external_data_services.get_objects(buckets, None)
         # Assert
-        assert not self.external_data_services.get_objects(buckets, None)
+        assert result == []
 
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
         self.external_data_services._s3_client.list_objects.return_value = [self.mock_object_1, self.mock_object_2]
         buckets = [self.mock_bucket_1, self.mock_bucket_2]
+        # Act
+        result = self.external_data_services.get_objects(buckets, None)
         # Assert
-        assert self.external_data_services.get_objects(buckets, None)[0].object_name == "mock_object_1"
-        assert self.external_data_services.get_objects(buckets, None)[1].object_name == "mock_object_2"
+        assert result[0].object_name == "mock_object_1"
+        assert result[1].object_name == "mock_object_2"
 
     def test_does_dir_exist_returns_true_if_item_is_in_directory(self):
         # Arrange
         bucket = self.mock_bucket_1
-        # Act
         self.external_data_services._s3_client.list_objects.return_value = [self.mock_object_1]
+        # Act
+        result = self.external_data_services.does_dir_exist(None, bucket)
         # Assert
-        assert self.external_data_services.does_dir_exist(None, bucket)
+        assert result is True
 
     def test_does_dir_exist_returns_false_if_directory_is_empty(self):
         # Arrange
         bucket = self.mock_bucket_1
-        # Act
         self.external_data_services._s3_client.list_objects.return_value = []
+        # Act
+        result = self.external_data_services.does_dir_exist(None, bucket)
         # Assert
-        assert not self.external_data_services.does_dir_exist(None, bucket)
+        assert result is False
 
-    def test_valid_bucket_returns_true_if_bucket_name_agrees_with_local_standards(self):
-        assert self.external_data_services.is_valid_bucket("test-1234")
-        assert not self.external_data_services.is_valid_bucket("test1234")
-        assert not self.external_data_services.is_valid_bucket("TEST-1234")
-        assert not self.external_data_services.is_valid_bucket("")
-        assert not self.external_data_services.is_valid_bucket("tes")
+    @pytest.mark.parametrize("valid_bucket_names", ["test1234", "TEST-1234", "", "tes"])
+    def test_valid_bucket_returns_false_if_bucket_name_does_not_agree_with_local_standards(self, valid_bucket_names):
+        assert self.external_data_services.is_valid_bucket(valid_bucket_names) is False
+
+    def test_valid_bucket_returns_true_if_bucket_name_does_agree_with_local_standards(self):
+        assert self.external_data_services.is_valid_bucket("test-1234") is True
 
     def test_does_object_exist_returns_true_when_object_exists(self):
+        # Arrange
         self.external_data_services._s3_client.stat_object.return_value = ["Okay"]
-        assert self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
+        # Act
+        result = self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
+        # Assert
+        assert result is True
 
     def test_does_object_exist_returns_false_when_object_does_not_exist(self):
+        # Arrange
         self.external_data_services._s3_client.stat_object.side_effect = NoSuchKey(1212)
-        assert not self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
+        # Act
+        result = self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
+        # Assert
+        assert result is False
