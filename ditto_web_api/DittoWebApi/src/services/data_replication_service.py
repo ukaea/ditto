@@ -1,6 +1,6 @@
+from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
-from minio.error import InvalidBucketError
 
 
 class DataReplicationService:
