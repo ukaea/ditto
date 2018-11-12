@@ -128,3 +128,15 @@ class TestExternalDataServices:
         result = self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
         # Assert
         assert result is False
+
+    def test_delete_file_returns_true_when_successful(self):
+        self.external_data_services._s3_client.remove_object.return_value = True
+        file_name = "some_file"
+        bucket_name = "some_bucket"
+        assert self.external_data_services.delete_file(file_name, bucket_name) is True
+
+    def test_delete_file_returns_false_when_unsuccessful(self):
+        self.external_data_services._s3_client.remove_object.return_value = False
+        file_name = "some_file"
+        bucket_name = "some_bucket"
+        assert self.external_data_services.delete_file(file_name, bucket_name) is False
