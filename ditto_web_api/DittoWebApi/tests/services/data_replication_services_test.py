@@ -85,7 +85,7 @@ class DataReplicationServiceTest(unittest.TestCase):
                              "last_modified": 2132142421.123123}
 
     def test_return_bucket_message_correct_when_bucket_name_invalid(self):
-        self.mock_external_data_service.is_valid_bucket.return_value = False
+        self.mock_external_data_service.is_bucket_valid_locally.return_value = False
         bucket_name = "test-1234-"
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket breaks local naming standard (test-1234-)",
@@ -99,7 +99,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_create_bucket_return_correct_when_bucket_already_exists(self):
         bucket_name = 'test-12345'
-        self.mock_external_data_service.is_valid_bucket.return_value = True
+        self.mock_external_data_service.is_bucket_valid_locally.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = True
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket already exists (test-12345)",
@@ -107,7 +107,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_create_bucket_returns_correctly_when_successful(self):
         bucket_name = 'test-12345'
-        self.mock_external_data_service.is_valid_bucket.return_value = True
+        self.mock_external_data_service.is_bucket_valid_locally.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = False
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",

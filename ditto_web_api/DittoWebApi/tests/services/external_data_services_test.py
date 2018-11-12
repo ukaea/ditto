@@ -46,20 +46,6 @@ class TestExternalDataServices:
         self.mock_object_2.etag = 'test_etag'
         self.mock_object_2.last_modified = datetime.datetime(2018, 8, 10)
 
-    @pytest.mark.parametrize("bucket_name", ["test-123esj", "test--.123esjs"])
-    def test_valid_bucket_names_are_accepted_by_is_valid_bucket(self, bucket_name):
-        # Act
-        valid = self.external_data_services.is_valid_bucket(bucket_name)
-        # Assert
-        assert valid is True
-
-    @pytest.mark.parametrize("bucket_name", ["test123esj--in-wrong-place", "badstart-112e2", ""])
-    def test_invalid_bucket_names_are_rejected_by_is_valid_bucket(self, bucket_name):
-        # Act
-        valid = self.external_data_services.is_valid_bucket(bucket_name)
-        # Assert
-        assert valid is False
-
     def test_get_buckets_returns_list_of_buckets_when_they_exist(self):
         # Arrange
         self.external_data_services._s3_client.list_buckets.return_value = [self.mock_bucket_1, self.mock_bucket_2]
@@ -121,11 +107,11 @@ class TestExternalDataServices:
         assert result is False
 
     @pytest.mark.parametrize("valid_bucket_name", ["test1234", "TEST-1234", "tes", ""])
-    def test_valid_bucket_returns_false_if_bucket_name_does_not_agree_with_local_standards(self, valid_bucket_name):
-        assert self.external_data_services.is_valid_bucket(valid_bucket_name) is False
+    def test_is_bucket_valid_locally_returns_false_if_bucket_name_does_not_agree_with_local_standards(self, valid_bucket_name):
+        assert self.external_data_services.is_bucket_valid_locally(valid_bucket_name) is False
 
-    def test_valid_bucket_returns_true_if_bucket_name_does_agree_with_local_standards(self):
-        assert self.external_data_services.is_valid_bucket("test-1234") is True
+    def test_is_bucket_valid_locally_returns_true_if_bucket_name_does_agree_with_local_standards(self):
+        assert self.external_data_services.is_bucket_valid_locally("test-1234") is True
 
     def test_does_object_exist_returns_true_when_object_exists(self):
         # Arrange

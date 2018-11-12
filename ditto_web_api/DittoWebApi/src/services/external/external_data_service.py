@@ -40,7 +40,7 @@ class ExternalDataService:
     def create_bucket(self, bucket_name):
         self._s3_client.make_bucket(bucket_name, location="eu-west-1")
 
-    def is_valid_bucket(self, bucket_name):
+    def is_bucket_valid_locally(self, bucket_name):
         length_of_bucket_standard = len(self._bucket_standard)
         return bucket_name[0:(length_of_bucket_standard + 1)] == (self._bucket_standard + "-")
 
