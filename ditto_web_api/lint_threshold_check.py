@@ -13,3 +13,4 @@ if score < THRESHOLD:
     print("exit code = 1")
     sys.exit(1)
 print("exit code = 0")
+print("Passed with threshold level set at {}".format(THRESHOLD))
