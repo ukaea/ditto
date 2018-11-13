@@ -1,5 +1,4 @@
 # pylint: disable=W0221,W0223
-import tornado.web
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
 
@@ -29,11 +28,12 @@ class DeleteFileHandler(APIHandler):
                 "Bucket containing file": {"type": "string"},
             }
         },
-        output_example={"type": "object",
-                        "properties": {
-                            "Message": "File path_to_file/file_name, successfully deleted from bucket test-bucket-name",
-                            "File attempted to delete": "path_to_file/file_name",
-                            "Bucket containing file": "test-bucket-name",
+        output_example={
+            "type": "object",
+            "properties": {
+                "Message": "File path_to_file/file_name, successfully deleted from bucket test-bucket-name",
+                "File attempted to delete": "path_to_file/file_name",
+                "Bucket containing file": "test-bucket-name",
             }
         }
     )

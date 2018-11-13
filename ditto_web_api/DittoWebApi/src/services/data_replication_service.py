@@ -25,7 +25,7 @@ class DataReplicationService:
             self._logger.warning(message)
             return return_dict(message=message)
         # route if files have been found
-        if self._external_data_service.does_dir_exist(dir_path, bucket_name):
+        if self._external_data_service.does_dir_exist(bucket_name, dir_path):
             skipped_files = len(files_to_copy)
             message = "Directory already exists, {} files skipped".format(skipped_files)
             self._logger.warning(message)
@@ -34,7 +34,7 @@ class DataReplicationService:
         self._logger.info("About to copy {} files".format(len(files_to_copy)))
         data_transferred = 0
         for processed_file in files_to_copy:
-            data_transferred += self._external_data_service.upload_file(processed_file, bucket_name)
+            data_transferred += self._external_data_service.upload_file(bucket_name, processed_file)
         message = "Copied across {} files totaling {} bytes".format(len(files_to_copy), data_transferred)
         return return_dict(files_transferred=len(files_to_copy), data_transferred=data_transferred, message=message)
 

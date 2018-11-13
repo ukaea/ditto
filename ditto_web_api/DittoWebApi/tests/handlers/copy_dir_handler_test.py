@@ -16,6 +16,7 @@ def app():
     ])
     return application
 
+
 @pytest.mark.gen_test
 def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, base_url):
     # Arrange
@@ -37,6 +38,7 @@ def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, b
                                      'Files skipped': 0,
                                      'Data transferred (bytes)': 100}
 
+
 @pytest.mark.gen_test
 def test_post_returns_summary_of_failed_transfer_as_json(http_client, base_url):
     # Arrange
@@ -57,4 +59,3 @@ def test_post_returns_summary_of_failed_transfer_as_json(http_client, base_url):
                                      'Files updated': 0,
                                      'Files skipped': 5,
                                      'Data transferred (bytes)': 0}
-

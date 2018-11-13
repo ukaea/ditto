@@ -167,5 +167,3 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.upload_file.assert_called_once()
         assert response["Files transferred"] == 1
         assert response["Data transferred (bytes)"] == 42
-
-
