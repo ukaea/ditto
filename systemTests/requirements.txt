@@ -1,0 +1,10 @@
+flake8
+minio
+mock
+psutil
+pylint
+pytest
+pytest-cov
+pytest-mock
+pytest-tornado
+tornado
