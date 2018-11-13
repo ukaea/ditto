@@ -24,7 +24,7 @@ class CopyDirHandler(APIHandler):
             "type": "object",
             "properties": {
                 "message": {"type": "string"},
-                "files transferred": {"type": "integer"},
+                "new files transferred": {"type": "integer"},
                 "files updated": {"type": "integer"},
                 "files skipped": {"type": "integer"},
                 "data transferred (bytes)": {"type": "integer"},
@@ -34,7 +34,7 @@ class CopyDirHandler(APIHandler):
             "type": "object",
             "properties": {
                 "message": "Transfer successful",
-                "files transferred": 1,
+                "new files transferred": 1,
                 "files updated": 0,
                 "files skipped": 0,
                 "data transferred (bytes)": 1000,

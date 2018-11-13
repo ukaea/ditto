@@ -21,7 +21,7 @@ def app():
 def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, base_url):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.copy_dir.return_value = {"message": "Transfer successful",
-                                                           "files transferred": 1,
+                                                           "new files transferred": 1,
                                                            "files updated": 0,
                                                            "files skipped": 0,
                                                            "data transferred (bytes)": 100}
@@ -33,7 +33,7 @@ def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, b
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
     assert response_body["data"] == {'message': 'Transfer successful',
-                                     'files transferred': 1,
+                                     'new files transferred': 1,
                                      'files updated': 0,
                                      'files skipped': 0,
                                      'data transferred (bytes)': 100}
@@ -43,7 +43,7 @@ def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, b
 def test_post_returns_summary_of_failed_transfer_as_json(http_client, base_url):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.copy_dir.return_value = {"message": "Directory already exists, 5 files skipped",
-                                                           "files transferred": 0,
+                                                           "new files transferred": 0,
                                                            "files updated": 0,
                                                            "files skipped": 5,
                                                            "data transferred (bytes)": 0}
@@ -55,7 +55,7 @@ def test_post_returns_summary_of_failed_transfer_as_json(http_client, base_url):
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
     assert response_body["data"] == {'message': 'Directory already exists, 5 files skipped',
-                                     'files transferred': 0,
+                                     'new files transferred': 0,
                                      'files updated': 0,
                                      'files skipped': 5,
                                      'data transferred (bytes)': 0}
