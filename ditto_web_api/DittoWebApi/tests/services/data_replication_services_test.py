@@ -7,7 +7,7 @@ import pytest
 
 from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
-from DittoWebApi.src.services.data_replication_service import DataReplicationService
+from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.models.bucket_information import BucketInformation

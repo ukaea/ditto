@@ -2,7 +2,7 @@ import json
 import mock
 import pytest
 import tornado.web
-from DittoWebApi.src.services.data_replication_service import DataReplicationService
+from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 
 

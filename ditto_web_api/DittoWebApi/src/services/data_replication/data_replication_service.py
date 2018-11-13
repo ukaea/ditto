@@ -2,6 +2,7 @@ from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
+from DittoWebApi.src.services.data_replication import storage_difference_processor
 
 
 class DataReplicationService:
@@ -74,4 +75,17 @@ class DataReplicationService:
         return return_delete_file_helper(message, file_name, bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
-        pass
+        self._logger
+        files_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
+        files_in_directory = self._internal_data_service.find_files(dir_path)
+        files_to_transfer = storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
+        data_transferred = 0
+        for file in files_to_transfer:
+            data_transferred += self._external_data_service.upload_file(bucket_name, file)
+        message = "Transfer successful, copied {} files totalling {} bytes".format(len(files_to_transfer),
+                                                                                   data_transferred)
+        self._logger.info(message)
+        return return_dict(files_transferred=len(files_to_transfer),
+                           files_skipped=(len(files_in_directory)-len(files_to_transfer)),
+                           data_transferred=data_transferred,
+                           message=message)
