@@ -14,6 +14,7 @@ class Configuration:
 
         # Logging
         self._log_folder_location = None
+        self._logging_level = "NOTSET"
 
         # S3 client
         self._s3_url = None
@@ -29,6 +30,10 @@ class Configuration:
     @property
     def log_folder_location(self):
         return self._log_folder_location
+
+    @property
+    def logging_level(self):
+        return self._logging_level
 
     @property
     def s3_url(self):
@@ -50,6 +55,10 @@ class Configuration:
     def root_dir(self):
         return self._root_dir
 
+    @property
+    def bucket_standard(self):
+        return self._bucket_standard
+
     def _parse(self, path):
         config = configparser.ConfigParser()
         config.read(path)
@@ -57,6 +66,7 @@ class Configuration:
 
         # Logging
         self._log_folder_location = self.get_directory(settings, "LogFolderLocation")
+        self._logging_level = settings["LoggingLevel"]
 
         # S3 client
         self._s3_url = settings['S3Address']
@@ -66,6 +76,7 @@ class Configuration:
 
         # Local data
         self._root_dir = os.path.abspath(settings['RootDirectory'])
+        self._bucket_standard = settings['BucketStandardisation']
 
     @staticmethod
     def get_directory(settings, key):

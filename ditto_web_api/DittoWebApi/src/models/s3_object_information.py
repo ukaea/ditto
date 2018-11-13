@@ -1,4 +1,4 @@
-class Object:
+class S3ObjectInformation:
 
     def __init__(self, minio_object):
         self._minio_object = minio_object

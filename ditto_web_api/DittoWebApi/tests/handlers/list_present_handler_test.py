@@ -11,7 +11,7 @@ MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
 @pytest.fixture(autouse=True)
 def app():
     application = tornado.web.Application([
-        (r"/", ListPresentHandler, dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE))
+        (r"/(.*)", ListPresentHandler, dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE))
     ])
     return application
 

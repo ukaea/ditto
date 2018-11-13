@@ -1,4 +1,4 @@
-class Bucket:
+class BucketInformation:
 
     def __init__(self, minio_bucket):
         self._minio_bucket = minio_bucket
