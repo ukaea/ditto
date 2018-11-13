@@ -16,23 +16,22 @@ class SystemTestContext:
     def __init__(self):
         self.execution_folder_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + '/../execution_space/')
 
-        self.gridftp_process = None
-        self.ftp_client = None
+        self.ditto_api_process = None
 
         self.console_logger = ProcessLogger('console')
 
     def clean_up(self):
         print('cleaning up test')
         self.console_logger.clean_up()
-        self.shut_down_gridftp()
+        self.shut_down_ditto_api()
 
-    def shut_down_gridftp(self):
-      if self.gridftp_process is not None:
-        gridftp_processes = [p.info for p in psutil.process_iter(attrs=['pid', 'name']) if 'globus-gridftp-server' in p.info['name']]
-        for gridftp_proc in gridftp_processes:
-          os.kill(gridftp_proc['pid'], signal.SIGTERM)
+    def shut_down_ditto_api(self):
+      if self.ditto_api_process is not None:
+        #gridftp_processes = [p.info for p in psutil.process_iter(attrs=['pid', 'name']) if 'globus-gridftp-server' in p.info['name']]
+        #for gridftp_proc in gridftp_processes:
+        #  os.kill(gridftp_proc['pid'], signal.SIGTERM)
 
-        self.gridftp_process = None
+        self.ditto_api_process = None
 
 
 class BaseSystemTest(unittest.TestCase):
@@ -43,6 +42,7 @@ class BaseSystemTest(unittest.TestCase):
         self.context = SystemTestContext()
 
         self._clean_up_working_folders()
+
         self._set_up_loggers()
 
         self.given = GivenSteps(self.context)
@@ -56,8 +56,10 @@ class BaseSystemTest(unittest.TestCase):
 
     def _clean_up_working_folders(self):
         # clear out the old logs
-        shutil.rmtree(self.context.execution_folder_path + '/logs')
-        os.makedirs(self.context.execution_folder_path + '/logs')
+
+        #the following two lines should probably be uncommented but, when they are,the first test gets an error
+        #shutil.rmtree(self.context.execution_folder_path + '/logs')
+        #os.makedirs(self.context.execution_folder_path + '/logs')
 
         shutil.rmtree(self.context.execution_folder_path + '/testing_area')
         os.makedirs(self.context.execution_folder_path + '/testing_area/src')
