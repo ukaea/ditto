@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+
 class IS3Adapter(metaclass=ABCMeta):
     @abstractmethod
     def list_buckets(self):

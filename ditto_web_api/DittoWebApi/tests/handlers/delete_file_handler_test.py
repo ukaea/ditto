@@ -22,8 +22,8 @@ def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_cl
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"Message": "File some_file.txt, successfully deleted"
                                                                              " from bucket bucket_1",
-                                                                             "File": "some_file.txt",
-                                                                             "Bucket": "bucket_1"}
+                                                                  "File": "some_file.txt",
+                                                                  "Bucket": "bucket_1"}
     # Act
     url = base_url + "/deletefile/"
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})
@@ -41,8 +41,8 @@ def test_delete_returns_summary_of_failed_delete_as_json_when_unsuccessful(http_
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"Message": "File some_file.txt does not exist in "
                                                                              "bucket bucket_1",
-                                                                             "File": "some_file.txt",
-                                                                             "Bucket": "bucket_1"}
+                                                                  "File": "some_file.txt",
+                                                                  "Bucket": "bucket_1"}
     # Act
     url = base_url + "/deletefile/"
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})

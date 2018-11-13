@@ -177,7 +177,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_buckets.return_value = [mock_bucket]
         self.mock_external_data_service.does_object_exist.return_value = False
         # Act
-        response = self.test_service.try_delete_file(file_name)
+        response = self.test_service.try_delete_file(mock_bucket.name, file_name)
         # Assert
         assert response == {'Bucket': 'some-bucket',
                             'File': 'unknown_file',
@@ -191,7 +191,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_buckets.return_value = [mock_bucket]
         self.mock_external_data_service.does_object_exist.return_value = True
         # Act
-        response = self.test_service.try_delete_file(file_name)
+        response = self.test_service.try_delete_file(mock_bucket.name, file_name)
         # Assert
         assert response == {'Bucket': 'some-bucket',
                             'File': 'known_file',
