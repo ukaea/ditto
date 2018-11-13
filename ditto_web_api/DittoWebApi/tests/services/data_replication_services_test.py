@@ -140,7 +140,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         self.mock_external_data_service.upload_file.assert_not_called()
 
-    def test_copy_dir_does_not_upload_if_no_s3_dir_already_exists(self):
+    def test_copy_dir_does_not_upload_if_s3_dir_already_exists(self):
         # Arrange
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
@@ -168,6 +168,22 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.upload_file.assert_called_once()
         assert response["Files transferred"] == 1
         assert response["Data transferred (bytes)"] == 42
+
+    def test_copy_dir_uploads_files_from_sub_dir_in_new_dir(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
+        file_2 = FileInformation("/home/test/sub_1/test2.txt", "sub_1/test2.txt", "test2.txt")
+        self.mock_internal_data_service.find_files.return_value = [file_1, file_2]
+        self.mock_external_data_service.does_dir_exist.return_value = False
+        self.mock_external_data_service.upload_file.return_value = 44
+        # Act
+        response = self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        assert self.mock_external_data_service.upload_file.call_count == 2
+        assert response["Files transferred"] == 2
+        assert response["Data transferred (bytes)"] == 88
 
     def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):
         # Arrange
