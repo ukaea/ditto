@@ -27,5 +27,5 @@ class IS3Adapter(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def remove_object(self, object_name, bucket_name):
+    def remove_object(self, bucket_name, object_name):
         pass

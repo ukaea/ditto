@@ -66,7 +66,7 @@ class DataReplicationService:
         if not self._external_data_service.does_object_exist(bucket_name, file_name):
             message = "File {} does not exist in bucket {}".format(file_name, bucket_name)
             self._logger.warning(message)
-            return return_delete_file_helper(message, file_name, target_bucket_name)
-        self._external_data_service.delete_file(file_name, target_bucket_name)
-        message = "File {} successfully deleted from bucket {}".format(file_name, target_bucket_name)
-        return return_delete_file_helper(message, file_name, target_bucket_name)
+            return return_delete_file_helper(message, file_name, bucket_name)
+        self._external_data_service.delete_file(bucket_name, file_name)
+        message = "File {} successfully deleted from bucket {}".format(file_name, bucket_name)
+        return return_delete_file_helper(message, file_name, bucket_name)

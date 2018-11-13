@@ -37,7 +37,7 @@ class MinioAdapter(IS3Adapter):
     def stat_object(self, bucket_name, object_name):
         return self._s3_client.stat_object(bucket_name, object_name)
 
-    def remove_object(self, object_name, bucket_name):
+    def remove_object(self, bucket_name, object_name):
         try:
             self._s3_client.remove_object(bucket_name, object_name)
             return True
