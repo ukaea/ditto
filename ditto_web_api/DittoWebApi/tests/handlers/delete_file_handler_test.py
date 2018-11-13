@@ -20,10 +20,10 @@ def app():
 @pytest.mark.gen_test
 def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"Message": "File some_file.txt, successfully deleted"
+    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"message": "File some_file.txt, successfully deleted"
                                                                              " from bucket bucket_1",
-                                                                  "File": "some_file.txt",
-                                                                  "Bucket": "bucket_1"}
+                                                                  "file": "some_file.txt",
+                                                                  "bucket": "bucket_1"}
     # Act
     url = base_url + "/deletefile/"
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})
@@ -31,18 +31,18 @@ def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_cl
     # Assert
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
-    assert response_body["data"] == {'Message': 'File some_file.txt, successfully deleted from bucket bucket_1',
-                                     'File': 'some_file.txt',
-                                     'Bucket': 'bucket_1'}
+    assert response_body["data"] == {'message': 'File some_file.txt, successfully deleted from bucket bucket_1',
+                                     'file': 'some_file.txt',
+                                     'bucket': 'bucket_1'}
 
 
 @pytest.mark.gen_test
 def test_delete_returns_summary_of_failed_delete_as_json_when_unsuccessful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"Message": "File some_file.txt does not exist in "
+    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"message": "File some_file.txt does not exist in "
                                                                              "bucket bucket_1",
-                                                                  "File": "some_file.txt",
-                                                                  "Bucket": "bucket_1"}
+                                                                  "file": "some_file.txt",
+                                                                  "bucket": "bucket_1"}
     # Act
     url = base_url + "/deletefile/"
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})
@@ -50,6 +50,6 @@ def test_delete_returns_summary_of_failed_delete_as_json_when_unsuccessful(http_
     # Assert
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
-    assert response_body["data"] == {'Message': 'File some_file.txt does not exist in bucket bucket_1',
-                                     'File': 'some_file.txt',
-                                     'Bucket': 'bucket_1'}
+    assert response_body["data"] == {'message': 'File some_file.txt does not exist in bucket bucket_1',
+                                     'file': 'some_file.txt',
+                                     'bucket': 'bucket_1'}

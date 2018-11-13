@@ -20,8 +20,8 @@ def app():
 @pytest.mark.gen_test
 def test_create_bucket_returns_summary_of_new_bucket_when_successful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = {"Message": "Bucket Created (some-bucket)",
-                                                                "Bucket": "some-bucket"}
+    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = {"message": "Bucket Created (some-bucket)",
+                                                                "bucket": "some-bucket"}
     # Act
     url = base_url + "/createbucket/"
     body = json.dumps({'bucket': "bucket_1"})
@@ -29,15 +29,15 @@ def test_create_bucket_returns_summary_of_new_bucket_when_successful(http_client
     # Assert
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
-    assert response_body["data"] == {'Message': 'Bucket Created (some-bucket)',
-                                     'Bucket': 'some-bucket'}
+    assert response_body["data"] == {'message': 'Bucket Created (some-bucket)',
+                                     'bucket': 'some-bucket'}
 
 
 @pytest.mark.gen_test
 def test_create_bucket_returns_summary_of_failure_when_bucket_already_exists(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = {"Message": "Bucket already exists (some-bucket)",
-                                                                "Bucket": "some-bucket"}
+    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = {"message": "Bucket already exists (some-bucket)",
+                                                                "bucket": "some-bucket"}
     # Act
     url = base_url + "/createbucket/"
     body = json.dumps({'bucket': "bucket_1"})
@@ -45,5 +45,5 @@ def test_create_bucket_returns_summary_of_failure_when_bucket_already_exists(htt
     # Assert
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
-    assert response_body["data"] == {'Message': 'Bucket already exists (some-bucket)',
-                                     'Bucket': 'some-bucket'}
+    assert response_body["data"] == {'message': 'Bucket already exists (some-bucket)',
+                                     'bucket': 'some-bucket'}

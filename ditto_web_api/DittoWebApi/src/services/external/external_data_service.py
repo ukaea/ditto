@@ -26,8 +26,7 @@ class ExternalDataService:
         objects = [obj for obj in self._s3_client.list_objects(bucket, dir_path)]
         return len(objects) > 0
 
-    def upload_file(self, target_bucket, processed_file):
-        bucket_name = target_bucket
+    def upload_file(self, bucket_name, processed_file):
         with open(processed_file.abs_path, 'rb') as file:
             file_length = os.stat(processed_file.abs_path).st_size
             self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)

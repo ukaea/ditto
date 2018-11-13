@@ -14,7 +14,9 @@ class DataReplicationService:
         self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
         objects = self._external_data_service.get_objects([bucket_name], dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
-        self._logger.info("Found {} objects".format(len(objects)))
+        self._logger.info("Found {} objects in '{}' directory of bucket '{}'".format(len(objects),
+                                                                                     dir_path,
+                                                                                     bucket_name))
         return object_dicts
 
     def copy_dir(self, bucket_name, dir_path):

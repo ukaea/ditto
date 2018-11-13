@@ -23,17 +23,17 @@ class DeleteFileHandler(APIHandler):
         output_schema={
             "type": "object",
             "properties": {
-                "Message": {"type": "string"},
-                "File attempted to delete": {"type": "string"},
-                "Bucket containing file": {"type": "string"},
+                "message": {"type": "string"},
+                "file": {"type": "string"},
+                "bucket": {"type": "string"},
             }
         },
         output_example={
             "type": "object",
             "properties": {
-                "Message": "File path_to_file/file_name, successfully deleted from bucket test-bucket-name",
-                "File attempted to delete": "path_to_file/file_name",
-                "Bucket containing file": "test-bucket-name",
+                "message": "File path_to_file/file_name, successfully deleted from bucket test-bucket-name",
+                "file": "path_to_file/file_name",
+                "bucket": "test-bucket-name",
             }
         }
     )

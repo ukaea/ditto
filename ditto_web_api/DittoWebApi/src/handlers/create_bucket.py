@@ -21,15 +21,15 @@ class CreateBucketHandler(APIHandler):
         output_schema={
             "type": "object",
             "properties": {
-                "Message": {"type": "string"},
-                "Name of bucket attempted": {"type": "string"},
+                "message": {"type": "string"},
+                "bucket": {"type": "string"},
             }
         },
         output_example={
             "type": "object",
             "properties": {
-                "Message": "Bucket test-bucket-name created",
-                "Name of bucket attempted": "test-bucket-name",
+                "message": "Bucket test-bucket-name created",
+                "bucket": "test-bucket-name",
             }
         }
     )
