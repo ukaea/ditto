@@ -1,7 +1,14 @@
 ---
-- name: Directory permissions
+- name: Ditto Web API directory permissions
   file:
     path: /home/vagrant/ditto_web_api
+    state: directory
+    mode: '0777'
+  become: true
+
+- name: System Tests directory permissions
+  file:
+    path: /home/vagrant/systemTests
     state: directory
     mode: '0777'
   become: true
