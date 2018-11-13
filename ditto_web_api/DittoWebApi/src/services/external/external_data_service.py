@@ -14,21 +14,19 @@ class ExternalDataService:
     def get_buckets(self):
         return [BucketInformation(bucket) for bucket in self._s3_client.list_buckets()]
 
-    def get_objects(self, buckets, dir_path):
+    def get_objects(self, bucket_names, dir_path):
         """Passes list of object of Objects up to data replication service"""
         objs = []
-        for bucket in buckets:
-            bucket = BucketInformation(bucket)
-            objects = self._s3_client.list_objects(bucket.name, dir_path, recursive=True)
+        for bucket_name in bucket_names:
+            objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
             objs += [S3ObjectInformation(obj) for obj in objects if not obj.is_dir]
         return objs
 
-    def does_dir_exist(self, dir_path, bucket):
+    def does_dir_exist(self, bucket, dir_path):
         objects = [obj for obj in self._s3_client.list_objects(bucket, dir_path)]
         return len(objects) > 0
 
-    def upload_file(self, processed_file, target_bucket):
-        bucket_name = target_bucket.name
+    def upload_file(self, bucket_name, processed_file):
         with open(processed_file.abs_path, 'rb') as file:
             file_length = os.stat(processed_file.abs_path).st_size
             self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)
@@ -44,10 +42,10 @@ class ExternalDataService:
         length_of_bucket_standard = len(self._bucket_standard)
         return bucket_name[:(length_of_bucket_standard + 1)] == (self._bucket_standard + "-")
 
-    def delete_file(self, file_name, bucket_name):
+    def delete_file(self, bucket_name, file_name):
         return self._s3_client.remove_object(bucket_name, file_name)
 
-    def does_object_exist(self, file_name, bucket_name):
+    def does_object_exist(self, bucket_name, file_name):
         try:
             self._s3_client.stat_object(bucket_name, file_name)
             return True

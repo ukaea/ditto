@@ -1,8 +1,9 @@
 from minio import Minio
 from minio.error import ResponseError
+from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 
 
-class MinioAdapter:
+class MinioAdapter(IS3Adapter):
     def __init__(self, configuration):
         self._s3_client = Minio(configuration.s3_url,
                                 configuration.s3_access_key,
@@ -36,7 +37,7 @@ class MinioAdapter:
     def stat_object(self, bucket_name, object_name):
         return self._s3_client.stat_object(bucket_name, object_name)
 
-    def remove_object(self, object_name, bucket_name):
+    def remove_object(self, bucket_name, object_name):
         try:
             self._s3_client.remove_object(bucket_name, object_name)
             return True

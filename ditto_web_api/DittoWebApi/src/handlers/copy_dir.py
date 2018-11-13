@@ -1,12 +1,49 @@
 # pylint: disable=W0221,W0223
-import tornado.web
-from DittoWebApi.src.utils.parse_args import extract_primary_arg
+from tornado_json.requesthandlers import APIHandler
+from tornado_json import schema
 
 
-class CopyDirHandler(tornado.web.RequestHandler):
+class CopyDirHandler(APIHandler):
     def initialize(self, data_replication_service):
         self._data_replication_service = data_replication_service
 
+    @schema.validate(
+        input_schema={
+            "type": "object",
+            "properties": {
+                "bucket": {"type": "string"},
+                "directory": {"type": "string"},
+            },
+            "required": ["bucket"]
+        },
+        input_example={
+            "bucket": "test-bucket-name",
+            "directory": "testdir/testsubdir",
+        },
+        output_schema={
+            "type": "object",
+            "properties": {
+                "message": {"type": "string"},
+                "new files transferred": {"type": "integer"},
+                "files updated": {"type": "integer"},
+                "files skipped": {"type": "integer"},
+                "data transferred (bytes)": {"type": "integer"},
+            }
+        },
+        output_example={
+            "type": "object",
+            "properties": {
+                "message": "Transfer successful",
+                "new files transferred": 1,
+                "files updated": 0,
+                "files skipped": 0,
+                "data transferred (bytes)": 1000,
+            }
+        },
+    )
     def post(self, *args, **kwargs):
-        dir_path = extract_primary_arg(args)
-        self.write(self._data_replication_service.copy_dir(dir_path))
+        attrs = dict(self.body)
+        bucket_name = attrs["bucket"]
+        dir_path = attrs["directory"] if "directory" in attrs.keys() else None
+        result = self._data_replication_service.copy_dir(bucket_name, dir_path)
+        return result

@@ -5,6 +5,7 @@ import unittest
 import mock
 import pytest
 
+from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
@@ -32,14 +33,15 @@ class DataReplicationServiceTest(unittest.TestCase):
                                               "last_modified": 2132142421.123123}
         mock_object_2 = mock.create_autospec(S3ObjectInformation)
         mock_object_2.to_dict.return_value = {"object_name": "test_2",
-                                              "bucket_name": "test_bucket_2",
+                                              "bucket_name": "test_bucket",
                                               "is_dir": False, "size": 100,
                                               "etag": "test_etag_2",
                                               "last_modified": 2132142421.123123}
         self.mock_external_data_service.get_objects.return_value = [mock_object_1, mock_object_2]
         # Act
-        output = self.test_service.retrieve_object_dicts(None)
+        output = self.test_service.retrieve_object_dicts("test_bucket", None)
         # Assert
+        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], None)
         assert output[0] == {"object_name": "test",
                              "bucket_name": "test_bucket",
                              "is_dir": False,
@@ -47,16 +49,18 @@ class DataReplicationServiceTest(unittest.TestCase):
                              "etag": "test_etag",
                              "last_modified": 2132142421.123123}
         assert output[1] == {"object_name": "test_2",
-                             "bucket_name": "test_bucket_2",
+                             "bucket_name": "test_bucket",
                              "is_dir": False, "size": 100,
                              "etag": "test_etag_2",
                              "last_modified": 2132142421.123123}
+        assert len(output) == 2
 
     def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
         self.mock_external_data_service.get_objects.return_value = []
         # Act
-        output = self.test_service.retrieve_object_dicts(None)
+        output = self.test_service.retrieve_object_dicts("test_bucket", None)
         # Assert
+        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], None)
         assert output == []
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects_from_sub_dir(self):
@@ -68,51 +72,118 @@ class DataReplicationServiceTest(unittest.TestCase):
                                               "size": 100,
                                               "etag": "test_etag",
                                               "last_modified": 2132142421.123123}
-        mock_object_2 = mock.create_autospec(S3ObjectInformation)
-        mock_object_2.to_dict.return_value = {"object_name": "test_2",
-                                              "bucket_name": "test_bucket_2",
-                                              "is_dir": False, "size": 100,
-                                              "etag": "test_etag_2",
-                                              "last_modified": 2132142421.123123}
         self.mock_external_data_service.get_objects.return_value = [mock_object_1]
         # Act
-        output = self.test_service.retrieve_object_dicts("test_dir")
+        output = self.test_service.retrieve_object_dicts("test_bucket", "test_dir")
         # Assert
+        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], "test_dir")
         assert output[0] == {"object_name": "test_dir/test",
                              "bucket_name": "test_bucket",
                              "is_dir": False,
                              "size": 100,
                              "etag": "test_etag",
                              "last_modified": 2132142421.123123}
+        assert len(output) == 1
 
     def test_return_bucket_message_correct_when_bucket_name_invalid(self):
+        # Arrange
         self.mock_external_data_service.does_bucket_match_standard.return_value = False
         bucket_name = "test-1234-"
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"Message": "Bucket breaks local naming standard (test-1234-)",
                                     "Bucket": "test-1234-"})
 
     def test_create_bucket_return_correct_when_bucket_not_given(self):
+        # Arrange
         bucket_name = None
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"Message": "No bucket name provided",
                                     "Bucket": ""})
 
     def test_create_bucket_return_correct_when_bucket_already_exists(self):
+        # Arrange
         bucket_name = 'test-12345'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = True
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"Message": "Bucket already exists (test-12345)",
                                     "Bucket": "test-12345"})
 
     def test_create_bucket_returns_correctly_when_successful(self):
+        # Arrange
         bucket_name = 'test-12345'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = False
+        # Act
         response = self.test_service.create_bucket(bucket_name)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_called_once_with(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",
                                     "Bucket": "test-12345"})
+
+    def test_copy_dir_does_not_upload_if_no_local_files_found(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        self.mock_internal_data_service.find_files.return_value = []
+        # Act
+        self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        self.mock_external_data_service.upload_file.assert_not_called()
+
+    def test_copy_dir_does_not_upload_if_s3_dir_already_exists(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        self.mock_internal_data_service.find_files.return_value = [
+            FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
+        ]
+        self.mock_external_data_service.does_dir_exist.return_value = True
+        # Act
+        self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        self.mock_external_data_service.upload_file.assert_not_called()
+
+    def test_copy_dir_uploads_single_file_in_new_dir(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        self.mock_internal_data_service.find_files.return_value = [
+            FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
+        ]
+        self.mock_external_data_service.does_dir_exist.return_value = False
+        self.mock_external_data_service.upload_file.return_value = 42
+        # Act
+        response = self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        self.mock_external_data_service.upload_file.assert_called_once()
+        assert response["Files transferred"] == 1
+        assert response["Data transferred (bytes)"] == 42
+
+    def test_copy_dir_uploads_files_from_sub_dir_in_new_dir(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        dir_path = 'testdir/testsubdir/'
+        file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
+        file_2 = FileInformation("/home/test/sub_1/test2.txt", "sub_1/test2.txt", "test2.txt")
+        self.mock_internal_data_service.find_files.return_value = [file_1, file_2]
+        self.mock_external_data_service.does_dir_exist.return_value = False
+        self.mock_external_data_service.upload_file.return_value = 44
+        # Act
+        response = self.test_service.copy_dir(bucket_name, dir_path)
+        # Assert
+        assert self.mock_external_data_service.upload_file.call_count == 2
+        assert response["Files transferred"] == 2
+        assert response["Data transferred (bytes)"] == 88
 
     def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):
         # Arrange
@@ -122,7 +193,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_buckets.return_value = [mock_bucket]
         self.mock_external_data_service.does_object_exist.return_value = False
         # Act
-        response = self.test_service.try_delete_file(file_name)
+        response = self.test_service.try_delete_file(mock_bucket.name, file_name)
         # Assert
         assert response == {'Bucket': 'some-bucket',
                             'File': 'unknown_file',
@@ -136,7 +207,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_buckets.return_value = [mock_bucket]
         self.mock_external_data_service.does_object_exist.return_value = True
         # Act
-        response = self.test_service.try_delete_file(file_name)
+        response = self.test_service.try_delete_file(mock_bucket.name, file_name)
         # Assert
         assert response == {'Bucket': 'some-bucket',
                             'File': 'known_file',
