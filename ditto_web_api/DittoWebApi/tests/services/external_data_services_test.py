@@ -128,3 +128,14 @@ class TestExternalDataServices:
         result = self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
         # Assert
         assert result is False
+
+    @pytest.mark.parametrize("return_value", [True, False])
+    def test_delete_file_wraps_the_s3_adapter_method(self, return_value):
+        # Arrange
+        self.external_data_services._s3_client.remove_object.return_value = return_value
+        file_name = "some_file"
+        bucket_name = "some_bucket"
+        # Act
+        response = self.external_data_services.delete_file(file_name, bucket_name)
+        # Assert
+        assert response is return_value

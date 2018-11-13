@@ -1,4 +1,5 @@
 from minio import Minio
+from minio.error import ResponseError
 
 
 class MinioAdapter:
@@ -16,16 +17,28 @@ class MinioAdapter:
 
     def put_object(self, bucket_name, object_name, data, length,
                    content_type='application/octet-stream', metadata=None):
-        self._s3_client.put_object(bucket_name, object_name, data, length, content_type, metadata)
+        try:
+            self._s3_client.put_object(bucket_name, object_name, data, length, content_type, metadata)
+            return True
+        except ResponseError:
+            return False
 
     def make_bucket(self, bucket_name, location="eu-west-1"):
-        self._s3_client.make_bucket(bucket_name, location)
+        try:
+            self._s3_client.make_bucket(bucket_name, location)
+            return True
+        except ResponseError:
+            return False
 
     def bucket_exists(self, bucket_name):
         return self._s3_client.bucket_exists(bucket_name)
 
-    def stat_object(self, object_name, bucket_name):
+    def stat_object(self, bucket_name, object_name):
         return self._s3_client.stat_object(bucket_name, object_name)
 
     def remove_object(self, object_name, bucket_name):
-        self._s3_client.remove_object(bucket_name, object_name)
+        try:
+            self._s3_client.remove_object(bucket_name, object_name)
+            return True
+        except ResponseError:
+            return False
