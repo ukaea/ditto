@@ -14,12 +14,11 @@ class ExternalDataService:
     def get_buckets(self):
         return [BucketInformation(bucket) for bucket in self._s3_client.list_buckets()]
 
-    def get_objects(self, buckets, dir_path):
+    def get_objects(self, bucket_names, dir_path):
         """Passes list of object of Objects up to data replication service"""
         objs = []
-        for bucket in buckets:
-            bucket = BucketInformation(bucket)
-            objects = self._s3_client.list_objects(bucket.name, dir_path, recursive=True)
+        for bucket_name in bucket_names:
+            objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
             objs += [S3ObjectInformation(obj) for obj in objects if not obj.is_dir]
         return objs
 
@@ -28,7 +27,7 @@ class ExternalDataService:
         return len(objects) > 0
 
     def upload_file(self, target_bucket, processed_file):
-        bucket_name = target_bucket.name
+        bucket_name = target_bucket
         with open(processed_file.abs_path, 'rb') as file:
             file_length = os.stat(processed_file.abs_path).st_size
             self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)
