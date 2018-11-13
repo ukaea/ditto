@@ -75,11 +75,19 @@ class DataReplicationService:
         return return_delete_file_helper(message, file_name, bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
-        self._logger
+        self._logger.info("Finding files in {}".format(dir_path))
         files_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_in_directory = self._internal_data_service.find_files(dir_path)
+        self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
+            len(files_in_directory), dir_path, bucket_name)
+        )
         files_to_transfer = storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
         data_transferred = 0
+        if not files_to_transfer:
+            message = "No new files found in directory or directory does not exist ({})".format(dir_path)
+            self._logger.warning(message)
+            return return_dict(message=message)
+        self._logger.info("About to transfer {} new files into bucket {}".format(len(files_to_transfer), bucket_name))
         for file in files_to_transfer:
             data_transferred += self._external_data_service.upload_file(bucket_name, file)
         message = "Transfer successful, copied {} files totalling {} bytes".format(len(files_to_transfer),
