@@ -90,13 +90,13 @@ class DataReplicationServiceTest(unittest.TestCase):
         bucket_name = "test-1234-"
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket breaks local naming standard (test-1234-)",
-                                    "Name of bucket attempted": "test-1234-"})
+                                    "Bucket": "test-1234-"})
 
     def test_create_bucket_return_correct_when_bucket_not_given(self):
         bucket_name = None
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "No bucket name provided",
-                                    "Name of bucket attempted": ""})
+                                    "Bucket": ""})
 
     def test_create_bucket_return_correct_when_bucket_already_exists(self):
         bucket_name = 'test-12345'
@@ -104,7 +104,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket already exists (test-12345)",
-                                    "Name of bucket attempted": "test-12345"})
+                                    "Bucket": "test-12345"})
 
     def test_create_bucket_returns_correctly_when_successful(self):
         bucket_name = 'test-12345'
@@ -112,7 +112,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = False
         response = self.test_service.create_bucket(bucket_name)
         self.assertEqual(response, {"Message": "Bucket Created (test-12345)",
-                                    "Name of bucket attempted": "test-12345"})
+                                    "Bucket": "test-12345"})
 
     def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):
         # Arrange
@@ -124,8 +124,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.try_delete_file(file_name)
         # Assert
-        assert response == {'Bucket containing file': 'some-bucket',
-                            'File attempted to delete': 'unknown_file',
+        assert response == {'Bucket': 'some-bucket',
+                            'File': 'unknown_file',
                             'Message': 'File unknown_file does not exist in bucket some-bucket'}
 
     def test_try_delete_file_returns_confirmation_message_when_file_does_exist(self):
@@ -138,6 +138,6 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.try_delete_file(file_name)
         # Assert
-        assert response == {'Bucket containing file': 'some-bucket',
-                            'File attempted to delete': 'known_file',
+        assert response == {'Bucket': 'some-bucket',
+                            'File': 'known_file',
                             'Message': 'File known_file successfully deleted from bucket some-bucket'}
