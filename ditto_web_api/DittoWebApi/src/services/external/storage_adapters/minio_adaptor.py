@@ -1,8 +1,9 @@
 from minio import Minio
 from minio.error import ResponseError
+from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 
 
-class MinioAdapter:
+class MinioAdapter(IS3Adapter):
     def __init__(self, configuration):
         self._s3_client = Minio(configuration.s3_url,
                                 configuration.s3_access_key,
