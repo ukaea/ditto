@@ -72,3 +72,6 @@ class DataReplicationService:
         self._external_data_service.delete_file(bucket_name, file_name)
         message = "File {} successfully deleted from bucket {}".format(file_name, bucket_name)
         return return_delete_file_helper(message, file_name, bucket_name)
+
+    def copy_new(self, bucket_name, dir_path):
+        pass
