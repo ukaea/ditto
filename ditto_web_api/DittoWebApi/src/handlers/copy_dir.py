@@ -24,10 +24,10 @@ class CopyDirHandler(APIHandler):
             "type": "object",
             "properties": {
                 "Message": {"type": "string"},
-                "Files transferred": {"type": "int"},
-                "Files updated": {"type": "int"},
-                "Files skipped": {"type": "int"},
-                "Data transferred (bytes)": {"type": "int"},
+                "Files transferred": {"type": "integer"},
+                "Files updated": {"type": "integer"},
+                "Files skipped": {"type": "integer"},
+                "Data transferred (bytes)": {"type": "integer"},
             }
         },
         output_example={

@@ -1,9 +1,9 @@
 # pylint: disable=W0221,W0223
-import tornado.web
+from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
 
 
-class CreatBucketHandler(tornado.web.RequestHandler):
+class CreateBucketHandler(APIHandler):
     def initialize(self, data_replication_service):
         self._data_replication_service = data_replication_service
 
@@ -36,5 +36,5 @@ class CreatBucketHandler(tornado.web.RequestHandler):
     def post(self, *args, **kwargs):
         attrs = dict(self.body)
         bucket_name = attrs["bucket"]
-        result = self.write(self._data_replication_service.create_bucket(bucket_name))
+        result = self._data_replication_service.create_bucket(bucket_name)
         return result
