@@ -73,5 +73,5 @@ class DataReplicationService:
             self._logger.warning(message)
             return return_delete_file_helper(message, file_name, target_bucket_name)
         self._external_data_service.delete_file(file_name, target_bucket_name)
-        message = "File {}, successfully deleted from bucket {}".format(file_name, target_bucket_name)
+        message = "File {} successfully deleted from bucket {}".format(file_name, target_bucket_name)
         return return_delete_file_helper(message, file_name, target_bucket_name)

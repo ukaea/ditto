@@ -140,4 +140,4 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         assert response == {'Bucket containing file': 'some-bucket',
                             'File attempted to delete': 'known_file',
-                            'Message': 'File known_file, successfully deleted from bucket some-bucket'}
+                            'Message': 'File known_file successfully deleted from bucket some-bucket'}
