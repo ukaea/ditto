@@ -1,7 +1,6 @@
 flake8
 minio
 mock
-psutil
 pylint
 pytest
 pytest-cov
