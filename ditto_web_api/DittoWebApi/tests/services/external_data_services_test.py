@@ -130,7 +130,7 @@ class TestExternalDataServices:
         assert result is False
 
     @pytest.mark.parametrize("return_value", [True, False])
-    def test_delete_file_returns_true_when_successful_and_unsuccessful(self, return_value):
+    def test_delete_file_wraps_the_s3_adapter_method(self, return_value):
         # Arrange
         self.external_data_services._s3_client.remove_object.return_value = return_value
         file_name = "some_file"
