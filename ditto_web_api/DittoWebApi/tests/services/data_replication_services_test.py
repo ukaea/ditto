@@ -23,6 +23,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_logger = mock.create_autospec(logging.Logger)
         self.test_service = DataReplicationService(self.mock_external_data_service,
                                                    self.mock_internal_data_service,
+                                                   self.mock_storage_difference_processor,
                                                    self.mock_logger)
         # Mock_objects
         self.mock_object_1 = mock.create_autospec(S3ObjectInformation)
@@ -32,14 +33,12 @@ class DataReplicationServiceTest(unittest.TestCase):
                                                    "size": 100,
                                                    "etag": "test_etag",
                                                    "last_modified": 2132142421.123123}
-        self.mock_object_1.object_name = "test"
         self.mock_object_2 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_2.to_dict.return_value = {"object_name": "test_2",
                                                    "bucket_name": "test_bucket",
                                                    "is_dir": False, "size": 100,
                                                    "etag": "test_etag_2",
                                                    "last_modified": 2132142421.123123}
-        self.mock_object_2.object_name = "test_2"
         self.mock_object_3 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_3.to_dict.return_value = {"object_name": "test_dir/test",
                                                    "bucket_name": "test_bucket",
@@ -47,7 +46,6 @@ class DataReplicationServiceTest(unittest.TestCase):
                                                    "size": 100,
                                                    "etag": "test_etag",
                                                    "last_modified": 2132142421.123123}
-        self.mock_object_3.object_name = "test_dir/test"
         # mock file information
         self.mock_file_information_1 = mock.create_autospec(FileInformation)
         self.mock_file_information_1.rel_path = "test"
@@ -263,6 +261,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2,
                                                                    self.mock_file_information_3]
+        self.mock_storage_difference_processor.return_new_files.return_value = [self.mock_file_information_2,
+                                                                                self.mock_file_information_3]
         self.mock_external_data_service.upload_file.side_effect = [12, 34]
         # Act
         response = self.test_service.copy_new_with_optional_updates("bucket", "some_dir")

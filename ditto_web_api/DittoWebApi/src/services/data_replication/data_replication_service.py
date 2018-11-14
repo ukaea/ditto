@@ -2,13 +2,13 @@ from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
-from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 
 
 class DataReplicationService:
-    def __init__(self, external_data_service, internal_data_service, logger):
+    def __init__(self, external_data_service, internal_data_service, storage_difference_processor, logger):
         self._external_data_service = external_data_service
         self._internal_data_service = internal_data_service
+        self._storage_difference_processor = storage_difference_processor
         self._logger = logger
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
@@ -81,7 +81,6 @@ class DataReplicationService:
         files_in_directory = self._internal_data_service.find_files(dir_path)
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
             len(files_in_directory), directory, bucket_name))
-        storage_difference_processor = StorageDifferenceProcessor()
         new_files = storage_difference_processor.return_new_files(files_already_in_bucket,
                                                                   files_in_directory)[0]
         files_to_update = storage_difference_processor.return_new_files(files_already_in_bucket,
