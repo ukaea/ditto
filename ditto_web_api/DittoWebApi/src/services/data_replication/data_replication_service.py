@@ -2,13 +2,13 @@ from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
+from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 
 
 class DataReplicationService:
-    def __init__(self, external_data_service, internal_data_service, storage_difference_processor, logger):
+    def __init__(self, external_data_service, internal_data_service, logger):
         self._external_data_service = external_data_service
         self._internal_data_service = internal_data_service
-        self._storage_difference_processor = storage_difference_processor
         self._logger = logger
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
@@ -75,15 +75,13 @@ class DataReplicationService:
         return return_delete_file_helper(message, file_name, bucket_name)
 
     def copy_new_with_optional_updates(self, bucket_name, dir_path, check_for_update):
-        if dir_path:
-            directory = dir_path
-        else:
-            directory = "root"
+        directory = dir_path if dir_path else "root"
         self._logger.info("Finding files in {}".format(directory))
         files_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_in_directory = self._internal_data_service.find_files(dir_path)
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
             len(files_in_directory), directory, bucket_name))
+        storage_difference_processor = StorageDifferenceProcessor()
         new_files = self._storage_difference_processor.return_new_files(files_already_in_bucket,
                                                                         files_in_directory)[0]
         files_to_update = self._storage_difference_processor.return_new_files(files_already_in_bucket,
@@ -100,6 +98,7 @@ class DataReplicationService:
         self._logger.info("About to transfer {} new files from {} into bucket {}".format(len(files_to_transfer),
                                                                                          directory,
                                                                                          bucket_name))
+        data_transferred = 0
         for file in files_to_transfer:
             data_transferred += self._external_data_service.upload_file(bucket_name, file)
         message = "Transfer successful, copied {} new files from {} totalling {} bytes".format(len(files_to_transfer),
