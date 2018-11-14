@@ -231,7 +231,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
         self.mock_storage_difference_processor.return_new_files.return_value = []
         # Act
-        response = self.test_service.copy_new("bucket", None)
+        response = self.test_service.copy_new_with_optional_updates("bucket", None)
         assert self.mock_external_data_service.upload_file.call_count == 0
         # Assert
         assert response == {'Message': 'No new files found in directory or directory does not exist (root)',
@@ -246,7 +246,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = []
         self.mock_storage_difference_processor.return_new_files.return_value = []
         # Act
-        response = self.test_service.copy_new("bucket", None)
+        response = self.test_service.copy_new_with_optional_updates("bucket", None)
         # Assert
         assert self.mock_external_data_service.upload_file.call_count == 0
         assert response == {'Message': 'No new files found in directory or directory does not exist (root)',
@@ -265,7 +265,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_storage_difference_processor.return_new_files.return_value = [self.mock_file_information_2,
                                                                                 self.mock_file_information_3]
         # Act
-        response = self.test_service.copy_new("bucket", "some_dir")
+        response = self.test_service.copy_new_with_optional_updates("bucket", "some_dir")
         # Assert
         assert self.mock_external_data_service.upload_file.call_count == 2
         assert response == {'Message': 'Transfer successful, copied 2 new files from some_dir totalling 46 bytes',

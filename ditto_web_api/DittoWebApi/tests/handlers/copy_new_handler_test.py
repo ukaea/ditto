@@ -20,7 +20,7 @@ def app():
 @pytest.mark.gen_test
 def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.copy_new.return_value = {"message": "Transfer successful",
+    MOCK_DATA_REPLICATION_SERVICE.copy_new_with_optional_updates.return_value = {"message": "Transfer successful",
                                                            "new files transferred": 1,
                                                            "files updated": 0,
                                                            "files skipped": 3,
@@ -42,7 +42,7 @@ def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, b
 @pytest.mark.gen_test
 def test_post_returns_summary_of_failed_transfer_as_json(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.copy_new.return_value = {"message": "Directory already exists, 5 files skipped",
+    MOCK_DATA_REPLICATION_SERVICE.copy_new_with_optional_updates.return_value = {"message": "Directory already exists, 5 files skipped",
                                                            "new files transferred": 0,
                                                            "files updated": 0,
                                                            "files skipped": 5,
