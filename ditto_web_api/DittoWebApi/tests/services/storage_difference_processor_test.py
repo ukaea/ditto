@@ -34,7 +34,7 @@ class TestSorageDifferenceProcessor:
         objects_in_bucket = []
         files_in_directory = [self.file_1, self.file_2]
         # Act
-        result = self.processor.new_files(objects_in_bucket, files_in_directory)
+        result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
         assert len(result) == 2
         assert result[0].rel_path == "file_1.txt"
@@ -45,7 +45,7 @@ class TestSorageDifferenceProcessor:
         objects_in_bucket = [self.s3_object_1, self.s3_object_2]
         files_in_directory = [self.file_1, self.file_2]
         # Act
-        result = self.processor.new_files(objects_in_bucket, files_in_directory)
+        result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
         assert result == []
 
@@ -54,7 +54,7 @@ class TestSorageDifferenceProcessor:
         objects_in_bucket = [self.s3_object_2]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
         # Act
-        result = self.processor.new_files(objects_in_bucket, files_in_directory)
+        result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
         assert len(result) == 2
         assert result[0].rel_path == "file_1.txt"
@@ -65,7 +65,7 @@ class TestSorageDifferenceProcessor:
         objects_in_bucket = [self.s3_object_2, self.s3_object_4]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
         # Act
-        result = self.processor.new_files(objects_in_bucket, files_in_directory)
+        result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
         assert len(result) == 2
         assert result[0].rel_path == "file_1.txt"

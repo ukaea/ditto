@@ -84,7 +84,7 @@ class DataReplicationService:
         files_in_directory = self._internal_data_service.find_files(dir_path)
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
             len(files_in_directory), directory, bucket_name))
-        files_to_transfer = self._storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
+        files_to_transfer = self._storage_difference_processor.return_new_files(files_already_in_bucket, files_in_directory)
         data_transferred = 0
         if not files_to_transfer:
             message = "No new files found in directory or directory does not exist ({})".format(directory)

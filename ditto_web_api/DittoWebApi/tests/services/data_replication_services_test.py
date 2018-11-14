@@ -229,7 +229,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
-        self.mock_storage_difference_processor.new_files.return_value = []
+        self.mock_storage_difference_processor.return_new_files.return_value = []
         # Act
         response = self.test_service.copy_new("bucket", None)
         assert self.mock_external_data_service.upload_file.call_count == 0
@@ -244,7 +244,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = []
-        self.mock_storage_difference_processor.new_files.return_value = []
+        self.mock_storage_difference_processor.return_new_files.return_value = []
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
@@ -262,8 +262,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                                                                    self.mock_file_information_2,
                                                                    self.mock_file_information_3]
         self.mock_external_data_service.upload_file.side_effect = [12, 34]
-        self.mock_storage_difference_processor.new_files.return_value = [self.mock_file_information_2,
-                                                                         self.mock_file_information_3]
+        self.mock_storage_difference_processor.return_new_files.return_value = [self.mock_file_information_2,
+                                                                                self.mock_file_information_3]
         # Act
         response = self.test_service.copy_new("bucket", "some_dir")
         # Assert

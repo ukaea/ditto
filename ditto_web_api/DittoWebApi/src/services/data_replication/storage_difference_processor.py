@@ -1,7 +1,7 @@
 # pylint: disable=R0201
 class StorageDifferenceProcessor:
 
-    def new_files(self, objects_in_bucket, files_in_directory):
+    def return_new_files(self, objects_in_bucket, files_in_directory):
         list_of_new_files = []
         if not objects_in_bucket:
             return files_in_directory
