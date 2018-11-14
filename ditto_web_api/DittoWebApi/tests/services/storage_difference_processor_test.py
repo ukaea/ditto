@@ -106,4 +106,3 @@ class TestSorageDifferenceProcessor:
         result = self.processor.are_the_same(s3_object, file_information)
         # Assert
         assert result is True
-
