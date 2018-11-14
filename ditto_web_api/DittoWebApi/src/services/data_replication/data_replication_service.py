@@ -83,8 +83,7 @@ class DataReplicationService:
         files_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_in_directory = self._internal_data_service.find_files(dir_path)
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
-            len(files_in_directory), directory, bucket_name)
-        )
+            len(files_in_directory), directory, bucket_name))
         files_to_transfer = self._storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
         data_transferred = 0
         if not files_to_transfer:

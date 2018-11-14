@@ -1,3 +1,4 @@
+# pylint: disable=W0201,
 import pytest
 import mock
 from DittoWebApi.src.models.file_information import FileInformation
@@ -87,4 +88,3 @@ class TestSorageDifferenceProcessor:
         result = self.processor.are_the_same(s3_object, file_information)
         # Assert
         assert result is False
-

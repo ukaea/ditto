@@ -273,5 +273,3 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'Files updated': 0,
                             'Files skipped': 1,
                             'Data transferred (bytes)': 46}
-
-
