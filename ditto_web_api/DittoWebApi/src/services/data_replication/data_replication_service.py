@@ -83,26 +83,42 @@ class DataReplicationService:
             len(files_in_directory), directory, bucket_name))
         storage_difference_processor = StorageDifferenceProcessor()
         new_files = storage_difference_processor.return_new_files(files_already_in_bucket,
-                                                                        files_in_directory)[0]
+                                                                  files_in_directory)[0]
         files_to_update = storage_difference_processor.return_new_files(files_already_in_bucket,
-                                                                              files_in_directory)[1]
+                                                                        files_in_directory)[1]
         if check_for_update:
             files_to_transfer = new_files + files_to_update
         else:
             files_to_transfer = new_files
         if not files_to_transfer:
-            message = "No new files found in directory or directory does not exist ({})".format(directory)
+            message = "No new or updated files found in directory or directory doesn't exist ({})".format(directory)\
+                if check_for_update \
+                else "No new files found in directory or directory does not exist ({})".format(directory)
             self._logger.warning(message)
             return return_dict(message=message, files_skipped=len(files_in_directory))
-        self._logger.info("About to transfer {} new files from {} into bucket {}".format(len(files_to_transfer),
-                                                                                         directory,
-                                                                                         bucket_name))
         data_transferred = 0
+        if check_for_update:
+            self._logger.info("About to transfer {} new files and update {} files from {} into bucket {}".format(
+                len(files_to_transfer), len(files_to_update), directory, bucket_name))
+        else:
+            self._logger.info("About to transfer {} new files from {} into bucket {}".format(len(files_to_transfer),
+                                                                                             directory,
+                                                                                             bucket_name))
+
         for file in files_to_transfer:
             data_transferred += self._external_data_service.upload_file(bucket_name, file)
-        message = "Transfer successful, copied {} new files from {} totalling {} bytes".format(len(files_to_transfer),
-                                                                                               directory,
-                                                                                               data_transferred)
+        if check_for_update:
+            message = "Transfer successful, copied {} new files and updated {} files from {} totalling {} bytes".format(
+                len(files_to_transfer), len(files_to_update), directory, data_transferred)
+            self._logger.info(message)
+            return return_dict(files_transferred=len(new_files),
+                               files_updated=len(files_to_update),
+                               files_skipped=(len(files_in_directory) - len(files_to_transfer)),
+                               data_transferred=data_transferred,
+                               message=message)
+        else:
+            message = "Transfer successful, copied {} new files from {} totalling {} bytes".format(
+                len(files_to_transfer), directory, data_transferred)
         self._logger.info(message)
         return return_dict(files_transferred=len(files_to_transfer),
                            files_skipped=(len(files_in_directory)-len(files_to_transfer)),

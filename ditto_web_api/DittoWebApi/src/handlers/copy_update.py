@@ -45,5 +45,5 @@ class CopyUpdateHandler(APIHandler):
         attrs = dict(self.body)
         bucket_name = attrs["bucket"]
         dir_path = attrs["directory"] if "directory" in attrs.keys() else None
-        result = self._data_replication_service.copy_update(bucket_name, dir_path)
+        result = self._data_replication_service.copy_new_with_optional_updates(bucket_name, dir_path, True)
         return result
