@@ -4,6 +4,7 @@ import pytest
 import tornado.web
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
+from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 
 
 MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
@@ -20,10 +21,9 @@ def app():
 @pytest.mark.gen_test
 def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"message": "File some_file.txt, successfully deleted"
-                                                                             " from bucket bucket_1",
-                                                                  "file": "some_file.txt",
-                                                                  "bucket": "bucket_1"}
+    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = return_delete_file_helper(
+        "File some_file.txt, successfully deleted from bucket bucket_1", "some_file.txt", "bucket_1"
+    )
     # Act
     url = base_url + "/deletefile/"
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})
@@ -39,10 +39,9 @@ def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_cl
 @pytest.mark.gen_test
 def test_delete_returns_summary_of_failed_delete_as_json_when_unsuccessful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = {"message": "File some_file.txt does not exist in "
-                                                                             "bucket bucket_1",
-                                                                  "file": "some_file.txt",
-                                                                  "bucket": "bucket_1"}
+    MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = return_delete_file_helper(
+        "File some_file.txt does not exist in bucket bucket_1", "some_file.txt", "bucket_1"
+    )
     # Act
     url = base_url + "/deletefile/"
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})

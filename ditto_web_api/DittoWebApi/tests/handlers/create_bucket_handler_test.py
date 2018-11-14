@@ -4,6 +4,7 @@ import pytest
 import tornado.web
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
+from DittoWebApi.src.utils.return_helper import return_bucket_message
 
 
 MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
@@ -20,8 +21,8 @@ def app():
 @pytest.mark.gen_test
 def test_create_bucket_returns_summary_of_new_bucket_when_successful(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = {"message": "Bucket Created (some-bucket)",
-                                                                "bucket": "some-bucket"}
+    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = return_bucket_message("Bucket Created (some-bucket)",
+                                                                                     "some-bucket")
     # Act
     url = base_url + "/createbucket/"
     body = json.dumps({'bucket': "bucket_1"})
@@ -36,8 +37,9 @@ def test_create_bucket_returns_summary_of_new_bucket_when_successful(http_client
 @pytest.mark.gen_test
 def test_create_bucket_returns_summary_of_failure_when_bucket_already_exists(http_client, base_url):
     # Arrange
-    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = {"message": "Bucket already exists (some-bucket)",
-                                                                "bucket": "some-bucket"}
+    MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = return_bucket_message(
+        "Bucket already exists (some-bucket)", "some-bucket"
+    )
     # Act
     url = base_url + "/createbucket/"
     body = json.dumps({'bucket': "bucket_1"})
