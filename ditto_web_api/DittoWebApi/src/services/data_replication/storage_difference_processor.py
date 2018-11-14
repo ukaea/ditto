@@ -1,4 +1,7 @@
 # pylint: disable=R0201
+from DittoWebApi.src.utils.file_system.path_helpers import to_posix
+
+
 class StorageDifferenceProcessor:
 
     def return_new_files(self, objects_in_bucket, files_in_directory):
@@ -20,4 +23,4 @@ class StorageDifferenceProcessor:
     @staticmethod
     def are_the_same(s3_object, file_information):
         s3_object_name = s3_object.object_name
-        return file_information.rel_path == s3_object_name
+        return to_posix(file_information.rel_path) == to_posix(s3_object_name)
