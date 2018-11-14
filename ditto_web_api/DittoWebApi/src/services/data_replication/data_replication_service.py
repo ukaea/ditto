@@ -2,7 +2,7 @@ from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
-from DittoWebApi.src.services.data_replication import storage_difference_processor
+from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 
 
 class DataReplicationService:
@@ -13,7 +13,7 @@ class DataReplicationService:
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
         self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
-        objects = self._external_data_service.get_objects([bucket_name], dir_path)
+        objects = self._external_data_service.get_objects(bucket_name, dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
         self._logger.info("Found {} objects in '{}' directory of bucket '{}'".format(len(objects),
                                                                                      dir_path,
@@ -75,23 +75,31 @@ class DataReplicationService:
         return return_delete_file_helper(message, file_name, bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
-        self._logger.info("Finding files in {}".format(dir_path))
+        if dir_path:
+            directory = dir_path
+        else:
+            directory = "root"
+        self._logger.info("Finding files in {}".format(directory))
         files_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_in_directory = self._internal_data_service.find_files(dir_path)
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
-            len(files_in_directory), dir_path, bucket_name)
+            len(files_in_directory), directory, bucket_name)
         )
+        storage_difference_processor = StorageDifferenceProcessor()
         files_to_transfer = storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
         data_transferred = 0
         if not files_to_transfer:
-            message = "No new files found in directory or directory does not exist ({})".format(dir_path)
+            message = "No new files found in directory or directory does not exist ({})".format(directory)
             self._logger.warning(message)
-            return return_dict(message=message)
-        self._logger.info("About to transfer {} new files into bucket {}".format(len(files_to_transfer), bucket_name))
+            return return_dict(message=message, files_skipped=len(files_in_directory))
+        self._logger.info("About to transfer {} new files from {} into bucket {}".format(len(files_to_transfer),
+                                                                                         directory,
+                                                                                         bucket_name))
         for file in files_to_transfer:
             data_transferred += self._external_data_service.upload_file(bucket_name, file)
-        message = "Transfer successful, copied {} files totalling {} bytes".format(len(files_to_transfer),
-                                                                                   data_transferred)
+        message = "Transfer successful, copied {} files from {} totalling {} bytes".format(len(files_to_transfer),
+                                                                                           directory,
+                                                                                           data_transferred)
         self._logger.info(message)
         return return_dict(files_transferred=len(files_to_transfer),
                            files_skipped=(len(files_in_directory)-len(files_to_transfer)),
