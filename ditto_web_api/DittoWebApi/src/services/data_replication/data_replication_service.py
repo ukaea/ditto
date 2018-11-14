@@ -2,13 +2,13 @@ from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_dict
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
-from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 
 
 class DataReplicationService:
-    def __init__(self, external_data_service, internal_data_service, logger):
+    def __init__(self, external_data_service, internal_data_service, storage_difference_processor, logger):
         self._external_data_service = external_data_service
         self._internal_data_service = internal_data_service
+        self._storage_difference_processor = storage_difference_processor
         self._logger = logger
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
@@ -85,8 +85,7 @@ class DataReplicationService:
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
             len(files_in_directory), directory, bucket_name)
         )
-        storage_difference_processor = StorageDifferenceProcessor()
-        files_to_transfer = storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
+        files_to_transfer = self._storage_difference_processor.new_files(files_already_in_bucket, files_in_directory)
         data_transferred = 0
         if not files_to_transfer:
             message = "No new files found in directory or directory does not exist ({})".format(directory)
@@ -97,9 +96,9 @@ class DataReplicationService:
                                                                                          bucket_name))
         for file in files_to_transfer:
             data_transferred += self._external_data_service.upload_file(bucket_name, file)
-        message = "Transfer successful, copied {} files from {} totalling {} bytes".format(len(files_to_transfer),
-                                                                                           directory,
-                                                                                           data_transferred)
+        message = "Transfer successful, copied {} new files from {} totalling {} bytes".format(len(files_to_transfer),
+                                                                                               directory,
+                                                                                               data_transferred)
         self._logger.info(message)
         return return_dict(files_transferred=len(files_to_transfer),
                            files_skipped=(len(files_in_directory)-len(files_to_transfer)),
