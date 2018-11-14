@@ -8,11 +8,11 @@ from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
+from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
-from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 
 
 def setup_logger(log_file_location, level):
@@ -47,10 +47,8 @@ if __name__ == "__main__":
     # Set up services
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION)
     INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
-    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor()
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
-                                                      STORAGE_DIFFERENCE_PROCESSOR,
                                                       LOGGER)
 
     # Launch app

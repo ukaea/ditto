@@ -17,6 +17,7 @@ class StorageDifferenceProcessor:
                     del objects_to_check[matches.index(True)]
         return list_of_new_files
 
-    def are_the_same(self, s3_object, file_information):
+    @staticmethod
+    def are_the_same(s3_object, file_information):
         s3_object_name = s3_object.object_name
         return file_information.rel_path == s3_object_name
