@@ -13,7 +13,7 @@ class DataReplicationService:
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
         if not self._external_data_service.does_bucket_exist(bucket_name):
-            message = "Warning, bucket {} does not exist in the S3 storage"
+            message = "Warning, bucket {} does not exist in the S3 storage".format(bucket_name)
             self._logger.warning(message)
             return {"message": message}
         self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
@@ -26,7 +26,7 @@ class DataReplicationService:
 
     def copy_dir(self, bucket_name, dir_path):
         if not self._external_data_service.does_bucket_exist(bucket_name):
-            message = "Warning, bucket {} does not exist in the S3 storage"
+            message = "Warning, bucket {} does not exist in the S3 storage".format(bucket_name)
             self._logger.warning(message)
             return return_dict(message=message)
         self._logger.debug("Copying for {}".format(dir_path))
@@ -75,7 +75,7 @@ class DataReplicationService:
 
     def try_delete_file(self, bucket_name, file_name):
         if not self._external_data_service.does_bucket_exist(bucket_name):
-            message = "Warning, bucket {} does not exist in the S3 storage"
+            message = "Warning, bucket {} does not exist in the S3 storage".format(bucket_name)
             self._logger.warning(message)
             return return_delete_file_helper(message=message, file_name=file_name, bucket_name=bucket_name)
         if not self._external_data_service.does_object_exist(bucket_name, file_name):
@@ -88,7 +88,7 @@ class DataReplicationService:
 
     def copy_new(self, bucket_name, dir_path):
         if not self._external_data_service.does_bucket_exist(bucket_name):
-            message = "Warning, bucket {} does not exist in the S3 storage"
+            message = "Warning, bucket {} does not exist in the S3 storage".format(bucket_name)
             self._logger.warning(message)
             return return_dict(message=message)
         directory = dir_path if dir_path else "root"
