@@ -24,7 +24,7 @@ class CopyUpdateHandler(APIHandler):
             "type": "object",
             "properties": {
                 "message": {"type": "string"},
-                "new files transferred": {"type": "integer"},
+                "new files uploaded": {"type": "integer"},
                 "files updated": {"type": "integer"},
                 "files skipped": {"type": "integer"},
                 "data transferred (bytes)": {"type": "integer"},
@@ -34,7 +34,7 @@ class CopyUpdateHandler(APIHandler):
             "type": "object",
             "properties": {
                 "message": "Transfer successful",
-                "new files transferred": 1,
+                "new files uploaded": 1,
                 "files updated": 0,
                 "files skipped": 0,
                 "data transferred (bytes)": 1000,
@@ -45,5 +45,5 @@ class CopyUpdateHandler(APIHandler):
         attrs = dict(self.body)
         bucket_name = attrs["bucket"]
         dir_path = attrs["directory"] if "directory" in attrs.keys() else None
-        result = self._data_replication_service.copy_new_with_optional_updates(bucket_name, dir_path, True)
+        result = self._data_replication_service.copy_new_and_update(bucket_name, dir_path)
         return result
