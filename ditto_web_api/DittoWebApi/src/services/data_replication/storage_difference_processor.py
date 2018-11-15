@@ -21,13 +21,14 @@ class StorageDifferenceProcessor:
                 if not any(matches):
                     list_of_new_files.append(file_information)
                 else:
+                    match_index = matches.index(True)
                     if check_for_updates:
-                        if self.need_update(objects_to_check[matches.index(True)], file_information):
+                        if self.need_update(objects_to_check[match_index], file_information):
                             files_to_update.append(file_information)
                     del objects_to_check[matches.index(True)]
-                files_in_directory.remove(file_information)
             else:
-                list_of_new_files += files_in_directory
+                index_of_file = files_in_directory.index(file_information)
+                list_of_new_files += files_in_directory[index_of_file:]
                 break
         return list_of_new_files, files_to_update
 

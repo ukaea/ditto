@@ -61,7 +61,7 @@ if __name__ == "__main__":
         (r"/createbucket/", CreateBucketHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/deletefile/", DeleteFileHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/copynew/", CopyNewHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/copupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
+        (r"/copyupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
     APP.listen(8888)
     tornado.ioloop.IOLoop.current().start()
