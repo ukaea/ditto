@@ -14,12 +14,10 @@ class ExternalDataService:
     def get_buckets(self):
         return [BucketInformation(bucket) for bucket in self._s3_client.list_buckets()]
 
-    def get_objects(self, bucket_names, dir_path):
+    def get_objects(self, bucket_name, dir_path):
         """Passes list of object of Objects up to data replication service"""
-        objs = []
-        for bucket_name in bucket_names:
-            objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
-            objs += [S3ObjectInformation(obj) for obj in objects if not obj.is_dir]
+        objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
+        objs = [S3ObjectInformation(obj) for obj in objects if not obj.is_dir]
         return objs
 
     def does_dir_exist(self, bucket, dir_path):
