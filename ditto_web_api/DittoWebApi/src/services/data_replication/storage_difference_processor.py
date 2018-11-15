@@ -10,14 +10,16 @@ class StorageDifferenceProcessor:
             return files_in_directory
         objects_to_check = [s3_obj for s3_obj in objects_in_bucket]
         for file_information in files_in_directory:
-            if not objects_to_check:
-                list_of_new_files.append(file_information)
-            else:
+            if objects_to_check:
                 matches = [self.are_the_same(s3_object, file_information) for s3_object in objects_to_check]
                 if not any(matches):
                     list_of_new_files.append(file_information)
                 else:
                     del objects_to_check[matches.index(True)]
+                files_in_directory.remove(file_information)
+            else:
+                list_of_new_files += files_in_directory
+                break
         return list_of_new_files
 
     @staticmethod
