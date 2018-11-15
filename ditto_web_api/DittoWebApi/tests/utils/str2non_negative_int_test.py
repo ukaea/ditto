@@ -26,7 +26,7 @@ def test_str2non_negative_int_throws_value_error_for_positive_float():
         str2non_negative_int("42.5")
 
 
-def test_str2non_negative_int_throws_value_error_for_positive_float():
+def test_str2non_negative_int_throws_value_error_for_negative_float():
     with pytest.raises(ValueError):
         str2non_negative_int("-42.5")
 
