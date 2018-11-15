@@ -1,8 +1,6 @@
 import datetime
 import unittest
 
-import mock
-
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 
 

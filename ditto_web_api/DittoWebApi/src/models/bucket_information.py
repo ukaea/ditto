@@ -1,3 +1,4 @@
+# pylint: disable=W0212
 class BucketInformation:
     def __init__(self):
         self._name = None

@@ -3,7 +3,6 @@ import datetime
 import mock
 import pytest
 
-from minio.error import NoSuchKey
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter

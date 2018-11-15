@@ -1,3 +1,4 @@
+# pylint: disable=W0212
 class S3ObjectInformation:
     def __init__(self):
         self._object_name = None
