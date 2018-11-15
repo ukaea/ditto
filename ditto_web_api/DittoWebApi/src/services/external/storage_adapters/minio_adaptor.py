@@ -26,6 +26,7 @@ class MinioAdapter(IS3Adapter):
             minio_object.object_name,
             minio_object.bucket_name,
             minio_object.is_dir,
+            minio_object.size,
             minio_object.etag,
             minio_object.last_modified
         )
