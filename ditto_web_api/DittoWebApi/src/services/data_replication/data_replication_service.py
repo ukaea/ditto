@@ -12,6 +12,10 @@ class DataReplicationService:
         self._logger = logger
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
+        if not self._external_data_service.does_bucket_exist(bucket_name):
+            message = "Warning, bucket {} does not exist in the S3 storage"
+            self._logger.warning(message)
+            return {"message": message}
         self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
         objects = self._external_data_service.get_objects(bucket_name, dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
@@ -70,13 +74,17 @@ class DataReplicationService:
         return return_bucket_message(message, bucket_name)
 
     def try_delete_file(self, bucket_name, file_name):
+        if not self._external_data_service.does_bucket_exist(bucket_name):
+            message = "Warning, bucket {} does not exist in the S3 storage"
+            self._logger.warning(message)
+            return return_delete_file_helper(message=message, file_name=file_name, bucket_name=bucket_name)
         if not self._external_data_service.does_object_exist(bucket_name, file_name):
             message = "File {} does not exist in bucket {}".format(file_name, bucket_name)
             self._logger.warning(message)
-            return return_delete_file_helper(message, file_name, bucket_name)
+            return return_delete_file_helper(message=message, file_name=file_name, bucket_name=bucket_name)
         self._external_data_service.delete_file(bucket_name, file_name)
         message = "File {} successfully deleted from bucket {}".format(file_name, bucket_name)
-        return return_delete_file_helper(message, file_name, bucket_name)
+        return return_delete_file_helper(message=message, file_name=file_name, bucket_name=bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
         if not self._external_data_service.does_bucket_exist(bucket_name):
