@@ -24,7 +24,7 @@ class IS3Adapter(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def stat_object(self, bucket_name, object_name):
+    def object_exists(self, bucket_name, object_name):
         pass
 
     @abstractmethod

@@ -1,29 +1,23 @@
 import os
-from minio.error import NoSuchKey
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
-from DittoWebApi.src.models.bucket_information import BucketInformation
-from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
-from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
 
 
 class ExternalDataService:
-    def __init__(self, configuration):
-        self._s3_client = MinioAdapter(configuration)
+    def __init__(self, configuration, s3_adapter):
         self._bucket_standard = configuration.bucket_standard
+        self._s3_client = s3_adapter
 
     def get_buckets(self):
-        return [BucketInformation(bucket) for bucket in self._s3_client.list_buckets()]
+        return self._s3_client.list_buckets()
 
-    def get_objects(self, bucket_names, dir_path):
+    def get_objects(self, bucket_name, dir_path):
         """Passes list of object of Objects up to data replication service"""
-        objs = []
-        for bucket_name in bucket_names:
-            objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
-            objs += [S3ObjectInformation(obj) for obj in objects if not obj.is_dir]
-        return objs
+        objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
+        objects = [obj for obj in objects if not obj.is_dir]
+        return objects
 
     def does_dir_exist(self, bucket, dir_path):
-        objects = [obj for obj in self._s3_client.list_objects(bucket, dir_path)]
+        objects = self._s3_client.list_objects(bucket, dir_path)
         return len(objects) > 0
 
     def upload_file(self, bucket_name, processed_file):
@@ -46,8 +40,4 @@ class ExternalDataService:
         return self._s3_client.remove_object(bucket_name, file_name)
 
     def does_object_exist(self, bucket_name, file_name):
-        try:
-            self._s3_client.stat_object(bucket_name, file_name)
-            return True
-        except NoSuchKey:
-            return False
+        return self._s3_client.object_exists(bucket_name, file_name)

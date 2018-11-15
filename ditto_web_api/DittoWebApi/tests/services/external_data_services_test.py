@@ -20,31 +20,24 @@ class TestExternalDataServices:
         mock_configuration.s3_access_key = "example"
         mock_configuration.s3_secret_key = "example"
         mock_configuration.s3_use_secure = "example"
-        self.external_data_services = ExternalDataService(mock_configuration)
         mock_s3_client = mock.create_autospec(MinioAdapter)
-        self.external_data_services._s3_client = mock_s3_client
+        self.external_data_services = ExternalDataService(mock_configuration, mock_s3_client)
         # Create mock buckets
-        self.mock_bucket_1 = mock.create_autospec(BucketInformation)
-        self.mock_bucket_2 = mock.create_autospec(BucketInformation)
-        self.mock_bucket_1.name = "bucket1"
-        self.mock_bucket_1.creation_date = "17/11/18"
-        self.mock_bucket_2.name = "bucket2"
-        self.mock_bucket_2.creation_date = "10/10/18"
+        self.mock_bucket_1 = BucketInformation.create("bucket1", "17/11/18")
+        self.mock_bucket_2 = BucketInformation.create("bucket2", "10/10/18")
         # Create mock s3 objects
-        self.mock_object_1 = mock.create_autospec(S3ObjectInformation)
-        self.mock_object_1.is_dir = False
-        self.mock_object_1.object_name = 'mock_object_1'
-        self.mock_object_1.bucket_name = 'mock_bucket_1'
-        self.mock_object_1.size = 100
-        self.mock_object_1.etag = 'test_etag'
-        self.mock_object_1.last_modified = datetime.datetime(2018, 10, 11)
-        self.mock_object_2 = mock.create_autospec(S3ObjectInformation)
-        self.mock_object_2.is_dir = False
-        self.mock_object_2.object_name = 'mock_object_2'
-        self.mock_object_2.bucket_name = 'mock_bucket_1'
-        self.mock_object_2.size = 100
-        self.mock_object_2.etag = 'test_etag'
-        self.mock_object_2.last_modified = datetime.datetime(2018, 8, 10)
+        self.mock_object_1 = S3ObjectInformation.create('mock_object_1',
+                                                        'mock_bucket_1',
+                                                        False,
+                                                        100,
+                                                        'test_etag',
+                                                        datetime.datetime(2018, 10, 11))
+        self.mock_object_2 = S3ObjectInformation.create('mock_object_2',
+                                                        'mock_bucket_1',
+                                                        False,
+                                                        100,
+                                                        'test_etag',
+                                                        datetime.datetime(2018, 8, 10))
 
     def test_get_buckets_returns_list_of_buckets_when_they_exist(self):
         # Arrange
@@ -113,21 +106,14 @@ class TestExternalDataServices:
     def test_does_bucket_match_standard_returns_true_if_bucket_name_does_agree_with_local_standards(self):
         assert self.external_data_services.does_bucket_match_standard("test-1234") is True
 
-    def test_does_object_exist_returns_true_when_object_exists(self):
+    @pytest.mark.parametrize("object_exists", [True, False])
+    def test_does_object_exist_passes_s3_client_response(self, object_exists):
         # Arrange
-        self.external_data_services._s3_client.stat_object.return_value = ["Okay"]
+        self.external_data_services._s3_client.object_exists.return_value = object_exists
         # Act
         result = self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
         # Assert
-        assert result is True
-
-    def test_does_object_exist_returns_false_when_object_does_not_exist(self):
-        # Arrange
-        self.external_data_services._s3_client.stat_object.side_effect = NoSuchKey(1212)
-        # Act
-        result = self.external_data_services.does_object_exist(self.mock_object_1, self.mock_bucket_1)
-        # Assert
-        assert result is False
+        assert result is object_exists
 
     @pytest.mark.parametrize("return_value", [True, False])
     def test_delete_file_wraps_the_s3_adapter_method(self, return_value):

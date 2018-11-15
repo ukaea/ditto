@@ -8,6 +8,7 @@ from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.services.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
+from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
@@ -43,7 +44,8 @@ if __name__ == "__main__":
     LOGGER.info("Starting DITTO Web API")
 
     # Set up services
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION)
+    S3_ADAPTER = MinioAdapter(CONFIGURATION)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, S3_ADAPTER)
     INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE, INTERNAL_DATA_SERVICE, LOGGER)
 
