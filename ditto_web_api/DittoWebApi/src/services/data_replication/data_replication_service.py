@@ -21,6 +21,10 @@ class DataReplicationService:
         return object_dicts
 
     def copy_dir(self, bucket_name, dir_path):
+        if not self._external_data_service.does_bucket_exist(bucket_name):
+            message = "Warning, bucket {} does not exist in the S3 storage"
+            self._logger.warning(message)
+            return return_dict(message=message)
         self._logger.debug("Copying for {}".format(dir_path))
         self._logger.info("Finding files in local directory")
         files_to_copy = self._internal_data_service.find_files(dir_path)
@@ -75,6 +79,10 @@ class DataReplicationService:
         return return_delete_file_helper(message, file_name, bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
+        if not self._external_data_service.does_bucket_exist(bucket_name):
+            message = "Warning, bucket {} does not exist in the S3 storage"
+            self._logger.warning(message)
+            return return_dict(message=message)
         directory = dir_path if dir_path else "root"
         self._logger.info("Finding files in {}".format(directory))
         files_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
