@@ -36,9 +36,9 @@ class TestSorageDifferenceProcessor:
         # Act
         result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
-        assert len(result) == 2
-        assert result[0] == self.file_1
-        assert result[1] == self.file_2
+        assert len(result[0]) == 2
+        assert result[0][0] == self.file_1
+        assert result[0][1] == self.file_2
 
     def test_new_files_returns_empty_array_when_all_files_are_already_present(self):
         # Arrange
@@ -47,7 +47,7 @@ class TestSorageDifferenceProcessor:
         # Act
         result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
-        assert result == []
+        assert result == ([], [])
 
     def test_new_files_returns_only_new_files_when_some_are_new_some_are_present_including_non_unix_paths(self):
         # Arrange
@@ -57,8 +57,8 @@ class TestSorageDifferenceProcessor:
         result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
         assert len(result) == 2
-        assert result[0] == self.file_1
-        assert result[1] == self.file_3
+        assert result[0][0] == self.file_1
+        assert result[0][1] == self.file_3
 
     def test_new_files_returns_only_new_files_when_there_is_extra_file_in_bucket_but_not_in_dir(self):
         # Arrange
@@ -68,8 +68,8 @@ class TestSorageDifferenceProcessor:
         result = self.processor.return_new_files(objects_in_bucket, files_in_directory)
         # Assert
         assert len(result) == 2
-        assert result[0] == self.file_1
-        assert result[1] == self.file_3
+        assert result[0][0] == self.file_1
+        assert result[0][1] == self.file_3
 
     def test_are_the_same_returns_true_when_objects_represent_the_same_file(self):
         # Arrange
