@@ -6,11 +6,15 @@ def no_files_found(dir_path):
     return "No files found in directory or directory does not exist ({})".format(dir_path)
 
 
+def no_new_files(dir_path):
+    return "No new files found in directory ({})".format(dir_path)
+
+
 def transfer_success():
     return "Transfer successful"
 
 
-def transfer_summary(files_to_tansfer , directory, data_transferred):
+def transfer_summary(files_to_tansfer, directory, data_transferred):
     return "Transfer successful, copied {} new files from {} totalling {} bytes".format(files_to_tansfer,
                                                                                         directory,
                                                                                         data_transferred)
