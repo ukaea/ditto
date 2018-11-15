@@ -10,27 +10,27 @@ class TestReturnHelper(unittest.TestCase):
                                 files_updated=4,
                                 data_transferred=102,
                                 message=message)
-        self.assertEqual(test_dict, {"Message": message,
-                                     "Files transferred": 5,
-                                     "Files updated": 4,
-                                     "Files skipped": 2,
-                                     "Data transferred (bytes)": 102})
+        self.assertEqual(test_dict, {"message": message,
+                                     "new files transferred": 5,
+                                     "files updated": 4,
+                                     "files skipped": 2,
+                                     "data transferred (bytes)": 102})
 
     def test_correct_return_when__no_message_is_added_for_return_dict(self):
         test_dict = return_dict(files_transferred=6,
                                 files_skipped=3,
                                 files_updated=1,
                                 data_transferred=2532,)
-        self.assertEqual(test_dict, {"Message": "",
-                                     "Files transferred": 6,
-                                     "Files updated": 1,
-                                     "Files skipped": 3,
-                                     "Data transferred (bytes)": 2532})
+        self.assertEqual(test_dict, {"message": "",
+                                     "new files transferred": 6,
+                                     "files updated": 1,
+                                     "files skipped": 3,
+                                     "data transferred (bytes)": 2532})
 
     def test_default_dict_returned_when_return_dict_called_with_no_args(self):
         test_dict = return_dict()
-        self.assertEqual(test_dict, {"Message": "",
-                                     "Files transferred": 0,
-                                     "Files updated": 0,
-                                     "Files skipped": 0,
-                                     "Data transferred (bytes)": 0})
+        self.assertEqual(test_dict, {"message": "",
+                                     "new files transferred": 0,
+                                     "files updated": 0,
+                                     "files skipped": 0,
+                                     "data transferred (bytes)": 0})

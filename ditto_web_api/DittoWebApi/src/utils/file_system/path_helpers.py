@@ -1,5 +1,5 @@
-from pathlib import Path
+from pathlib import PureWindowsPath
 
 
 def to_posix(path):
-    return Path(path).as_posix()
+    return PureWindowsPath(path).as_posix()
