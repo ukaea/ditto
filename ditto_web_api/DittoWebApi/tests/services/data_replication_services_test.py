@@ -331,3 +331,68 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'files updated': 0,
                             'files skipped': 1,
                             'data transferred (bytes)': 46}
+
+    def test_copy_new_and_update_return_warning_when_bucket_not_found(self):
+        # Arrange
+        self.mock_external_data_service.does_bucket_exist.return_value = False
+        # Act
+        response = self.test_service.copy_new_and_update("bucket", None)
+        # Assert
+        assert self.mock_external_data_service.upload_file.call_count == 0
+        assert response == {'message': 'Warning, bucket bucket does not exist in the S3 storage',
+                            'new files uploaded': 0,
+                            'files updated': 0,
+                            'files skipped': 0,
+                            'data transferred (bytes)': 0}
+
+    def test_copy_new_and_update_return_message_when_no_new_files_to_transfer_or_update(self):
+        # Arrange
+        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
+        self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
+        self.mock_storage_difference_processor.return_new_files.return_value = ([], [])
+        # Act
+        response = self.test_service.copy_new_and_update("bucket", None)
+        # Assert
+        assert self.mock_external_data_service.upload_file.call_count == 0
+        assert response == {'message': 'No new or updated files found in directory (root)',
+                            'new files uploaded': 0,
+                            'files updated': 0,
+                            'files skipped': 1,
+                            'data transferred (bytes)': 0}
+
+    def test_copy_new_and_update_return_message_directory_does_not_exist(self):
+        # Arrange
+        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
+        self.mock_internal_data_service.find_files.return_value = []
+        self.mock_storage_difference_processor.return_new_files.return_value = ([], [])
+        # Act
+        response = self.test_service.copy_new_and_update("bucket", None)
+        # Assert
+        assert self.mock_external_data_service.upload_file.call_count == 0
+        assert response == {'message': 'No files found in directory or directory does not exist (root)',
+                            'new files uploaded': 0,
+                            'files updated': 0,
+                            'files skipped': 0,
+                            'data transferred (bytes)': 0}
+
+    def test_copy_new_and_update_return_message_when_new_files_transferred_and_files_updated(self):
+        # Arrange
+        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
+        self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
+                                                                   self.mock_file_information_2,
+                                                                   self.mock_file_information_3]
+        self.mock_storage_difference_processor.return_new_files.return_value = ([self.mock_file_information_2],
+                                                                                [self.mock_file_information_3])
+        self.mock_external_data_service.upload_file.side_effect = [12, 34]
+        # Act
+        response = self.test_service.copy_new_and_update("bucket", "some_dir")
+        # Assert
+        assert self.mock_external_data_service.upload_file.call_count == 2
+        assert response == {'message': 'Transfer successful',
+                            'new files uploaded': 1,
+                            'files updated': 1,
+                            'files skipped': 1,
+                            'data transferred (bytes)': 46}
