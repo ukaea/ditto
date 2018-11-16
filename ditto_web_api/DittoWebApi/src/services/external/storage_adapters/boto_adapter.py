@@ -1,6 +1,5 @@
 from boto.exception import S3CreateError
 from boto.exception import S3ResponseError
-from boto.s3.bucketlistresultset import BucketListResultSet
 import boto.s3.connection
 from DittoWebApi.src.models.bucket_information import BucketInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
@@ -51,7 +50,6 @@ class BotoAdapter(IS3Adapter):
         results_set = bucket.list(prefix=directory_to_search)
         objects = [BotoAdapter._get_s3_object_information(boto_object) for boto_object in results_set]
         return objects
-
 
     def put_object(self, bucket_name, object_name, data, length,
                    content_type='application/octet-stream', metadata=None):
