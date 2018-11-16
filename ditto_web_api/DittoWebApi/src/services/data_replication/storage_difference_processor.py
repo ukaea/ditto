@@ -1,9 +1,11 @@
 # pylint: disable=R0201
-import os
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 
 
 class StorageDifferenceProcessor:
+    def __init__(self):
+        self._file_system_helper = FileSystemHelper()
 
     def return_new_files(self, objects_in_bucket, files_in_directory, check_for_updates=False):
         """Returns a tuple of which the first element are the file information objects that are new
@@ -17,7 +19,9 @@ class StorageDifferenceProcessor:
         objects_to_check = [s3_obj for s3_obj in objects_in_bucket]
         for file_information in files_in_directory:
             if objects_to_check:
-                matches = [self.are_the_same(s3_object, file_information) for s3_object in objects_to_check]
+                matches = [self.are_the_same(s3_object, file_information)
+                           for s3_object
+                           in objects_to_check]
                 if not any(matches):
                     list_of_new_files.append(file_information)
                 else:
@@ -32,11 +36,10 @@ class StorageDifferenceProcessor:
                 break
         return list_of_new_files, files_to_update
 
-    @staticmethod
-    def are_the_same(s3_object, file_information):
+    def are_the_same(self, s3_object, file_information):
         s3_object_name = s3_object.object_name
         return to_posix(file_information.rel_path) == to_posix(s3_object_name)
 
-    @staticmethod
-    def need_update(s3_object, file_information):
-        return s3_object.last_modified < os.stat(file_information.abs_path).st_mtime
+    def need_update(self, s3_object, file_information):
+        return s3_object.last_modified < self._file_system_helper.last_modified(file_information.abs_path)
+

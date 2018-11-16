@@ -4,12 +4,15 @@ import mock
 from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
 class TestSorageDifferenceProcessor:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.processor = StorageDifferenceProcessor()
+        mock_file_system_helper = mock.create_autospec(FileSystemHelper)
+        self.processor._file_system_helper = mock_file_system_helper
         # Mock file information objects
         self.file_1 = mock.create_autospec(FileInformation)
         self.file_2 = mock.create_autospec(FileInformation)
@@ -19,6 +22,10 @@ class TestSorageDifferenceProcessor:
         self.file_2.rel_path = "some_dir/file_2.txt"
         self.file_3.rel_path = r"some_win_dir\some_win_sub_dir\file_3.txt"
         self.file_4.rel_path = r"some/badly\formed/path\file_4.txt"
+        self.file_1.abs_path = "root/file_1.txt"
+        self.file_2.abs_path = "root/some_dir/file_2.txt"
+        self.file_3.abs_path = r"root/some_win_dir\some_win_sub_dir\file_3.txt"
+        self.file_4.abs_path = r"root/some/badly\formed/path\file_4.txt"
         # Mock s3 objects
         self.s3_object_1 = mock.create_autospec(S3ObjectInformation)
         self.s3_object_2 = mock.create_autospec(S3ObjectInformation)
@@ -29,7 +36,7 @@ class TestSorageDifferenceProcessor:
         self.s3_object_3.object_name = "some_win_dir/some_win_sub_dir/file_3.txt"
         self.s3_object_4.object_name = "some/badly/formed/path/file_4.txt"
 
-    def test_new_files_returns_all_files_when_only_new_files_are_present(self):
+    def test_return_new_files_returns_all_files_when_only_new_files_are_present(self):
         # Arrange
         objects_in_bucket = []
         files_in_directory = [self.file_1, self.file_2]
@@ -40,7 +47,7 @@ class TestSorageDifferenceProcessor:
         assert result[0][0] == self.file_1
         assert result[0][1] == self.file_2
 
-    def test_new_files_returns_empty_array_when_all_files_are_already_present(self):
+    def test_return_new_files_returns_empty_array_when_all_files_are_already_present(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2]
         files_in_directory = [self.file_1, self.file_2]
@@ -49,7 +56,7 @@ class TestSorageDifferenceProcessor:
         # Assert
         assert result == ([], [])
 
-    def test_new_files_returns_only_new_files_when_some_are_new_some_are_present_including_non_unix_paths(self):
+    def test_return_new_files_returns_only_new_files_when_some_are_new_some_are_present_including_non_unix_paths(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
@@ -60,7 +67,7 @@ class TestSorageDifferenceProcessor:
         assert result[0][0] == self.file_1
         assert result[0][1] == self.file_3
 
-    def test_new_files_returns_only_new_files_when_there_is_extra_file_in_bucket_but_not_in_dir(self):
+    def test_return_new_files_returns_only_new_files_when_there_is_extra_file_in_bucket_but_not_in_dir(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2, self.s3_object_4]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
@@ -80,6 +87,7 @@ class TestSorageDifferenceProcessor:
         # Assert
         assert result is True
 
+
     def test_are_the_same_returns_false_when_objects_represent_different_files(self):
         # Arrange
         s3_object = self.s3_object_2
@@ -89,14 +97,16 @@ class TestSorageDifferenceProcessor:
         # Assert
         assert result is False
 
+
     def test_are_the_same_returns_true_when_objects_represent_the_same_file_but_with_windows_path(self):
-        # Arrange
-        s3_object = self.s3_object_3
-        file_information = self.file_3
-        # Act
-        result = self.processor.are_the_same(s3_object, file_information)
-        # Assert
-        assert result is True
+       # Arrange
+       s3_object = self.s3_object_3
+       file_information = self.file_3
+       # Act
+       result = self.processor.are_the_same(s3_object, file_information)
+       # Assert
+       assert result is True
+
 
     def test_are_the_same_returns_true_when_objects_represent_the_same_file_but_with_mixed_path(self):
         # Arrange
@@ -106,3 +116,36 @@ class TestSorageDifferenceProcessor:
         result = self.processor.are_the_same(s3_object, file_information)
         # Assert
         assert result is True
+
+    def test_need_update_returns_true_when_timestamp_for_file_information_is_more_recent(self):
+        # Arrange
+        s3_object = self.s3_object_1
+        file_information = self.file_1
+        s3_object.last_modified = 12345665.12345
+        self.processor._file_system_helper.last_modified.return_value = 22234589.12345
+        # Act
+        result = self.processor.need_update(s3_object, file_information)
+        # Assert
+        assert result is True
+
+    def test_need_update_returns_false_when_timestamp_for_s3_object_is_more_recent(self):
+        # Arrange
+        s3_object = self.s3_object_1
+        file_information = self.file_1
+        s3_object.last_modified = 9912345665.12345
+        self.processor._file_system_helper.last_modified.return_value = 12234589.12345
+        # Act
+        result = self.processor.need_update(s3_object, file_information)
+        # Assert
+        assert result is False
+
+    def test_need_update_returns_false_when_timestamps_are_equal_for_s3_object_and_file_information(self):
+        # Arrange
+        s3_object = self.s3_object_1
+        file_information = self.file_1
+        s3_object.last_modified = 12345.12345
+        self.processor._file_system_helper.last_modified.return_value = 12345.12345
+        # Act
+        result = self.processor.need_update(s3_object, file_information)
+        # Assert
+        assert result is False
