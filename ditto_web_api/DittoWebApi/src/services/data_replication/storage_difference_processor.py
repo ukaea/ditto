@@ -42,4 +42,3 @@ class StorageDifferenceProcessor:
 
     def need_update(self, s3_object, file_information):
         return s3_object.last_modified < self._file_system_helper.last_modified(file_information.abs_path)
-
