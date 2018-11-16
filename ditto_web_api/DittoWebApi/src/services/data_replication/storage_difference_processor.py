@@ -36,7 +36,8 @@ class StorageDifferenceProcessor:
                 break
         return list_of_new_files, files_to_update
 
-    def are_the_same(self, s3_object, file_information):
+    @staticmethod
+    def are_the_same(s3_object, file_information):
         s3_object_name = s3_object.object_name
         return to_posix(file_information.rel_path) == to_posix(s3_object_name)
 
