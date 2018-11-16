@@ -12,7 +12,7 @@ class DataReplicationService:
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
         self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
-        objects = self._external_data_service.get_objects([bucket_name], dir_path)
+        objects = self._external_data_service.get_objects(bucket_name, dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
         self._logger.info("Found {} objects in '{}' directory of bucket '{}'".format(len(objects),
                                                                                      dir_path,

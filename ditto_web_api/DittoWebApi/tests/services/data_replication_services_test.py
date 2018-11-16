@@ -41,7 +41,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         output = self.test_service.retrieve_object_dicts("test_bucket", None)
         # Assert
-        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], None)
+        self.mock_external_data_service.get_objects.assert_called_once_with("test_bucket", None)
         assert output[0] == {"object_name": "test",
                              "bucket_name": "test_bucket",
                              "is_dir": False,
@@ -60,7 +60,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         output = self.test_service.retrieve_object_dicts("test_bucket", None)
         # Assert
-        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], None)
+        self.mock_external_data_service.get_objects.assert_called_once_with("test_bucket", None)
         assert output == []
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects_from_sub_dir(self):
@@ -76,7 +76,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         output = self.test_service.retrieve_object_dicts("test_bucket", "test_dir")
         # Assert
-        self.mock_external_data_service.get_objects.assert_called_once_with(["test_bucket"], "test_dir")
+        self.mock_external_data_service.get_objects.assert_called_once_with("test_bucket", "test_dir")
         assert output[0] == {"object_name": "test_dir/test",
                              "bucket_name": "test_bucket",
                              "is_dir": False,
