@@ -1,5 +1,5 @@
 from minio.error import InvalidBucketError
-from DittoWebApi.src.utils.return_helper import return_dict
+from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 
@@ -26,20 +26,20 @@ class DataReplicationService:
         if not files_to_copy:
             message = "No files found in directory or directory does not exist ({})".format(dir_path)
             self._logger.warning(message)
-            return return_dict(message=message)
+            return return_transfer_summary(message=message)
         # route if files have been found
         if self._external_data_service.does_dir_exist(bucket_name, dir_path):
             skipped_files = len(files_to_copy)
             message = "Directory already exists, {} files skipped".format(skipped_files)
             self._logger.warning(message)
-            return return_dict(files_skipped=skipped_files, message=message)
+            return return_transfer_summary(files_skipped=skipped_files, message=message)
         # route if directory doesn't already exist
         self._logger.info("About to copy {} files".format(len(files_to_copy)))
         data_transferred = 0
         for processed_file in files_to_copy:
             data_transferred += self._external_data_service.upload_file(bucket_name, processed_file)
         message = "Copied across {} files totaling {} bytes".format(len(files_to_copy), data_transferred)
-        return return_dict(files_transferred=len(files_to_copy), data_transferred=data_transferred, message=message)
+        return return_transfer_summary(files_transferred=len(files_to_copy), data_transferred=data_transferred, message=message)
 
     def create_bucket(self, bucket_name):
         if not bucket_name:
