@@ -52,23 +52,6 @@ class TestExternalDataServices:
 
         assert len(results) == 2
 
-    def test_get_buckets_returns_empty_list_when_none_exist(self):
-        # Arrange
-        self.external_data_services._s3_client.list_buckets.return_value = []
-        # Act
-        result = self.external_data_services.get_buckets()
-        # Assert
-        assert result == []
-
-    def test_get_objects_returns_no_objects_when_none_exist(self):
-        # Arrange
-        self.external_data_services._s3_client.list_objects.return_value = []
-        buckets = [self.mock_bucket_1, self.mock_bucket_2]
-        # Act
-        result = self.external_data_services.get_objects(buckets, None)
-        # Assert
-        assert result == []
-
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
         self.external_data_services._s3_client.list_objects.return_value = [self.mock_object_1, self.mock_object_2]

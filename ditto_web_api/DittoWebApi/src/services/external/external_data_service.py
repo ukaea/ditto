@@ -7,9 +7,6 @@ class ExternalDataService:
         self._bucket_standard = configuration.bucket_standard
         self._s3_client = s3_adapter
 
-    def get_buckets(self):
-        return self._s3_client.list_buckets()
-
     def get_objects(self, bucket_name, dir_path):
         """Passes list of object of Objects up to data replication service"""
         objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
