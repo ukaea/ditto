@@ -8,7 +8,7 @@ from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Ad
 
 class MinioAdapter(IS3Adapter):
     def __init__(self, configuration):
-        self._s3_client = Minio(configuration.s3_url,
+        self._s3_client = Minio(configuration.s3_host + ":" + str(configuration.s3_port),
                                 configuration.s3_access_key,
                                 configuration.s3_secret_key,
                                 configuration.s3_use_secure)

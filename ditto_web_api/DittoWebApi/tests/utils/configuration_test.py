@@ -11,7 +11,8 @@ class SampleConfigurationCreator:
     @staticmethod
     def create_configuration(log_folder_loc,
                              logging_level,
-                             s3_url,
+                             s3_host,
+                             s3_port,
                              s3_access_key,
                              s3_secret_key,
                              s3_use_secure,
@@ -25,8 +26,11 @@ class SampleConfigurationCreator:
                                                                        "LoggingLevel",
                                                                        logging_level)
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
-                                                                       "S3Address",
-                                                                       s3_url)
+                                                                       "S3host",
+                                                                       s3_host)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "S3port",
+                                                                       s3_port)
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "S3AccessKey",
                                                                        s3_access_key)
@@ -77,7 +81,8 @@ def test_configuration_can_be_read_when_s3_secure():
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
                                                                          "INFO",
-                                                                         "0.0.0.0:9000",
+                                                                         "0.0.0.0",
+                                                                         "9000",
                                                                          "access",
                                                                          "secret",
                                                                          "true",
@@ -89,7 +94,8 @@ def test_configuration_can_be_read_when_s3_secure():
 
     # Assert
     assert configuration.log_folder_location == current
-    assert configuration.s3_url == "0.0.0.0:9000"
+    assert configuration.s3_host == "0.0.0.0"
+    assert configuration.s3_port == 9000
     assert configuration.s3_access_key == "access"
     assert configuration.s3_secret_key == "secret"
     assert configuration.s3_use_secure is True
@@ -105,7 +111,8 @@ def test_configuration_can_be_read_when_s3_not_secure():
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
                                                                          "INFO",
-                                                                         "0.0.0.0:9000",
+                                                                         "0.0.0.0",
+                                                                         "9000",
                                                                          "access",
                                                                          "secret",
                                                                          "false",
@@ -117,7 +124,8 @@ def test_configuration_can_be_read_when_s3_not_secure():
 
     # Assert
     assert configuration.log_folder_location == current
-    assert configuration.s3_url == "0.0.0.0:9000"
+    assert configuration.s3_host == "0.0.0.0"
+    assert configuration.s3_port == 9000
     assert configuration.s3_access_key == "access"
     assert configuration.s3_secret_key == "secret"
     assert configuration.s3_use_secure is False
