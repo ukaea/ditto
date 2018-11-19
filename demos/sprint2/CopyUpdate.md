@@ -18,7 +18,7 @@ Bash
 6. `cd data`
 7. `mkdir some_files`
   - `cd some_files`
-8. `echo "This is a test file \n" >> test_file_1`
+8. `echo "This is a test file \n" >> test_file_1.txt`
 9. `cd ../..`
 10. `PYTHONPATH=./ python DittoWebApi/main.py`
 
