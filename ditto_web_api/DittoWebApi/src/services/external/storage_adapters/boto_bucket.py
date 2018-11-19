@@ -11,8 +11,7 @@ class BotoBucket:
 
     def get_key(self, *args, **kwargs):
         key = self._bucket.get_key(*args, **kwargs)
-        wrapped_key = BotoKey(key)
-        return wrapped_key
+        return None if key is None else BotoKey(key)
 
     def list(self, *args, **kwargs):
         return self._bucket.list(*args, **kwargs)
