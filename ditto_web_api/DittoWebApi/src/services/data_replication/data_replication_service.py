@@ -92,6 +92,7 @@ class DataReplicationService:
         self._logger.info("Finding files in {}".format(directory))
         files_in_directory = self._internal_data_service.find_files(dir_path)
         number_of_files_in_directory = len(files_in_directory)
+
         if not files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
@@ -100,8 +101,10 @@ class DataReplicationService:
         self._logger.debug("Found {} objects in bucket {}".format(len(objects_already_in_bucket), bucket_name))
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
             number_of_files_in_directory, directory, bucket_name))
-        files_to_transfer = self._storage_difference_processor.return_new_files(objects_already_in_bucket,
-                                                                                files_in_directory)[0]
+
+        files_to_transfer = self._storage_difference_processor.return_difference_comparison(
+            objects_already_in_bucket, files_in_directory
+        ).new_files
         if not files_to_transfer:
             self._logger.warning(messages.no_new_files(directory))
             return return_transfer_summary(message=messages.no_new_files(directory),
@@ -126,34 +129,37 @@ class DataReplicationService:
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_in_directory = self._internal_data_service.find_files(dir_path)
         number_of_files_in_directory = len(files_in_directory)
+
         if not files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
+
         self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
             number_of_files_in_directory, directory, bucket_name))
-        files_to_use = self._storage_difference_processor.return_new_files(objects_already_in_bucket,
-                                                                           files_in_directory,
-                                                                           check_for_updates=True)
-        new_files = files_to_use[0]
-        self._logger.debug("Comparison shows {} new files".format(len(new_files)))
-        files_to_update = files_to_use[1]
-        self._logger.debug("Comparison shows {} files to update".format(len(files_to_update)))
-        files_to_transfer = new_files + files_to_update
+        files_to_use = self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket,
+                                                                                       files_in_directory,
+                                                                                       check_for_updates=True)
+
+        self._logger.debug("Comparison shows {} new files".format(len(files_to_use.new_files)))
+        self._logger.debug("Comparison shows {} files to update".format(len(files_to_use.updated_files)))
+
+        files_to_transfer = files_to_use.new_files + files_to_use.updated_files
         if not files_to_transfer:
             self._logger.warning(messages.no_new_or_updates(directory))
             return return_transfer_summary(message=messages.no_new_or_updates(directory),
                                            files_skipped=number_of_files_in_directory)
+
         data_transferred = 0
         self._logger.info("About to transfer {} new files and update {} files from {} into bucket {}".format(
-            len(files_to_transfer), len(files_to_update), directory, bucket_name))
+            len(files_to_transfer), len(files_to_use.updated_files), directory, bucket_name))
         for file in files_to_transfer:
             data_transferred += self._external_data_service.upload_file(bucket_name, file)
         self._logger.info(messages.transfer_summary_with_updates(len(files_to_transfer),
-                                                                 len(files_to_update),
+                                                                 len(files_to_use.updated_files),
                                                                  directory,
                                                                  data_transferred))
-        return return_transfer_summary(files_transferred=len(new_files),
-                                       files_updated=len(files_to_update),
+        return return_transfer_summary(files_transferred=len(files_to_use.new_files),
+                                       files_updated=len(files_to_use.updated_files),
                                        files_skipped=(number_of_files_in_directory - len(files_to_transfer)),
                                        data_transferred=data_transferred,
                                        message=messages.transfer_success())

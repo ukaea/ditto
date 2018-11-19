@@ -5,6 +5,7 @@ import unittest
 import mock
 import pytest
 
+from DittoWebApi.src.models.s3_object_file_comparison import S3ObjectFileComparison
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
@@ -21,6 +22,9 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service = mock.create_autospec(ExternalDataService)
         self.mock_internal_data_service = mock.create_autospec(InternalDataService)
         self.mock_storage_difference_processor = mock.create_autospec(StorageDifferenceProcessor)
+        self.mock_s3_object_file_comparison = mock.create_autospec(S3ObjectFileComparison)
+        self.mock_storage_difference_processor.return_difference_comparison.return_value = \
+            self.mock_s3_object_file_comparison
         self.mock_logger = mock.create_autospec(logging.Logger)
         self.test_service = DataReplicationService(self.mock_external_data_service,
                                                    self.mock_internal_data_service,
@@ -284,7 +288,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
-        self.mock_storage_difference_processor.return_new_files.return_value = ([], [])
+        self.mock_s3_object_file_comparison.new_files = []
+        self.mock_s3_object_file_comparison.updated_files = []
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
@@ -300,7 +305,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = []
-        self.mock_storage_difference_processor.return_new_files.return_value = ([], [])
+        self.mock_s3_object_file_comparison.new_files = []
+        self.mock_s3_object_file_comparison.updated_files = []
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
@@ -318,9 +324,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2,
                                                                    self.mock_file_information_3]
-        self.mock_storage_difference_processor.return_new_files.return_value = ([self.mock_file_information_2,
-                                                                                 self.mock_file_information_3],
-                                                                                [])
+        self.mock_s3_object_file_comparison.new_files = [self.mock_file_information_2, self.mock_file_information_3]
+        self.mock_s3_object_file_comparison.updated_files = []
         self.mock_external_data_service.upload_file.side_effect = [12, 34]
         # Act
         response = self.test_service.copy_new("bucket", "some_dir")
@@ -350,7 +355,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
-        self.mock_storage_difference_processor.return_new_files.return_value = ([], [])
+        self.mock_s3_object_file_comparison.new_files = []
+        self.mock_s3_object_file_comparison.updated_files = []
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
@@ -366,7 +372,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = []
-        self.mock_storage_difference_processor.return_new_files.return_value = ([], [])
+        self.mock_s3_object_file_comparison.new_files = []
+        self.mock_s3_object_file_comparison.updated_files = []
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
@@ -384,8 +391,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2,
                                                                    self.mock_file_information_3]
-        self.mock_storage_difference_processor.return_new_files.return_value = ([self.mock_file_information_2],
-                                                                                [self.mock_file_information_3])
+        self.mock_s3_object_file_comparison.new_files = [self.mock_file_information_2]
+        self.mock_s3_object_file_comparison.updated_files = [self.mock_file_information_3]
         self.mock_external_data_service.upload_file.side_effect = [12, 34]
         # Act
         response = self.test_service.copy_new_and_update("bucket", "some_dir")
