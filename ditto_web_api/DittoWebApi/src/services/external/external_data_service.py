@@ -1,4 +1,5 @@
 import dateutil.parser
+import os
 
 from DittoWebApi.src.models.bucket_information import BucketInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
@@ -91,7 +92,7 @@ class ExternalDataService:
         key = bucket.get_key(object_name)
         key = bucket.new_key(key_name=object_name) if key is None else key
         key.set_contents_from_filename(file_information.abs_path)
-        file_length = os.stat(processed_file.abs_path).st_size
+        file_length = os.stat(file_information.abs_path).st_size
         self._logger.debug(
             f'File "{object_name}" uploaded, {file_length} bytes transferred'
         )
