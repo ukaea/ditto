@@ -1,8 +1,8 @@
 # pylint: disable=W0201, W0212
 import datetime
+import logging
 import mock
 import pytest
-import logging
 
 from minio.error import NoSuchKey
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService

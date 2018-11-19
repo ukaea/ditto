@@ -1,7 +1,7 @@
 # pylint: disable=W0201, W0212
+import logging
 import pytest
 import mock
-import logging
 
 from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
