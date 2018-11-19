@@ -1,3 +1,9 @@
+def is_str_empty(string):
+    if string is None:
+        return True
+    return string.strip() == ""
+
+
 def str2bool(string):
     lower_str = string.lower()
     if lower_str == "true":
