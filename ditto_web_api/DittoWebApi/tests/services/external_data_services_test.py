@@ -1,5 +1,4 @@
 # pylint: disable=W0201, W0212
-import datetime
 import logging
 import mock
 import pytest
@@ -31,21 +30,6 @@ class TestExternalDataServices:
             self.mock_logger,
             self.mock_s3_client
         )
-        # Create mock buckets
-        self.mock_bucket = mock.create_autospec(Bucket)
-        # Create mock s3 objects
-        self.mock_object_1 = S3ObjectInformation.create('mock_object_1',
-                                                        'mock_bucket_1',
-                                                        False,
-                                                        100,
-                                                        'test_etag',
-                                                        datetime.datetime(2018, 10, 11))
-        self.mock_object_2 = S3ObjectInformation.create('mock_object_2',
-                                                        'mock_bucket_1',
-                                                        False,
-                                                        100,
-                                                        'test_etag',
-                                                        datetime.datetime(2018, 8, 10))
 
     @staticmethod
     def get_mock_key(name, bucket, etag, size, last_modified):
@@ -136,7 +120,14 @@ class TestExternalDataServices:
     def test_does_dir_exist_returns_true_if_item_is_in_directory(self):
         # Arrange
         mock_bucket = mock.create_autospec(Bucket)
-        mock_bucket.list.return_value = [self.mock_object_1]
+        mock_key_1 = TestExternalDataServices.get_mock_key(
+            'mock_object_1',
+            mock_bucket,
+            'test_etag_1',
+            42,
+            '2018-11-16T17:07:08.851Z'
+        )
+        mock_bucket.list.return_value = [mock_key_1]
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
         result = self.test_service.does_dir_exist("test-bucket", "testdir")
