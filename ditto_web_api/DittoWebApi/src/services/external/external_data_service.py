@@ -98,8 +98,8 @@ class ExternalDataService:
         )
         return True
 
-    def delete_file(self, bucket_name, file_information):
-        object_name = to_posix(file_information.rel_path)
+    def delete_file(self, bucket_name, file_rel_path):
+        object_name = to_posix(file_rel_path)
         bucket = self._s3_client.get_bucket(bucket_name)
         if bucket is None:
             self._logger.warning(

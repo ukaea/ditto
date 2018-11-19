@@ -267,9 +267,9 @@ class TestExternalDataServices:
     def test_delete_file_returns_false_if_bucket_does_not_exist(self):
         # Arrange
         self.mock_s3_client.get_bucket.return_value = None
-        file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
+        file_rel_path = "test.txt"
         # Act
-        result = self.test_service.delete_file("test-bucket", file_information)
+        result = self.test_service.delete_file("test-bucket", file_rel_path)
         # Assert
         self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
         self.mock_logger.warning.assert_called_once_with(
@@ -282,9 +282,9 @@ class TestExternalDataServices:
         mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.get_key.return_value = None
         self.mock_s3_client.get_bucket.return_value = mock_bucket
-        file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
+        file_rel_path = "test.txt"
         # Act
-        result = self.test_service.delete_file("test-bucket", file_information)
+        result = self.test_service.delete_file("test-bucket", file_rel_path)
         # Assert
         self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
         mock_bucket.get_key.assert_called_once_with("test.txt")
@@ -305,9 +305,9 @@ class TestExternalDataServices:
         )
         mock_bucket.get_key.return_value = mock_key
         self.mock_s3_client.get_bucket.return_value = mock_bucket
-        file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
+        file_rel_path = "test.txt"
         # Act
-        result = self.test_service.delete_file("test-bucket", file_information)
+        result = self.test_service.delete_file("test-bucket", file_rel_path)
         # Assert
         self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
         mock_bucket.get_key.assert_called_once_with("test.txt")
