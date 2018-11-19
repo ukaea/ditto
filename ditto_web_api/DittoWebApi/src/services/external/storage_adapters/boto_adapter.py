@@ -1,4 +1,4 @@
-import boto.s3.connection
+import boto
 
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 
@@ -16,7 +16,7 @@ class BotoAdapter(IS3Adapter):
                 calling_format=boto.s3.connection.OrdinaryCallingFormat()
             )
         except Exception as exception:
-            self._logger.critical(exception.value)
+            self._logger.critical(exception)
             raise exception
 
     def make_bucket(self, bucket_name, location=""):
