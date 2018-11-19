@@ -20,6 +20,12 @@ def transfer_summary(files_to_tansfer, directory, data_transferred):
                                                                                         data_transferred)
 
 
+def transfer_summary_with_updates(new_files, files_to_update, directory, data_transferred):
+    return "Transfer successful, copied {} new files and updated {} files from {} totalling {} bytes".format(
+        new_files, files_to_update, directory, data_transferred
+    )
+
+
 def file_deleted(file_name, bucket_name):
     return "File {} successfully deleted from bucket {}".format(file_name, bucket_name)
 
@@ -50,3 +56,7 @@ def directory_exists(directory, skipped_files):
 
 def bucket_exists(bucket_name):
     return "Bucket already exists ({})".format(bucket_name)
+
+
+def no_new_or_updates(directory):
+    return "No new or updated files found in directory ({})".format(directory)

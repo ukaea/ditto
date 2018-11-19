@@ -7,6 +7,7 @@ from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
+from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER, S3_ADAPTER)
     INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
-    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor()
+    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
                                                       STORAGE_DIFFERENCE_PROCESSOR,
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         (r"/createbucket/", CreateBucketHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/deletefile/", DeleteFileHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/copynew/", CopyNewHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-
+        (r"/copyupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
     APP.listen(8888)
     tornado.ioloop.IOLoop.current().start()

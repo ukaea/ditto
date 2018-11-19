@@ -21,3 +21,6 @@ class FileSystemHelper:
 
     def file_name(self, abs_file_path):
         return os.path.basename(abs_file_path)
+
+    def last_modified(self, file_path):
+        return os.path.getmtime(file_path)

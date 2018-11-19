@@ -14,6 +14,7 @@ from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 class TestExternalDataServices:
     @pytest.fixture(autouse=True)
     def setup(self):
+        self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
         mock_configuration = mock.create_autospec(Configuration)
         mock_configuration.bucket_standard = "test"
         mock_configuration.s3_url = "example"
