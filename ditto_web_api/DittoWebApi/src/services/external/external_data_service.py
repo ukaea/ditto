@@ -1,7 +1,6 @@
 import os
 import dateutil.parser
 
-from DittoWebApi.src.models.bucket_information import BucketInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.parse_strings import is_str_empty
@@ -118,13 +117,6 @@ class ExternalDataService:
         return True
 
     # Private methods
-
-    @staticmethod
-    def _get_bucket_information(boto_bucket):
-        return BucketInformation.create(
-            boto_bucket.name,
-            boto_bucket.creation_date
-        )
 
     @staticmethod
     def _get_s3_object_information(boto_object):
