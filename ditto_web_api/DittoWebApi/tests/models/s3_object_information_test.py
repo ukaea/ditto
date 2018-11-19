@@ -4,7 +4,7 @@ import unittest
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 
 
-class TestObjects(unittest.TestCase):
+class TestS3ObjectInformation(unittest.TestCase):
     def test_s3_object_information_is_correctly_converted_to_dictionary(self):
         # Arrange
         test_object = S3ObjectInformation.create(
