@@ -1,5 +1,4 @@
 flake8
-minio
 mock
 psutil
 pylint
