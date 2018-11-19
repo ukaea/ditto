@@ -10,7 +10,7 @@ from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
-from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import MinioAdapter
+from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
@@ -46,8 +46,8 @@ if __name__ == "__main__":
     LOGGER.info("Starting DITTO Web API")
 
     # Set up services
-    S3_ADAPTER = MinioAdapter(CONFIGURATION)
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, S3_ADAPTER)
+    S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER, S3_ADAPTER)
     INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
     STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor()
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
