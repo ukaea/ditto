@@ -46,9 +46,9 @@ if __name__ == "__main__":
     LOGGER.info("Starting DITTO Web API")
 
     # Set up services
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER)
     INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
-    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor()
+    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
                                                       STORAGE_DIFFERENCE_PROCESSOR,

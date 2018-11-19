@@ -5,13 +5,16 @@ from DittoWebApi.src.models.s3_object_file_comparison import S3ObjectFileCompari
 
 
 class StorageDifferenceProcessor:
-    def __init__(self):
+    def __init__(self, logger):
         self._file_system_helper = FileSystemHelper()
+        self._logger = logger
 
     def return_difference_comparison(self, objects_in_bucket, files_in_directory, check_for_updates=False):
+        self._logger.debug(f"Comparing objects in directory with those already in bucket")
         s3_object_file_comparison = S3ObjectFileComparison()
         if not objects_in_bucket:
             s3_object_file_comparison.new_files = files_in_directory
+            self._logger.debug("All files are new")
             return s3_object_file_comparison
         dict_of_files = self.file_information_to_dict(objects_in_bucket, files_in_directory)
         s3_object_file_comparison.new_files = [file_information for
@@ -19,6 +22,7 @@ class StorageDifferenceProcessor:
                                                files_in_directory if
                                                dict_of_files[to_posix(file_information.rel_path)] is None]
         if check_for_updates is False:
+            self._logger.debug(f"{len(s3_object_file_comparison.new_files)} files are new")
             return s3_object_file_comparison
         s3_object_file_comparison.updated_files = [file_information for
                                                    file_information in
@@ -28,6 +32,8 @@ class StorageDifferenceProcessor:
                                                    self.changes_in_file(
                                                        dict_of_files[to_posix(file_information.rel_path)],
                                                        file_information)]
+        self._logger.debug(f"{len(s3_object_file_comparison.new_files)} files are new")
+        self._logger.debug(f"{len(s3_object_file_comparison.updated_files)} files need updating")
         return s3_object_file_comparison
 
     @staticmethod

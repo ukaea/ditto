@@ -89,19 +89,12 @@ class DataReplicationService:
         if not self._external_data_service.does_bucket_exist(bucket_name):
             return return_transfer_summary(message=self._check_bucket_warning(bucket_name))
         directory = dir_path if dir_path else "root"
-        self._logger.info("Finding files in {}".format(directory))
         files_in_directory = self._internal_data_service.find_files(dir_path)
         number_of_files_in_directory = len(files_in_directory)
-
         if not files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
-        self._logger.debug("Found {} files in {}".format(number_of_files_in_directory, directory))
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-        self._logger.debug("Found {} objects in bucket {}".format(len(objects_already_in_bucket), bucket_name))
-        self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
-            number_of_files_in_directory, directory, bucket_name))
-
         files_to_transfer = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory
         ).new_files
@@ -124,8 +117,8 @@ class DataReplicationService:
     def copy_new_and_update(self, bucket_name, dir_path):
         if not self._external_data_service.does_bucket_exist(bucket_name):
             return return_transfer_summary(message=self._check_bucket_warning(bucket_name))
+
         directory = dir_path if dir_path else "root"
-        self._logger.info("Finding files in {}".format(directory))
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_in_directory = self._internal_data_service.find_files(dir_path)
         number_of_files_in_directory = len(files_in_directory)
@@ -134,15 +127,9 @@ class DataReplicationService:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
 
-        self._logger.info("Found {} files in {} comparing against files already in bucket {}".format(
-            number_of_files_in_directory, directory, bucket_name))
         files_to_use = self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket,
                                                                                        files_in_directory,
                                                                                        check_for_updates=True)
-
-        self._logger.debug("Comparison shows {} new files".format(len(files_to_use.new_files)))
-        self._logger.debug("Comparison shows {} files to update".format(len(files_to_use.updated_files)))
-
         files_to_transfer = files_to_use.new_files + files_to_use.updated_files
         if not files_to_transfer:
             self._logger.warning(messages.no_new_or_updates(directory))
