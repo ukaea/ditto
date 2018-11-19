@@ -125,12 +125,3 @@ class ExternalDataService:
             boto_object.etag,
             dateutil.parser.parse(boto_object.last_modified)
         )
-
-    @staticmethod
-    def dir_path_as_prefix(dir_path):
-        if dir_path is None or "":
-            return None
-        prefix = to_posix(dir_path)
-        return prefix \
-            if prefix[-1] is "/" \
-            else prefix + "/"
