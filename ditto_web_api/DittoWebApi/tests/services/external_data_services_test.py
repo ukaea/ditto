@@ -94,7 +94,7 @@ class TestExternalDataServices:
 
     def test_does_bucket_match_standard_allows_valid_bucket_name(self):
         bucket_name = "test-1234"
-        result = self.external_data_services.does_bucket_match_standard(bucket_name)
+        result = self.test_service.does_bucket_match_standard(bucket_name)
         assert result is True
 
     # does_dir_exist
@@ -105,7 +105,7 @@ class TestExternalDataServices:
         result = self.test_service.does_dir_exist("test-bucket", dir_path)
         # Assert
         assert result is False
-        self.mock_logger.debug.assert_called_once_with(
+        self.mock_logger.warning.assert_called_once_with(
             f'Tried to find empty directory path "{dir_path}"'
         )
 
@@ -115,7 +115,7 @@ class TestExternalDataServices:
         # Act
         result = self.test_service.does_dir_exist("test-bucket", "testdir")
         # Assert
-        self.mock_logger.debug.assert_called_once_with(
+        self.mock_logger.warning.assert_called_once_with(
             'Tried to find directory "testdir" in non-existent bucket "test-bucket"'
         )
         assert result is False
@@ -153,7 +153,8 @@ class TestExternalDataServices:
         self.mock_logger.warning.assert_called_once_with(
             'Tried to get objects from non-existent bucket "test-bucket"'
         )
-        assert len(result) == 0
+        assert isinstance(result, list)
+        assert not result
 
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
@@ -214,7 +215,6 @@ class TestExternalDataServices:
         self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
         mock_bucket.get_key.assert_called_once_with("test.txt")
         assert result is False
-
 
     @pytest.mark.parametrize("return_value", [True, False])
     def test_delete_file_wraps_the_s3_adapter_method(self, return_value):
