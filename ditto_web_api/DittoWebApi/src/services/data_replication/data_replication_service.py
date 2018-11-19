@@ -91,7 +91,7 @@ class DataReplicationService:
         directory = dir_path if dir_path else "root"
         files_in_directory = self._internal_data_service.find_files(dir_path)
         number_of_files_in_directory = len(files_in_directory)
-        if not files_in_directory:
+        if number_of_files_in_directory == 0:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
@@ -123,7 +123,7 @@ class DataReplicationService:
         files_in_directory = self._internal_data_service.find_files(dir_path)
         number_of_files_in_directory = len(files_in_directory)
 
-        if not files_in_directory:
+        if number_of_files_in_directory == 0:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
 

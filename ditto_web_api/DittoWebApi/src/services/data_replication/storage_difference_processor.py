@@ -21,18 +21,17 @@ class StorageDifferenceProcessor:
                                                file_information in
                                                files_in_directory if
                                                dict_of_files[to_posix(file_information.rel_path)] is None]
+        self._logger.debug(f"{len(s3_object_file_comparison.new_files)} files are new")
         if check_for_updates is False:
-            self._logger.debug(f"{len(s3_object_file_comparison.new_files)} files are new")
             return s3_object_file_comparison
         s3_object_file_comparison.updated_files = [file_information for
                                                    file_information in
                                                    files_in_directory if
                                                    dict_of_files[to_posix(file_information.rel_path)] is not None
                                                    and
-                                                   self.changes_in_file(
+                                                   self.has_file_changed(
                                                        dict_of_files[to_posix(file_information.rel_path)],
                                                        file_information)]
-        self._logger.debug(f"{len(s3_object_file_comparison.new_files)} files are new")
         self._logger.debug(f"{len(s3_object_file_comparison.updated_files)} files need updating")
         return s3_object_file_comparison
 
@@ -41,7 +40,7 @@ class StorageDifferenceProcessor:
         s3_object_name = s3_object.object_name
         return to_posix(file_information.rel_path) == to_posix(s3_object_name)
 
-    def changes_in_file(self, s3_object, file_information):
+    def has_file_changed(self, s3_object, file_information):
         return s3_object.last_modified < self._file_system_helper.last_modified(file_information.abs_path)
 
     @staticmethod

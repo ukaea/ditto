@@ -132,7 +132,7 @@ class TestSorageDifferenceProcessor:
         s3_object.last_modified = 12345665.12345
         self.processor._file_system_helper.last_modified.return_value = 22234589.12345
         # Act
-        result = self.processor.changes_in_file(s3_object, file_information)
+        result = self.processor.has_file_changed(s3_object, file_information)
         # Assert
         assert result is True
 
@@ -143,7 +143,7 @@ class TestSorageDifferenceProcessor:
         s3_object.last_modified = 9912345665.12345
         self.processor._file_system_helper.last_modified.return_value = 12234589.12345
         # Act
-        result = self.processor.changes_in_file(s3_object, file_information)
+        result = self.processor.has_file_changed(s3_object, file_information)
         # Assert
         assert result is False
 
@@ -154,7 +154,7 @@ class TestSorageDifferenceProcessor:
         s3_object.last_modified = 12345.12345
         self.processor._file_system_helper.last_modified.return_value = 12345.12345
         # Act
-        result = self.processor.changes_in_file(s3_object, file_information)
+        result = self.processor.has_file_changed(s3_object, file_information)
         # Assert
         assert result is False
 
