@@ -32,5 +32,4 @@ class BotoAdapter(IS3Adapter):
         # if the bucket does not exist, lookup() returns None.
         # get_bucket() would throw an exception.
         bucket = self._s3_client.lookup(bucket_name)
-        wrapped_bucket = BotoBucket(bucket)
-        return wrapped_bucket
+        return None if bucket is None else BotoBucket(bucket)
