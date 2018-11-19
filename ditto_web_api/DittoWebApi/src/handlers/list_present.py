@@ -30,16 +30,10 @@ class ListPresentHandler(APIHandler):
                 "required": ["message", "objects"]
             }
         },
-        output_example=[
-            {
-                "object_name": "testdir/file1.txt",
-                "bucket_name": "test-bucket-name"
-            },
-            {
-                "object_name": "testdir/subdir/file2.txt",
-                "bucket_name": "test-bucket-name"
-            }
-        ],
+        output_example={
+            "message": "objects retrieved successfully",
+            "objects": ["testdir/file1.txt", "testdir/subdir/file2.txt"]
+        },
     )
     def post(self, *args, **kwargs):
         attrs = dict(self.body)
