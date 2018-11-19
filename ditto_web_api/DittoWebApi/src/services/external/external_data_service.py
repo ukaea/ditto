@@ -5,7 +5,7 @@ from DittoWebApi.src.models.bucket_information import BucketInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.parse_strings import is_str_empty
-
+from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 
 class ExternalDataService:
     def __init__(self, configuration, logger, s3_adapter):
@@ -38,6 +38,7 @@ class ExternalDataService:
 
     def does_dir_exist(self, bucket_name, dir_path):
         if is_str_empty(dir_path):
+            msg = f'Tried to find empty directory path "{dir_path}"'
             self._logger.warning(
                 f'Tried to find empty directory path "{dir_path}"'
             )
@@ -48,7 +49,7 @@ class ExternalDataService:
                 f'Tried to find directory "{dir_path}" in non-existent bucket "{bucket_name}"'
             )
             return False
-        prefix = ExternalDataService.dir_path_as_prefix(dir_path)
+        prefix = dir_path_as_prefix(dir_path)
         result_set = bucket.list(prefix=prefix)
         try:
             next(iter(result_set))
@@ -65,7 +66,7 @@ class ExternalDataService:
                 f'Tried to get objects from non-existent bucket "{bucket_name}"'
             )
             return []
-        prefix = ExternalDataService.dir_path_as_prefix(dir_path)
+        prefix = dir_path_as_prefix(dir_path)
         results_set = bucket.list(prefix=prefix)
         objects = [ExternalDataService._get_s3_object_information(boto_object)
                    for boto_object in results_set]
