@@ -2,6 +2,7 @@
 import datetime
 import mock
 import pytest
+import logging
 
 from minio.error import NoSuchKey
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
@@ -14,13 +15,14 @@ from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 class TestExternalDataServices:
     @pytest.fixture(autouse=True)
     def setup(self):
+        self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
         mock_configuration = mock.create_autospec(Configuration)
         mock_configuration.bucket_standard = "test"
         mock_configuration.s3_url = "example"
         mock_configuration.s3_access_key = "example"
         mock_configuration.s3_secret_key = "example"
         mock_configuration.s3_use_secure = "example"
-        self.external_data_services = ExternalDataService(mock_configuration)
+        self.external_data_services = ExternalDataService(mock_configuration, self.mock_logger)
         mock_s3_client = mock.create_autospec(MinioAdapter)
         self.external_data_services._s3_client = mock_s3_client
         # Create mock buckets

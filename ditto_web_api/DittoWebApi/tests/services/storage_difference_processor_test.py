@@ -1,6 +1,8 @@
 # pylint: disable=W0201, W0212
 import pytest
 import mock
+import logging
+
 from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
@@ -10,7 +12,8 @@ from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHel
 class TestSorageDifferenceProcessor:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.processor = StorageDifferenceProcessor()
+        self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
+        self.processor = StorageDifferenceProcessor(self.mock_logger)
         mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         self.processor._file_system_helper = mock_file_system_helper
         # Mock file information objects
