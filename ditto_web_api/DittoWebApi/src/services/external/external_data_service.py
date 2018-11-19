@@ -100,12 +100,21 @@ class ExternalDataService:
         return True
 
     def delete_file(self, bucket_name, file_information):
+        object_name = to_posix(file_information.rel_path)
         bucket = self._s3_client.get_bucket(bucket_name)
         if bucket is None:
+            self._logger.warning(
+                f'Tried to delete object "{object_name}" from non-existent bucket "{bucket_name}"'
+            )
             return False
-        object_name = to_posix(file_information.rel_path)
         key = bucket.get_key(object_name)
+        if key is None:
+            self._logger.warning(
+                f'Tried to delete non-existent object "{object_name}" from bucket "{bucket_name}"'
+            )
+            return False
         key.delete()
+        self._logger.debug(f'Deleted object "{object_name}" from bucket "{bucket_name}"')
         return True
 
     # Private methods

@@ -1,14 +1,16 @@
 # pylint: disable=W0201, W0212
 from boto.s3.bucket import Bucket
+from boto.s3.key import Key
 import datetime
 import logging
 import mock
 import pytest
 
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
-from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
+from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
+from DittoWebApi.src.utils.configurations import Configuration
 
 
 class TestExternalDataServices:
@@ -43,6 +45,16 @@ class TestExternalDataServices:
                                                         100,
                                                         'test_etag',
                                                         datetime.datetime(2018, 8, 10))
+
+    @staticmethod
+    def get_mock_key(name, bucket, etag, size, last_modified):
+        mock_key = mock.create_autospec(Key)
+        mock_key.name = name
+        mock_key.bucket = bucket
+        mock_key.etag = etag
+        mock_key.size = size
+        mock_key.last_modified = last_modified
+        return mock_key
 
     # create_bucket
 
@@ -156,17 +168,60 @@ class TestExternalDataServices:
         assert isinstance(result, list)
         assert not result
 
+    def test_get_objects_returns_correct_object_when_one_exists(self):
+        # Arrange
+        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket.name = 'test-bucket'
+        mock_key_1 = TestExternalDataServices.get_mock_key(
+            'mock_object_1',
+            mock_bucket,
+            'test_etag_1',
+            42,
+            '2018-11-16T17:07:08.851Z'
+        )
+        mock_bucket.list.return_value = [mock_key_1]
+        self.mock_s3_client.get_bucket.return_value = mock_bucket
+        # Act
+        result = self.test_service.get_objects('test-bucket', None)
+        # Assert
+        assert isinstance(result, list)
+        assert 1 == len(result)
+        assert isinstance(result[0], S3ObjectInformation)
+        assert 'mock_object_1' == result[0].object_name
+        assert 'test-bucket' == result[0].bucket_name
+        assert 42 == result[0].size
+        assert 'test_etag_1' == result[0].etag
+        assert 1542388028.851 == result[0].last_modified
+
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
         mock_bucket = mock.create_autospec(Bucket)
-        mock_bucket.list.return_value = [self.mock_object_1, self.mock_object_2]
+        mock_bucket.name = 'test-bucket'
+        mock_key_1 = TestExternalDataServices.get_mock_key(
+            'mock_object_1',
+            mock_bucket,
+            'test_etag_1',
+            42,
+            '2018-11-16T17:07:08.851Z'
+        )
+        mock_key_2 = TestExternalDataServices.get_mock_key(
+            'mock_object_2',
+            mock_bucket,
+            'test_etag_2',
+            33,
+            '2016-05-07T10:30:00.000Z'
+        )
+        mock_bucket.list.return_value = [mock_key_1, mock_key_2]
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
-        result = self.test_service.get_objects("test-bucket", None)
+        result = self.test_service.get_objects('test-bucket', None)
         # Assert
-        assert result[0].object_name == "mock_object_1"
-        assert result[1].object_name == "mock_object_2"
-        assert len(result) == 2
+        assert isinstance(result, list)
+        assert 2 == len(result)
+        assert isinstance(result[0], S3ObjectInformation)
+        assert 'mock_object_1' == result[0].object_name
+        assert isinstance(result[1], S3ObjectInformation)
+        assert 'mock_object_2' == result[1].object_name
 
     def test_get_objects_returns_empty_array_when_no_objects_exist(self):
         # Arrange
@@ -216,13 +271,55 @@ class TestExternalDataServices:
         mock_bucket.get_key.assert_called_once_with("test.txt")
         assert result is False
 
-    @pytest.mark.parametrize("return_value", [True, False])
-    def test_delete_file_wraps_the_s3_adapter_method(self, return_value):
+    # delete_file
+
+    def test_delete_file_returns_false_if_bucket_does_not_exist(self):
         # Arrange
-        self.test_service._s3_client.remove_object.return_value = return_value
-        file_name = "some_file"
-        bucket_name = "some_bucket"
+        self.mock_s3_client.get_bucket.return_value = None
+        file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
         # Act
-        response = self.external_data_services.delete_file(file_name, bucket_name)
+        result = self.test_service.delete_file("test-bucket", file_information)
         # Assert
-        assert response is return_value
+        self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
+        self.mock_logger.warning.assert_called_once_with(
+            'Tried to delete object "test.txt" from non-existent bucket "test-bucket"'
+        )
+        assert result is False
+
+    def test_delete_file_returns_false_if_object_does_not_exist(self):
+        # Arrange
+        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket.get_key.return_value = None
+        self.mock_s3_client.get_bucket.return_value = mock_bucket
+        file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
+        # Act
+        result = self.test_service.delete_file("test-bucket", file_information)
+        # Assert
+        self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
+        mock_bucket.get_key.assert_called_once_with("test.txt")
+        self.mock_logger.warning.assert_called_once_with(
+            'Tried to delete non-existent object "test.txt" from bucket "test-bucket"'
+        )
+        assert result is False
+
+    def test_delete_file_returns_true_if_object_does_exist(self):
+        # Arrange
+        mock_bucket = mock.create_autospec(Bucket)
+        mock_key = TestExternalDataServices.get_mock_key(
+            'test.txt',
+            mock_bucket,
+            'test_etag_1',
+            42,
+            '2018-11-16T17:07:08.851Z'
+        )
+        mock_bucket.get_key.return_value = mock_key
+        self.mock_s3_client.get_bucket.return_value = mock_bucket
+        file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
+        # Act
+        result = self.test_service.delete_file("test-bucket", file_information)
+        # Assert
+        self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
+        mock_bucket.get_key.assert_called_once_with("test.txt")
+        mock_key.delete.assert_called_once()
+        self.mock_logger.debug.assert_called_once_with('Deleted object "test.txt" from bucket "test-bucket"')
+        assert result is True
