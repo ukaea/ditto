@@ -7,7 +7,6 @@ from DittoWebApi.src.services.external.external_data_service import ExternalData
 from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoBucket
 from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoKey
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
-from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.configurations import Configuration
 
