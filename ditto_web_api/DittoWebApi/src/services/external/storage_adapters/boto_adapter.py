@@ -1,4 +1,4 @@
-import boto
+import boto.s3.connection
 
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 
