@@ -11,5 +11,5 @@ def dir_path_as_prefix(dir_path):
         return None
     prefix = to_posix(dir_path)
     return prefix \
-        if prefix[-1] is "/" \
+        if prefix[-1] == "/" \
         else prefix + "/"
