@@ -1,22 +1,20 @@
 import datetime
 import unittest
 
-import mock
-
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 
 
-class TestObjects(unittest.TestCase):
-    def test_minio_object_is_correctly_converted_to_dictionary(self):
+class TestS3ObjectInformation(unittest.TestCase):
+    def test_s3_object_information_is_correctly_converted_to_dictionary(self):
         # Arrange
-        mock_minio_object = mock.Mock()
-        mock_minio_object.object_name = "test_1.txt"
-        mock_minio_object.bucket_name = "bucket_1_test"
-        mock_minio_object.is_dir = False
-        mock_minio_object.size = 100
-        mock_minio_object.etag = "test_etag"
-        mock_minio_object.last_modified = datetime.datetime(2018, 11, 15)
-        test_object = S3ObjectInformation(mock_minio_object)
+        test_object = S3ObjectInformation.create(
+            "test_1.txt",
+            "bucket_1_test",
+            False,
+            100,
+            "test_etag",
+            datetime.datetime(2018, 11, 15)
+        )
         # Act
         output = test_object.to_dict()
         # Assert

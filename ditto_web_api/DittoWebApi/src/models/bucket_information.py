@@ -1,10 +1,8 @@
+# pylint: disable=W0212
 class BucketInformation:
-
-    def __init__(self, minio_bucket):
-        self._minio_bucket = minio_bucket
+    def __init__(self):
         self._name = None
         self._creation_date = None
-        self._parse(self._minio_bucket)
 
     @property
     def name(self):
@@ -14,6 +12,9 @@ class BucketInformation:
     def creation_date(self):
         return self._creation_date
 
-    def _parse(self, buck):
-        self._name = buck.name
-        self._creation_date = buck.creation_date
+    @staticmethod
+    def create(name, creation_date):
+        output = BucketInformation()
+        output._name = name
+        output._creation_date = creation_date
+        return output
