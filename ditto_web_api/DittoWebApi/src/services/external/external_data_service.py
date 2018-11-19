@@ -1,5 +1,5 @@
-import dateutil.parser
 import os
+import dateutil.parser
 
 from DittoWebApi.src.models.bucket_information import BucketInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation

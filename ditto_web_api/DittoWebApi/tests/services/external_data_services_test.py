@@ -1,10 +1,11 @@
 # pylint: disable=W0201, W0212
-from boto.s3.bucket import Bucket
-from boto.s3.key import Key
 import datetime
 import logging
 import mock
 import pytest
+
+from boto.s3.bucket import Bucket
+from boto.s3.key import Key
 
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
@@ -154,12 +155,11 @@ class TestExternalDataServices:
 
     # get_objects
 
-    @pytest.mark.parametrize("dir_path", [None, "testdir"])
-    def test_does_object_exist_returns_empty_array_if_bucket_does_not_exist(self, dir_path):
+    def test_does_object_exist_returns_empty_array_if_bucket_does_not_exist(self):
         # Arrange
         self.mock_s3_client.get_bucket.return_value = None
         # Act
-        result = self.test_service.get_objects("test-bucket", None)
+        result = self.test_service.get_objects("test-bucket", "testdir")
         # Assert
         self.mock_s3_client.get_bucket.assert_called_once_with("test-bucket")
         self.mock_logger.warning.assert_called_once_with(
@@ -185,13 +185,13 @@ class TestExternalDataServices:
         result = self.test_service.get_objects('test-bucket', None)
         # Assert
         assert isinstance(result, list)
-        assert 1 == len(result)
+        assert len(result) == 1
         assert isinstance(result[0], S3ObjectInformation)
-        assert 'mock_object_1' == result[0].object_name
-        assert 'test-bucket' == result[0].bucket_name
-        assert 42 == result[0].size
-        assert 'test_etag_1' == result[0].etag
-        assert 1542388028.851 == result[0].last_modified
+        assert result[0].object_name == 'mock_object_1'
+        assert result[0].bucket_name == 'test-bucket'
+        assert result[0].size == 42
+        assert result[0].etag == 'test_etag_1'
+        assert result[0].last_modified == 1542388028.851
 
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
@@ -217,11 +217,11 @@ class TestExternalDataServices:
         result = self.test_service.get_objects('test-bucket', None)
         # Assert
         assert isinstance(result, list)
-        assert 2 == len(result)
+        assert len(result) == 2
         assert isinstance(result[0], S3ObjectInformation)
-        assert 'mock_object_1' == result[0].object_name
+        assert result[0].object_name == 'mock_object_1'
         assert isinstance(result[1], S3ObjectInformation)
-        assert 'mock_object_2' == result[1].object_name
+        assert result[1].object_name == 'mock_object_2'
 
     def test_get_objects_returns_empty_array_when_no_objects_exist(self):
         # Arrange
@@ -231,7 +231,8 @@ class TestExternalDataServices:
         # Act
         result = self.test_service.get_objects("test-bucket", None)
         # Assert
-        assert len(result) == 0
+        assert isinstance(result, list)
+        assert not result
 
     # does_object_exist
 
