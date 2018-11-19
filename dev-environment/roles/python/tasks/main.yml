@@ -10,9 +10,16 @@
     - python36-devel
     - python36-setuptools
 
-- name: Install Python dependencies
+- name: Install Python dependencies for ditto_web_api
   pip:
     requirements: /vagrant/ditto_web_api/requirements.txt
     virtualenv: /home/vagrant/ditto_web_api/venv
+    virtualenv_command: /usr/bin/python3.6 -m venv
+  become: true
+
+- name: Install Python dependencies for systemTests
+  pip:
+    requirements: /vagrant/systemTests/requirements.txt
+    virtualenv: /home/vagrant/systemTests/venv
     virtualenv_command: /usr/bin/python3.6 -m venv
   become: true
