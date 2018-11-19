@@ -7,9 +7,10 @@ from DittoWebApi.src.services.external.storage_adapters.minio_adaptor import Min
 
 
 class ExternalDataService:
-    def __init__(self, configuration):
+    def __init__(self, configuration, logger):
         self._s3_client = MinioAdapter(configuration)
         self._bucket_standard = configuration.bucket_standard
+        self._logger = logger
 
     def get_buckets(self):
         return [BucketInformation(bucket) for bucket in self._s3_client.list_buckets()]
@@ -18,6 +19,7 @@ class ExternalDataService:
         """Passes list of object of Objects up to data replication service"""
         objects = self._s3_client.list_objects(bucket_name, dir_path, recursive=True)
         objs = [S3ObjectInformation(obj) for obj in objects if not obj.is_dir]
+        self._logger.debug(f"Found {len(objs)} objects in bucket {bucket_name}")
         return objs
 
     def does_dir_exist(self, bucket, dir_path):
@@ -28,6 +30,7 @@ class ExternalDataService:
         with open(processed_file.abs_path, 'rb') as file:
             file_length = os.stat(processed_file.abs_path).st_size
             self._s3_client.put_object(bucket_name, to_posix(processed_file.rel_path), file, file_length)
+            self._logger.debug(f"File {processed_file.rel_path} uploaded, {file_length} bytes transferred")
         return file_length
 
     def does_bucket_exist(self, bucket_name):
