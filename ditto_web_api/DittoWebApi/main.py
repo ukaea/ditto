@@ -6,7 +6,10 @@ from DittoWebApi.src.handlers.list_present import ListPresentHandler
 from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
-from DittoWebApi.src.services.data_replication_service import DataReplicationService
+from DittoWebApi.src.handlers.copy_new import CopyNewHandler
+from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
+from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
+from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
@@ -43,9 +46,13 @@ if __name__ == "__main__":
     LOGGER.info("Starting DITTO Web API")
 
     # Set up services
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER)
     INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
-    DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE, INTERNAL_DATA_SERVICE, LOGGER)
+    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
+    DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
+                                                      INTERNAL_DATA_SERVICE,
+                                                      STORAGE_DIFFERENCE_PROCESSOR,
+                                                      LOGGER)
 
     # Launch app
     APP = tornado.web.Application([
@@ -53,6 +60,8 @@ if __name__ == "__main__":
         (r"/copydir/", CopyDirHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/createbucket/", CreateBucketHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/deletefile/", DeleteFileHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
+        (r"/copynew/", CopyNewHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
+        (r"/copyupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
     APP.listen(8888)
     tornado.ioloop.IOLoop.current().start()
