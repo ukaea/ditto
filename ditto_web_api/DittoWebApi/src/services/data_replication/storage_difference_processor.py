@@ -10,7 +10,7 @@ class StorageDifferenceProcessor:
         self._logger = logger
 
     def return_difference_comparison(self, objects_in_bucket, files_in_directory, check_for_updates=False):
-        self._logger.debug(f"Comparing objects in directory with those already in bucket")
+        self._logger.debug("Comparing objects in directory with those already in bucket")
         s3_object_file_comparison = S3ObjectFileComparison()
         if not objects_in_bucket:
             s3_object_file_comparison.new_files = files_in_directory
