@@ -58,5 +58,8 @@ def bucket_exists(bucket_name):
     return "Bucket already exists ({})".format(bucket_name)
 
 
+def bucket_not_exists(bucket_name):
+    return "Bucket does not exists ({})".format(bucket_name)
+
 def no_new_or_updates(directory):
     return "No new or updated files found in directory ({})".format(directory)

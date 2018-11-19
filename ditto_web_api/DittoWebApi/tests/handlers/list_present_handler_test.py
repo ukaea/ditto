@@ -18,7 +18,7 @@ def app():
 
 
 @pytest.mark.gen_test
-def test_get_returns_objects_from_server_as_json(http_client, base_url):
+def test_post_returns_objects_from_server_as_json(http_client, base_url):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.retrieve_object_dicts.return_value = [{"object_name": "file_1.txt",
                                                                          "bucket_name": "bucket_1"}]
@@ -33,7 +33,7 @@ def test_get_returns_objects_from_server_as_json(http_client, base_url):
 
 
 @pytest.mark.gen_test
-def test_get_returns_multiple_objects_as_a_json_array(http_client, base_url):
+def test_post_returns_multiple_objects_as_a_json_array(http_client, base_url):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.retrieve_object_dicts.return_value = [{"object_name": "file_1.txt",
                                                                          "bucket_name": "bucket_1"},
@@ -51,7 +51,7 @@ def test_get_returns_multiple_objects_as_a_json_array(http_client, base_url):
 
 
 @pytest.mark.gen_test
-def test_get_returns_empty_array_when_no_objects(http_client, base_url):
+def test_post_returns_empty_array_when_no_objects(http_client, base_url):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.retrieve_object_dicts.return_value = []
     # Act
@@ -62,3 +62,18 @@ def test_get_returns_empty_array_when_no_objects(http_client, base_url):
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
     assert response_body["data"] == []
+
+@pytest.mark.gen_test
+def test_post_returns__when_invalid_bucket_name_provided(http_client, base_url):
+    # Arrange
+    MOCK_DATA_REPLICATION_SERVICE.retrieve_object_dicts.return_value = {"message": "bucket_1 does not exist in S3",
+                                                                        "data": []}
+    # Act
+    url = base_url + "/listpresent/"
+    body = json.dumps({'bucket': "bucket_1", })
+    response = yield http_client.fetch(url, method="POST", body=body)
+    # Assert
+    response_body = json.loads(response.body, encoding='utf-8')
+    assert response_body["status"] == "success"
+    assert response_body["data"]["objects"] == []
+    assert response_body["data"]["message"] == "bucket_1 does not exist in S3"

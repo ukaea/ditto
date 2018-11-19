@@ -21,14 +21,13 @@ class ListPresentHandler(APIHandler):
             "directory": "testdir/testsubdir",
         },
         output_schema={
-            "type": "array",
+            "type": "object",
             "items": {
-                "type": "object",
                 "properties": {
-                    "object_name": {"type": "string"},
-                    "bucket_name": {"type": "string"},
+                    "message": {"type": "string"},
+                    "objects": {"type": "array"},
                 },
-                "required": ["object_name", "bucket_name"]
+                "required": ["message", "objects"]
             }
         },
         output_example=[
