@@ -7,6 +7,7 @@ from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.parse_strings import is_str_empty
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 
+
 class ExternalDataService:
     def __init__(self, configuration, logger, s3_adapter):
         self._logger = logger
@@ -38,7 +39,6 @@ class ExternalDataService:
 
     def does_dir_exist(self, bucket_name, dir_path):
         if is_str_empty(dir_path):
-            msg = f'Tried to find empty directory path "{dir_path}"'
             self._logger.warning(
                 f'Tried to find empty directory path "{dir_path}"'
             )
