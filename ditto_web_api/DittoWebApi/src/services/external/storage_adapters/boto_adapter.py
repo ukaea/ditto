@@ -1,5 +1,6 @@
 import boto.s3.connection
 
+from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoBucket
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 
 
@@ -31,4 +32,5 @@ class BotoAdapter(IS3Adapter):
         # if the bucket does not exist, lookup() returns None.
         # get_bucket() would throw an exception.
         bucket = self._s3_client.lookup(bucket_name)
-        return bucket
+        wrapped_bucket = BotoBucket(bucket)
+        return wrapped_bucket

@@ -3,10 +3,9 @@ import logging
 import mock
 import pytest
 
-from boto.s3.bucket import Bucket
-from boto.s3.key import Key
-
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
+from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoBucket
+from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoKey
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
@@ -33,7 +32,7 @@ class TestExternalDataServices:
 
     @staticmethod
     def get_mock_key(name, bucket, etag, size, last_modified):
-        mock_key = mock.create_autospec(Key)
+        mock_key = mock.create_autospec(BotoKey)
         mock_key.name = name
         mock_key.bucket = bucket
         mock_key.etag = etag
@@ -65,7 +64,7 @@ class TestExternalDataServices:
 
     def test_does_bucket_exist_returns_true_when_bucket_retrieved(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
         output = self.test_service.does_bucket_exist("test-bucket")
@@ -119,7 +118,7 @@ class TestExternalDataServices:
 
     def test_does_dir_exist_returns_true_if_item_is_in_directory(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_key_1 = TestExternalDataServices.get_mock_key(
             'mock_object_1',
             mock_bucket,
@@ -136,7 +135,7 @@ class TestExternalDataServices:
 
     def test_does_dir_exist_returns_false_if_directory_is_empty(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.list.return_value = []
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
@@ -161,7 +160,7 @@ class TestExternalDataServices:
 
     def test_get_objects_returns_correct_object_when_one_exists(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.name = 'test-bucket'
         mock_key_1 = TestExternalDataServices.get_mock_key(
             'mock_object_1',
@@ -186,7 +185,7 @@ class TestExternalDataServices:
 
     def test_get_objects_returns_correct_objects_when_they_exist(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.name = 'test-bucket'
         mock_key_1 = TestExternalDataServices.get_mock_key(
             'mock_object_1',
@@ -216,7 +215,7 @@ class TestExternalDataServices:
 
     def test_get_objects_returns_empty_array_when_no_objects_exist(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.list.return_value = []
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
@@ -241,7 +240,7 @@ class TestExternalDataServices:
 
     def test_does_object_exist_returns_true_when_it_exists(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.get_key.return_value = "Object"
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
@@ -253,7 +252,7 @@ class TestExternalDataServices:
 
     def test_does_object_exist_returns_false_when_no_object(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.get_key.return_value = None
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         # Act
@@ -280,7 +279,7 @@ class TestExternalDataServices:
 
     def test_delete_file_returns_false_if_object_does_not_exist(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_bucket.get_key.return_value = None
         self.mock_s3_client.get_bucket.return_value = mock_bucket
         file_information = FileInformation("/home/test/test.txt", "test.txt", "test.txt")
@@ -296,7 +295,7 @@ class TestExternalDataServices:
 
     def test_delete_file_returns_true_if_object_does_exist(self):
         # Arrange
-        mock_bucket = mock.create_autospec(Bucket)
+        mock_bucket = mock.create_autospec(BotoBucket)
         mock_key = TestExternalDataServices.get_mock_key(
             'test.txt',
             mock_bucket,
