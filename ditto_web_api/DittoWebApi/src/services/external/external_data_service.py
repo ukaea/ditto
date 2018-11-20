@@ -37,18 +37,13 @@ class ExternalDataService:
     # Directories
 
     def does_dir_exist(self, bucket_name, dir_path):
-        if is_str_empty(dir_path):
-            self._logger.warning(
-                f'Tried to find empty directory path "{dir_path}"'
-            )
-            return False
         bucket = self._s3_client.get_bucket(bucket_name)
         if bucket is None:
             self._logger.warning(
                 f'Tried to find directory "{dir_path}" in non-existent bucket "{bucket_name}"'
             )
             return False
-        prefix = dir_path_as_prefix(dir_path)
+        prefix = None if dir_path is None else dir_path_as_prefix(dir_path)
         result_set = bucket.list(prefix=prefix)
         try:
             next(iter(result_set))
