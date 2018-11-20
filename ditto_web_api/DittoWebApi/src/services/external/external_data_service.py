@@ -3,7 +3,6 @@ import dateutil.parser
 
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
-from DittoWebApi.src.utils.parse_strings import is_str_empty
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 
 
