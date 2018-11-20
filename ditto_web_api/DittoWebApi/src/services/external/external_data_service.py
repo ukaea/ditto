@@ -90,7 +90,7 @@ class ExternalDataService:
         self._logger.debug(
             f'File "{object_name}" uploaded, {file_length} bytes transferred'
         )
-        return True
+        return file_length
 
     def delete_file(self, bucket_name, file_rel_path):
         object_name = to_posix(file_rel_path)
@@ -122,3 +122,13 @@ class ExternalDataService:
             boto_object.etag,
             dateutil.parser.parse(boto_object.last_modified)
         )
+
+    def perform_transfer(self, bucket_name, files_summary):
+        data_transferred = 0
+        for file in files_summary.new_files or files_summary.updated_files:
+            data_transferred += self.upload_file(bucket_name, file)
+        return {"message": "Transfer successful",
+                "new_files_uploaded": len(files_summary.new_files),
+                "files_updated": len(files_summary.updated_files),
+                "files_skipped": len(files_summary.files_to_be_skipped()),
+                "data_transferred": data_transferred}
