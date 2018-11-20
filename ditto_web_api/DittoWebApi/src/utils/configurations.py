@@ -2,6 +2,7 @@ import os
 import configparser
 
 from .parse_strings import str2bool
+from .parse_strings import str2non_negative_int
 
 
 class Configuration:
@@ -17,7 +18,8 @@ class Configuration:
         self._logging_level = "NOTSET"
 
         # S3 client
-        self._s3_url = None
+        self._s3_host = None
+        self._s3_port = None
         self._s3_access_key = None
         self._s3_secret_key = None
         self._s3_use_secure = False
@@ -36,8 +38,12 @@ class Configuration:
         return self._logging_level
 
     @property
-    def s3_url(self):
-        return self._s3_url
+    def s3_host(self):
+        return self._s3_host
+
+    @property
+    def s3_port(self):
+        return self._s3_port
 
     @property
     def s3_access_key(self):
@@ -69,7 +75,8 @@ class Configuration:
         self._logging_level = settings["LoggingLevel"]
 
         # S3 client
-        self._s3_url = settings['S3Address']
+        self._s3_host = settings['S3Host']
+        self._s3_port = str2non_negative_int(settings['S3Port'])
         self._s3_access_key = settings['S3AccessKey']
         self._s3_secret_key = settings['S3SecretKey']
         self._s3_use_secure = str2bool(settings['S3Secure'])
