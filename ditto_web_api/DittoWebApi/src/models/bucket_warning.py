@@ -1,4 +1,4 @@
 class BucketWarning:
     def __init__(self):
-        self.warning = False
+        self.is_warning_found = False
         self.message = ""
