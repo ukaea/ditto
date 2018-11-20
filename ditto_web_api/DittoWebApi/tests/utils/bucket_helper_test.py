@@ -1,5 +1,5 @@
-from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
 import pytest
+from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
 
 
 class TestBucketHelpers:
