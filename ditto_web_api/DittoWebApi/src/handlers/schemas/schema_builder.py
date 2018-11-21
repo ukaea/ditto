@@ -24,7 +24,7 @@ class SchemaBuilder:
         }
 
     @staticmethod
-    def create_copy_output_schema():
+    def create_transfer_output_schema():
         return {
             "type": "object",
             "properties": {

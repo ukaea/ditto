@@ -16,7 +16,7 @@ class CopyNewHandler(APIHandler):
             "bucket": "test-bucket-name",
             "directory": "testdir/testsubdir",
         },
-        output_schema=SCHEMA_BUILDER.create_copy_output_schema(),
+        output_schema=SCHEMA_BUILDER.create_transfer_output_schema(),
         output_example={
             "type": "object",
             "properties": {
