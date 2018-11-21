@@ -3,19 +3,20 @@ from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
 from DittoWebApi.src.handlers.schemas.schema_builder import SchemaBuilder
 
-schema_builder = SchemaBuilder()
+SCHEMA_BUILDER = SchemaBuilder()
+
 
 class CopyNewHandler(APIHandler):
     def initialize(self, data_replication_service):
         self._data_replication_service = data_replication_service
 
     @schema.validate(
-        input_schema=schema_builder.create_object_schema_with_string_properties(["bucket", "directory"], ["bucket"]),
+        input_schema=SCHEMA_BUILDER.create_object_schema_with_string_properties(["bucket", "directory"], ["bucket"]),
         input_example={
             "bucket": "test-bucket-name",
             "directory": "testdir/testsubdir",
         },
-        output_schema=schema_builder.create_copy_output_schema(),
+        output_schema=SCHEMA_BUILDER.create_copy_output_schema(),
         output_example={
             "type": "object",
             "properties": {

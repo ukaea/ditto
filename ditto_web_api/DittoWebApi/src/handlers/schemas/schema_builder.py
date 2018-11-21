@@ -1,5 +1,6 @@
 class SchemaBuilder:
-    def create_object_schema_with_string_properties(self, list_of_properties, required=None):
+    @staticmethod
+    def create_object_schema_with_string_properties(list_of_properties, required=None):
         if required is None:
             return {"type": "object",
                     "properties":
@@ -22,7 +23,8 @@ class SchemaBuilder:
             },
         }
 
-    def create_copy_output_schema(self):
+    @staticmethod
+    def create_copy_output_schema():
         return {
             "type": "object",
             "properties": {
@@ -33,4 +35,3 @@ class SchemaBuilder:
                 "data transferred (bytes)": {"type": "integer"},
             }
         }
-

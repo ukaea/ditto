@@ -1,9 +1,9 @@
 # pylint: disable=W0221,W0223
-from DittoWebApi.src.handlers.schemas.schema_builder import SchemaBuilder
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
+from DittoWebApi.src.handlers.schemas.schema_builder import SchemaBuilder
 
-schema_builder = SchemaBuilder()
+SCHEMA_BUILDER = SchemaBuilder()
 
 
 class CreateBucketHandler(APIHandler):
@@ -11,14 +11,14 @@ class CreateBucketHandler(APIHandler):
         self._data_replication_service = data_replication_service
 
     @schema.validate(
-        input_schema=schema_builder.create_object_schema_with_string_properties(["bucket"], ["bucket"]),
+        input_schema=SCHEMA_BUILDER.create_object_schema_with_string_properties(["bucket"], ["bucket"]),
         input_example={
             "type": "object",
             "properties": {
                 "bucket": {"type": "string"}
             },
         },
-        output_schema=schema_builder.create_object_schema_with_string_properties(["message", "bucket"]),
+        output_schema=SCHEMA_BUILDER.create_object_schema_with_string_properties(["message", "bucket"]),
         output_example={
             "type": "object",
             "properties": {
