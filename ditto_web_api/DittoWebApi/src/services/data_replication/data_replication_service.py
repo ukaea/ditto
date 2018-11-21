@@ -4,7 +4,7 @@ from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
 from DittoWebApi.src.models.bucket_warning import BucketWarning
-from DittoWebApi.src.models.s3_object_file_comparison import FilesSummary
+from DittoWebApi.src.models.file_summary import FilesSummary
 from DittoWebApi.src.utils import messages
 
 
@@ -44,7 +44,7 @@ class DataReplicationService:
             return return_transfer_summary(message=warnings.message)
         files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
 
-        if files_summary.files_in_directory is []:
+        if not files_summary.files_in_directory:
             self._logger.warning(messages.no_files_found(dir_path))
             return return_transfer_summary(message=messages.no_files_found(dir_path))
 
@@ -96,16 +96,19 @@ class DataReplicationService:
         directory = dir_path if dir_path else "root"
         files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
 
-        if files_summary.files_in_directory == []:
+        if not files_summary.files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-        self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket, files_summary)
-        if files_summary.new_files == []:
+        completed_files_summary = self._storage_difference_processor.return_difference_comparison(
+            objects_already_in_bucket, files_summary
+        )
+        if not completed_files_summary.new_files:
             self._logger.warning(messages.no_new_files(directory))
             return return_transfer_summary(message=messages.no_new_files(directory),
-                                           files_skipped=len(files_summary.files_to_be_skipped()))
-        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name, files_summary))
+                                           files_skipped=len(completed_files_summary.files_to_be_skipped()))
+        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name,
+                                                                                      completed_files_summary))
 
     def copy_new_and_update(self, bucket_name, dir_path):
         bucket_warnings = self._check_bucket_warnings(bucket_name)
@@ -115,14 +118,15 @@ class DataReplicationService:
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
 
-        if files_summary.files_in_directory == []:
+        if not files_summary.files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
-        self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket,
-                                                                        files_summary,
-                                                                        check_for_updates=True)
-        if files_summary.new_files == [] and files_summary.updated_files == []:
+        completed_files_summary = self._storage_difference_processor.return_difference_comparison(
+            objects_already_in_bucket, files_summary, check_for_updates=True
+        )
+        if not completed_files_summary.new_files and not completed_files_summary.updated_files:
             self._logger.warning(messages.no_new_or_updates(directory))
             return return_transfer_summary(message=messages.no_new_or_updates(directory),
-                                           files_skipped=len(files_summary.files_to_be_skipped()))
-        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name, files_summary))
+                                           files_skipped=len(completed_files_summary.files_to_be_skipped()))
+        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name,
+                                                                                      completed_files_summary))
