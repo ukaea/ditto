@@ -11,11 +11,7 @@ from testScenarios.tools.process_logger import ProcessLogger
 
 class SystemTestContext:
     def __init__(self):
-        self.execution_folder_path = os.path.abspath(os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            '..',
-            'execution_space'
-        ))
+        self._execution_folder_path = '/home/vagrant/execution_space'
         self.ditto_api_process = None
         self.console_logger = ProcessLogger('console')
 
@@ -27,6 +23,18 @@ class SystemTestContext:
     def shut_down_ditto_api(self):
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
+
+    @property
+    def ditto_web_api_folder_path(self):
+        return os.path.join(self._execution_folder_path, 'ditto_web_api')
+
+    @property
+    def logs_folder_path(self):
+        return os.path.join(self._execution_folder_path, 'logs')
+
+    @property
+    def local_data_folder_path(self):
+        return os.path.join(self._execution_folder_path, 'data')
 
 
 class BaseSystemTest(unittest.TestCase):
@@ -45,14 +53,10 @@ class BaseSystemTest(unittest.TestCase):
         self.context.console_logger.set_up()
 
     def _clean_up_working_folders(self):
-        # clear out the old logs
+        # Clear out the logs
+        shutil.rmtree(self.context.logs_folder_path)
+        os.makedirs(self.context.logs_folder_path)
 
-        #the following two lines should probably be uncommented but, when they are,the first test gets an error
-        #shutil.rmtree(self.context.execution_folder_path + '/logs')
-        #os.makedirs(self.context.execution_folder_path + '/logs')
-
-        shutil.rmtree(self.context.execution_folder_path + '/testing_area')
-        os.makedirs(self.context.execution_folder_path + '/testing_area/src')
-        os.makedirs(self.context.execution_folder_path + '/testing_area/staging')
-        os.makedirs(self.context.execution_folder_path + '/testing_area/target')
-
+        # Clear out the local data
+        shutil.rmtree(self.context.local_data_folder_path)
+        os.makedirs(self.context.local_data_folder_path)
