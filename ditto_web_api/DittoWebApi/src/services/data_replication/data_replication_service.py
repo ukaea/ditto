@@ -148,6 +148,6 @@ class DataReplicationService:
             warning = messages.no_new_or_updates(directory)
             self._logger.warning(warning)
             return return_transfer_summary(message=warning,
-                                           files_skipped=files_summary.number_files_to_be_skipped)
+                                           files_skipped=files_summary.number_of_files_to_be_skipped)
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         return return_transfer_summary(**transfer_summary)

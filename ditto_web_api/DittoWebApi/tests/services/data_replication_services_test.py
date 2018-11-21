@@ -298,7 +298,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         mock_file_summary.files_in_directory = [self.mock_file_information_1]
         mock_file_summary.new_files = []
         mock_file_summary.updated_files = []
-        mock_file_summary.number_files_to_be_skipped = 1
+        mock_file_summary.number_of_files_to_be_skipped = 1
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         # Act
         response = self.test_service.copy_new("bucket", None)
@@ -376,7 +376,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         mock_file_summary.files_in_directory = [self.mock_file_information_1]
         mock_file_summary.new_files = []
         mock_file_summary.updated_files = []
-        mock_file_summary.number_files_to_be_skipped = 1
+        mock_file_summary.number_of_files_to_be_skipped = 1
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
@@ -416,7 +416,7 @@ class DataReplicationServiceTest(unittest.TestCase):
                                                 self.mock_file_information_3]
         mock_file_summary.new_files = [self.mock_file_information_2]
         mock_file_summary.updated_files = [self.mock_file_information_3]
-        mock_file_summary.number_files_to_be_skipped = 1
+        mock_file_summary.number_of_files_to_be_skipped = 1
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         self.mock_external_data_service.perform_transfer.return_value = {'message': 'Transfer successful',
                                                                          'new_files_uploaded': 1,

@@ -134,5 +134,5 @@ class ExternalDataService:
         return {"message": "Transfer successful",
                 "new_files_uploaded": len(file_summary.new_files),
                 "files_updated": len(file_summary.files_to_update),
-                "files_skipped": file_summary.number_files_to_be_skipped,
+                "files_skipped": file_summary.number_of_files_to_be_skipped,
                 "data_transferred": data_transferred}
