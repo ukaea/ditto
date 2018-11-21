@@ -124,9 +124,10 @@ class ExternalDataService:
             dateutil.parser.parse(boto_object.last_modified)
         )
 
-    def perform_transfer(self, bucket_name, new_files, files_to_update=[], files_to_skip=0):
+    def perform_transfer(self, bucket_name, new_files, files_to_update=None, files_to_skip=0):
         data_transferred = 0
-        for file in new_files + files_to_update:
+        files_to_transfer = new_files + files_to_update if files_to_update is not None else new_files
+        for file in files_to_transfer:
             data_transferred += self.upload_file(bucket_name, file)
         return {"message": "Transfer successful",
                 "new_files_uploaded": len(new_files),
