@@ -1,8 +1,6 @@
 import subprocess
 import os
 
-from testScenarios.when.gridftp_with_plugin import GridftpWithPlugin
-
 
 class WhenSteps:
     def __init__(self, context):
