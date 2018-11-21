@@ -13,6 +13,7 @@ class DataReplicationService:
         self._logger = logger
 
     def _check_bucket_warning(self, bucket_name):
+        self._logger.debug(f"About to check for warning to do with bucket name {bucket_name}")
         bucket_warning = None
         if not is_valid_bucket(bucket_name):
             bucket_warning = messages.bucket_breaks_s3_convention(bucket_name)
@@ -22,6 +23,7 @@ class DataReplicationService:
             bucket_warning = messages.bucket_not_exists(bucket_name)
         if bucket_warning is not None:
             self._logger.warning(bucket_warning)
+        self._logger.debug("No warnings found")
         return bucket_warning
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
@@ -49,7 +51,7 @@ class DataReplicationService:
             return return_transfer_summary(message=warning, files_skipped=len(files_in_directory))
 
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
-        transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary, updates=False)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary)
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name):
@@ -116,7 +118,7 @@ class DataReplicationService:
             self._logger.warning(warning)
             return return_transfer_summary(message=warning,
                                            files_skipped=len(files_in_directory))
-        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary, updates=False)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
@@ -146,6 +148,6 @@ class DataReplicationService:
             warning = messages.no_new_or_updates(directory)
             self._logger.warning(warning)
             return return_transfer_summary(message=warning,
-                                           files_skipped=files_summary.files_to_be_skipped)
-        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary, updates=True)
+                                           files_skipped=files_summary.number_files_to_be_skipped)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         return return_transfer_summary(**transfer_summary)
