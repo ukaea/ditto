@@ -1,4 +1,3 @@
-from minio.error import InvalidBucketError
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
@@ -56,19 +55,19 @@ class DataReplicationService:
         if not bucket_name:
             self._logger.warning(messages.no_bucket_name())
             return return_bucket_message(messages.no_bucket_name())
+
         if not self._external_data_service.does_bucket_match_standard(bucket_name):
             self._logger.info(messages.bucket_breaks_config(bucket_name))
             return return_bucket_message(messages.bucket_breaks_config(bucket_name), bucket_name)
-        try:
-            if self._external_data_service.does_bucket_exist(bucket_name):
-                self._logger.warning(messages.bucket_already_exists(bucket_name))
-                return return_bucket_message(messages.bucket_already_exists(bucket_name), bucket_name)
-        except InvalidBucketError:
-            self._logger.warning(messages.bucket_breaks_s3_convention(bucket_name))
-            return return_bucket_message(messages.bucket_breaks_s3_convention(bucket_name), bucket_name)
-        self._external_data_service.create_bucket(bucket_name)
-        self._logger.info(messages.bucket_created(bucket_name))
-        return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
+
+        if self._external_data_service.does_bucket_exist(bucket_name):
+            self._logger.warning(messages.bucket_already_exists(bucket_name))
+            return return_bucket_message(messages.bucket_already_exists(bucket_name), bucket_name)
+
+        if is_valid_bucket(bucket_name) is True:
+            self._external_data_service.create_bucket(bucket_name)
+            return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
+        return return_bucket_message(messages.bucket_breaks_s3_convention(bucket_name), bucket_name)
 
     def try_delete_file(self, bucket_name, file_name):
         bucket_warning = self._check_bucket_warning(bucket_name)
@@ -76,14 +75,16 @@ class DataReplicationService:
             return return_delete_file_helper(message=bucket_warning,
                                              file_name=file_name,
                                              bucket_name=bucket_name)
+
         if not self._external_data_service.does_object_exist(bucket_name, file_name):
             self._logger.warning(messages.file_existence_warning(file_name, bucket_name))
             return return_delete_file_helper(message=messages.file_existence_warning(file_name, bucket_name),
                                              file_name=file_name,
                                              bucket_name=bucket_name)
         self._external_data_service.delete_file(bucket_name, file_name)
-        message = messages.file_deleted(file_name, bucket_name)
-        return return_delete_file_helper(message=message, file_name=file_name, bucket_name=bucket_name)
+        return return_delete_file_helper(message=messages.file_deleted(file_name, bucket_name),
+                                         file_name=file_name,
+                                         bucket_name=bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
         bucket_warning = self._check_bucket_warning(bucket_name)
