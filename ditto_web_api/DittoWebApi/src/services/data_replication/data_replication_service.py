@@ -96,16 +96,15 @@ class DataReplicationService:
         directory = dir_path if dir_path else "root"
         files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
 
-        if files_summary.files_in_directory is []:
+        if files_summary.files_in_directory == []:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket, files_summary)
-
-        if files_summary.new_files is []:
+        if files_summary.new_files == []:
             self._logger.warning(messages.no_new_files(directory))
             return return_transfer_summary(message=messages.no_new_files(directory),
-                                           files_skipped=files_summary.files_to_be_skipped())
+                                           files_skipped=len(files_summary.files_to_be_skipped()))
         return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name, files_summary))
 
     def copy_new_and_update(self, bucket_name, dir_path):
@@ -116,13 +115,13 @@ class DataReplicationService:
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
 
-        if files_summary.files_in_directory is []:
+        if files_summary.files_in_directory == []:
             self._logger.warning(messages.no_files_found(directory))
             return return_transfer_summary(message=messages.no_files_found(directory))
-        files_to_transfer = self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket,
-                                                                                            files_summary,
-                                                                                            check_for_updates=True)
-        if files_to_transfer.new_files is [] and files_to_transfer.updated_files is []:
+        self._storage_difference_processor.return_difference_comparison(objects_already_in_bucket,
+                                                                        files_summary,
+                                                                        check_for_updates=True)
+        if files_summary.new_files == [] and files_summary.updated_files == []:
             self._logger.warning(messages.no_new_or_updates(directory))
             return return_transfer_summary(message=messages.no_new_or_updates(directory),
                                            files_skipped=len(files_summary.files_to_be_skipped()))
