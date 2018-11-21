@@ -1,5 +1,5 @@
 # pylint: disable=R0903
-class FilesSummary:
+class FilesStorageSummary:
     def __init__(self, files_in_directory):
         self.files_in_directory = files_in_directory
         self.new_files = []

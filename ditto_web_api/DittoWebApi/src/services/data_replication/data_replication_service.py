@@ -4,7 +4,7 @@ from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
 from DittoWebApi.src.models.bucket_warning import BucketWarning
-from DittoWebApi.src.models.file_summary import FilesSummary
+from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils import messages
 
 
@@ -42,7 +42,7 @@ class DataReplicationService:
 
         if warnings.is_warning_found is True:
             return return_transfer_summary(message=warnings.message)
-        files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
+        files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
 
         if not files_summary.files_in_directory:
             self._logger.warning(messages.no_files_found(dir_path))
@@ -94,7 +94,7 @@ class DataReplicationService:
         if bucket_warnings.is_warning_found:
             return return_transfer_summary(message=bucket_warnings.message)
         directory = dir_path if dir_path else "root"
-        files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
+        files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
 
         if not files_summary.files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
@@ -116,7 +116,7 @@ class DataReplicationService:
             return return_transfer_summary(message=bucket_warnings.message)
         directory = dir_path if dir_path else "root"
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-        files_summary = FilesSummary(self._internal_data_service.find_files(dir_path))
+        files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
 
         if not files_summary.files_in_directory:
             self._logger.warning(messages.no_files_found(directory))
