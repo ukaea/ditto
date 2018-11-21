@@ -72,8 +72,8 @@ class DataReplicationService:
             return return_bucket_message(messages.bucket_breaks_config(bucket_name), bucket_name)
         try:
             if self._external_data_service.does_bucket_exist(bucket_name):
-                self._logger.warning(messages.bucket_exists(bucket_name))
-                return return_bucket_message(messages.bucket_exists(bucket_name), bucket_name)
+                self._logger.warning(messages.bucket_already_exists(bucket_name))
+                return return_bucket_message(messages.bucket_already_exists(bucket_name), bucket_name)
         except InvalidBucketError:
             self._logger.warning(messages.bucket_breaks_s3_convention(bucket_name))
             return return_bucket_message(messages.bucket_breaks_s3_convention(bucket_name), bucket_name)
