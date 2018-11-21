@@ -19,8 +19,7 @@ class TestBucketHelpers:
                                              "test!!",
                                              "",
                                              "test-",
-                                             "tests-..bucketname",
-                                             "test.test"])
+                                             "tests-..bucketname"])
     def test_is_valid_returns_false_for_s3_bucket_names_that_are_invalid(self, bucket_name):
         # Arrange
         name_to_test = bucket_name
