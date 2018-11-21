@@ -29,8 +29,40 @@ class SystemTestContext:
         return os.path.join(self._execution_folder_path, 'ditto_web_api')
 
     @property
-    def logs_folder_path(self):
+    def log_folder_path(self):
         return os.path.join(self._execution_folder_path, 'logs')
+
+    @property
+    def log_level(self):
+        return 'DEBUG'
+
+    @property
+    def s3host(self):
+        # This is set in Vagrantfile
+        return '172.28.129.160'
+
+    @property
+    def s3port(self):
+        # This is the Minio default
+        return 9000
+
+    @property
+    def s3access(self):
+        # This is set in minio.conf
+        return 'AKIAIOSFODNN7EXAMPLE'
+
+    @property
+    def s3secret(self):
+        # This is set in minio.conf
+        return 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+
+    @property
+    def s3secure(self):
+        return 'FALSE'
+
+    @property
+    def bucket_standardisation(self):
+        return 'systemtest'
 
     @property
     def local_data_folder_path(self):
@@ -54,8 +86,8 @@ class BaseSystemTest(unittest.TestCase):
 
     def _clean_up_working_folders(self):
         # Clear out the logs
-        shutil.rmtree(self.context.logs_folder_path)
-        os.makedirs(self.context.logs_folder_path)
+        shutil.rmtree(self.context.log_folder_path)
+        os.makedirs(self.context.log_folder_path)
 
         # Clear out the local data
         shutil.rmtree(self.context.local_data_folder_path)
