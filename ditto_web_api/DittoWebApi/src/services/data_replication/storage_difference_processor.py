@@ -1,6 +1,7 @@
 # pylint: disable=R0201
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
+from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 
 
 class StorageDifferenceProcessor:
@@ -8,16 +9,13 @@ class StorageDifferenceProcessor:
         self._file_system_helper = FileSystemHelper()
         self._logger = logger
 
-    def return_difference_comparison(self, objects_in_bucket, file_summary, check_for_updates=False):
+    def return_difference_comparison(self, objects_in_bucket, files_in_directory, check_for_updates=False):
         self._logger.debug("Comparing objects in directory with those already in bucket")
-        if not objects_in_bucket:
-            file_summary.new_files = file_summary.files_in_directory
-            self._logger.debug("All files are new")
-            return file_summary
-        dict_of_files = self.file_information_to_dict(objects_in_bucket, file_summary.files_in_directory)
+        file_summary = FilesStorageSummary(files_in_directory)
+        dict_of_files = self.file_information_to_dict(objects_in_bucket, files_in_directory)
         file_summary.new_files = [file_information for
                                   file_information in
-                                  file_summary.files_in_directory if
+                                  files_in_directory if
                                   dict_of_files[to_posix(file_information.rel_path)] is None]
         self._logger.debug(f"{len(file_summary.new_files)} files are new")
         if check_for_updates is False:

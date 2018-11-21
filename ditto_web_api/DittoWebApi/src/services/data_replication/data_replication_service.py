@@ -2,7 +2,6 @@ from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
-from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils import messages
 
 
@@ -29,7 +28,6 @@ class DataReplicationService:
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return {"message": bucket_warning, "objects": []}
-        self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
         objects = self._external_data_service.get_objects(bucket_name, dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
         return {"message": "objects returned successfully", "objects": object_dicts}
@@ -38,36 +36,41 @@ class DataReplicationService:
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
-        files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
+        files_in_directory = self._internal_data_service.find_files(dir_path)
 
-        if not files_summary.files_in_directory:
-            self._logger.warning(messages.no_files_found(dir_path))
-            return return_transfer_summary(message=messages.no_files_found(dir_path))
+        if not files_in_directory:
+            warning = messages.no_files_found(dir_path)
+            self._logger.warning(warning)
+            return return_transfer_summary(message=warning)
 
         if self._external_data_service.does_dir_exist(bucket_name, dir_path):
-            self._logger.warning(messages.directory_exists(dir_path, len(files_summary.files_in_directory)))
-            return return_transfer_summary(message=messages.directory_exists(dir_path,
-                                                                             len(files_summary.files_in_directory)),
-                                           files_skipped=len(files_summary.files_to_be_skipped()))
-        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name, files_summary))
+            warning = messages.directory_exists(dir_path, len(files_in_directory))
+            self._logger.warning(warning)
+            return return_transfer_summary(message=warning, files_skipped=len(files_in_directory))
+
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_in_directory)
+        return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name):
         if not bucket_name:
-            self._logger.warning(messages.no_bucket_name())
-            return return_bucket_message(messages.no_bucket_name())
+            warning = messages.no_bucket_name()
+            self._logger.warning(warning)
+            return return_bucket_message(warning)
 
         if not self._external_data_service.does_bucket_match_standard(bucket_name):
-            self._logger.info(messages.bucket_breaks_config(bucket_name))
-            return return_bucket_message(messages.bucket_breaks_config(bucket_name), bucket_name)
+            message = messages.bucket_breaks_config(bucket_name)
+            self._logger.info(message)
+            return return_bucket_message(message, bucket_name)
 
         if self._external_data_service.does_bucket_exist(bucket_name):
-            self._logger.warning(messages.bucket_already_exists(bucket_name))
-            return return_bucket_message(messages.bucket_already_exists(bucket_name), bucket_name)
+            warning = messages.bucket_already_exists(bucket_name)
+            self._logger.warning(warning)
+            return return_bucket_message(warning, bucket_name)
 
-        if is_valid_bucket(bucket_name) is True:
-            self._external_data_service.create_bucket(bucket_name)
-            return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
-        return return_bucket_message(messages.bucket_breaks_s3_convention(bucket_name), bucket_name)
+        if is_valid_bucket(bucket_name) is False:
+            return return_bucket_message(messages.bucket_breaks_s3_convention(bucket_name), bucket_name)
+        self._external_data_service.create_bucket(bucket_name)
+        return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
 
     def try_delete_file(self, bucket_name, file_name):
         bucket_warning = self._check_bucket_warning(bucket_name)
@@ -77,8 +80,9 @@ class DataReplicationService:
                                              bucket_name=bucket_name)
 
         if not self._external_data_service.does_object_exist(bucket_name, file_name):
-            self._logger.warning(messages.file_existence_warning(file_name, bucket_name))
-            return return_delete_file_helper(message=messages.file_existence_warning(file_name, bucket_name),
+            warning = messages.file_existence_warning(file_name, bucket_name)
+            self._logger.warning(warning)
+            return return_delete_file_helper(message=warning,
                                              file_name=file_name,
                                              bucket_name=bucket_name)
         self._external_data_service.delete_file(bucket_name, file_name)
@@ -91,21 +95,30 @@ class DataReplicationService:
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
         directory = dir_path if dir_path else "root"
-        files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
+        files_in_directory = self._internal_data_service.find_files(dir_path)
 
-        if not files_summary.files_in_directory:
-            self._logger.warning(messages.no_files_found(directory))
-            return return_transfer_summary(message=messages.no_files_found(directory))
+        if not files_in_directory:
+            warning = messages.no_files_found(directory)
+            self._logger.warning(warning)
+            return return_transfer_summary(message=warning)
+
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-        completed_files_summary = self._storage_difference_processor.return_difference_comparison(
-            objects_already_in_bucket, files_summary
+        if not objects_already_in_bucket:
+            transfer_summary = self._external_data_service.perform_transfer(files_in_directory)
+            return_transfer_summary(transfer_summary)
+
+        files_summary = self._storage_difference_processor.return_difference_comparison(
+            objects_already_in_bucket, files_in_directory
         )
-        if not completed_files_summary.new_files:
-            self._logger.warning(messages.no_new_files(directory))
-            return return_transfer_summary(message=messages.no_new_files(directory),
-                                           files_skipped=len(completed_files_summary.files_to_be_skipped()))
-        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name,
-                                                                                      completed_files_summary))
+        if not files_summary.new_files:
+            warning = messages.no_new_files(directory)
+            self._logger.warning(warning)
+            return return_transfer_summary(message=warning,
+                                           files_skipped=len(files_in_directory))
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name,
+                                                                        files_summary.new_files,
+                                                                        files_to_skip=files_summary.files_to_be_skipped)
+        return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
         bucket_warning = self._check_bucket_warning(bucket_name)
@@ -113,18 +126,30 @@ class DataReplicationService:
             return return_transfer_summary(message=bucket_warning)
 
         directory = dir_path if dir_path else "root"
-        objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-        files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
+        files_in_directory = self._internal_data_service.find_files(dir_path)
 
-        if not files_summary.files_in_directory:
-            self._logger.warning(messages.no_files_found(directory))
-            return return_transfer_summary(message=messages.no_files_found(directory))
-        completed_files_summary = self._storage_difference_processor.return_difference_comparison(
-            objects_already_in_bucket, files_summary, check_for_updates=True
+        if not files_in_directory:
+            warning = messages.no_files_found(directory)
+            self._logger.warning(warning)
+            return return_transfer_summary(message=warning)
+
+        objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
+
+        if not objects_already_in_bucket:
+            transfer_summary = self._external_data_service.perform_transfer(files_in_directory)
+            return_transfer_summary(transfer_summary)
+
+        files_summary = self._storage_difference_processor.return_difference_comparison(
+            objects_already_in_bucket, files_in_directory, check_for_updates=True
         )
-        if not completed_files_summary.new_files and not completed_files_summary.updated_files:
-            self._logger.warning(messages.no_new_or_updates(directory))
-            return return_transfer_summary(message=messages.no_new_or_updates(directory),
-                                           files_skipped=len(completed_files_summary.files_to_be_skipped()))
-        return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name,
-                                                                                      completed_files_summary))
+
+        if not files_summary.new_files and not files_summary.updated_files:
+            warning = messages.no_new_or_updates(directory)
+            self._logger.warning(warning)
+            return return_transfer_summary(message=warning,
+                                           files_skipped=files_summary.files_to_be_skipped)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name,
+                                                                        files_summary.new_files,
+                                                                        files_summary.updated_files,
+                                                                        files_summary.files_to_be_skipped)
+        return return_transfer_summary(**transfer_summary)

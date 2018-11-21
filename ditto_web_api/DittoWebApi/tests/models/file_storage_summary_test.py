@@ -23,9 +23,7 @@ class TestFileStorageSummary:
         # Act
         files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
-        assert len(files_to_skip) == 2
-        assert files_to_skip[0] == self.mock_file_information_3
-        assert files_to_skip[1] == self.mock_file_information_4
+        assert files_to_skip == 2
 
     def test_files_to_be_skipped_skips_updated_files(self):
         # Arrange
@@ -33,9 +31,7 @@ class TestFileStorageSummary:
         # Act
         files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
-        assert len(files_to_skip) == 2
-        assert files_to_skip[0] == self.mock_file_information_1
-        assert files_to_skip[1] == self.mock_file_information_4
+        assert files_to_skip == 2
 
     def test_files_to_be_skipped_skips_new_and_updated_files(self):
         # Arrange
@@ -44,18 +40,13 @@ class TestFileStorageSummary:
         # Act
         files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
-        assert len(files_to_skip) == 1
-        assert files_to_skip[0] == self.mock_file_information_3
+        assert files_to_skip == 1
 
     def test_files_to_be_skipped_skips_all_when_none_new_or_updated(self):
         # Act
         files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
-        assert len(files_to_skip) == 4
-        assert files_to_skip[0] == self.mock_file_information_1
-        assert files_to_skip[1] == self.mock_file_information_2
-        assert files_to_skip[2] == self.mock_file_information_3
-        assert files_to_skip[3] == self.mock_file_information_4
+        assert files_to_skip == 4
 
     def test_files_to_be_skipped_skips_none_when_all_new_or_updated(self):
         # Arrange
@@ -64,4 +55,4 @@ class TestFileStorageSummary:
         # Act
         files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
-        assert not files_to_skip
+        assert files_to_skip == 0

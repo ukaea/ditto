@@ -53,6 +53,7 @@ class ExternalDataService:
     # Objects
 
     def get_objects(self, bucket_name, dir_path):
+        self._logger.debug("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
         bucket = self._s3_client.get_bucket(bucket_name)
         if bucket is None:
             self._logger.warning(
@@ -123,12 +124,12 @@ class ExternalDataService:
             dateutil.parser.parse(boto_object.last_modified)
         )
 
-    def perform_transfer(self, bucket_name, files_summary):
+    def perform_transfer(self, bucket_name, new_files, files_to_update=[], files_to_skip=0):
         data_transferred = 0
-        for file in files_summary.new_files or files_summary.updated_files:
+        for file in new_files + files_to_update:
             data_transferred += self.upload_file(bucket_name, file)
         return {"message": "Transfer successful",
-                "new_files_uploaded": len(files_summary.new_files),
-                "files_updated": len(files_summary.updated_files),
-                "files_skipped": len(files_summary.files_to_be_skipped()),
+                "new_files_uploaded": len(new_files),
+                "files_updated": len(files_to_update),
+                "files_skipped": int(files_to_skip),
                 "data_transferred": data_transferred}
