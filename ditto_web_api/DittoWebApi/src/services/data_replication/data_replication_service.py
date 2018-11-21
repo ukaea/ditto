@@ -49,7 +49,7 @@ class DataReplicationService:
             return return_transfer_summary(message=warning, files_skipped=len(files_in_directory))
 
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
-        transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary, False)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary, updates=False)
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name):
@@ -116,7 +116,7 @@ class DataReplicationService:
             self._logger.warning(warning)
             return return_transfer_summary(message=warning,
                                            files_skipped=len(files_in_directory))
-        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary, False)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary, updates=False)
         return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
@@ -147,5 +147,5 @@ class DataReplicationService:
             self._logger.warning(warning)
             return return_transfer_summary(message=warning,
                                            files_skipped=files_summary.files_to_be_skipped)
-        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary, True)
+        transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary, updates=True)
         return return_transfer_summary(**transfer_summary)
