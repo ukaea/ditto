@@ -95,14 +95,29 @@ class TestExternalDataServices:
     # does_dir_exist
 
     @pytest.mark.parametrize("dir_path", [None, "", " ", "  "])
-    def test_does_dir_exist_returns_false_if_dir_path_empty(self, dir_path):
+    def test_does_dir_exist_returns_false_if_dir_path_empty_and_bucket_exists_and_is_empty(self, dir_path):
         # Act
         result = self.test_service.does_dir_exist("test-bucket", dir_path)
         # Assert
         assert result is False
-        self.mock_logger.warning.assert_called_once_with(
-            f'Tried to find empty directory path "{dir_path}"'
+
+    @pytest.mark.parametrize("dir_path", [None, "", " ", "  "])
+    def test_does_dir_exist_returns_true_if_dir_path_empty_and_bucket_exists_and_contains_dir(self, dir_path):
+        # Arrange
+        mock_bucket = mock.create_autospec(BotoBucket)
+        mock_key_1 = TestExternalDataServices.get_mock_key(
+            'mock_object_1',
+            mock_bucket,
+            'test_etag_1',
+            42,
+            '2018-11-16T17:07:08.851Z'
         )
+        mock_bucket.list.return_value = [mock_key_1]
+        self.mock_s3_client.get_bucket.return_value = mock_bucket
+        # Act
+        result = self.test_service.does_dir_exist("test-bucket", dir_path)
+        # Assert
+        assert result is True
 
     def test_does_dir_exist_returns_false_if_bucket_does_not_exist(self):
         # Arrange
