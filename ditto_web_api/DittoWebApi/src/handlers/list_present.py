@@ -1,6 +1,9 @@
 # pylint: disable=W0221,W0223
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
+from DittoWebApi.src.handlers.schemas.schema_builder import SchemaBuilder
+
+schema_builder = SchemaBuilder()
 
 
 class ListPresentHandler(APIHandler):
@@ -8,31 +11,16 @@ class ListPresentHandler(APIHandler):
         self._data_replication_service = data_replication_service
 
     @schema.validate(
-        input_schema={
-            "type": "object",
-            "properties": {
-                "bucket": {"type": "string"},
-                "directory": {"type": "string"},
-            },
-            "required": ["bucket"]
-        },
+        input_schema=schema_builder.create_object_schema(["bucket", "directory"], ["bucket"]),
         input_example={
             "bucket": "test-bucket-name",
             "directory": "testdir/testsubdir",
         },
-        output_schema={
-            "type": "object",
-            "items": {
-                "properties": {
-                    "message": {"type": "string"},
-                    "objects": {"type": "array"},
-                },
-                "required": ["message", "objects"]
-            }
-        },
+        output_schema=schema_builder.create_list_present_schame(),
         output_example={
             "message": "objects retrieved successfully",
-            "objects": ["testdir/file1.txt", "testdir/subdir/file2.txt"]
+            "objects": [{"object_name": "testdir/file1.txt", "bucket_name": "test_bucket_1"},
+                        {"object_name": "testdir/subdir/file2.txt", "bucket_name": "test_bucket_1"}]
         },
     )
     def post(self, *args, **kwargs):
