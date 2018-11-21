@@ -7,7 +7,6 @@ from testScenarios.when.gridftp_with_plugin import GridftpWithPlugin
 class WhenSteps:
     def __init__(self, context):
         self._context = context
-        self._gridftp_with_plugin = GridftpWithPlugin(context)
 
     def environment_is_stopped(self):
         self._context.stop_dms()
@@ -23,6 +22,9 @@ class WhenSteps:
           stdout=self._context.console_logger.stdout_log_writer,
           stderr=self._context.console_logger.stderr_log_writer)
         shell_process.wait()
+
+    def something_happens(self):
+        print(self.__class__)
 
     def simple_file_is_copied(self):
         assert 1 == 0

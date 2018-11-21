@@ -8,6 +8,10 @@ class GivenSteps:
         self._context = context
         self._ditto_api_server = DittoApiServer(context)
 
+    @property
+    def ditto_web_api(self):
+        return self._ditto_api_server
+
     def _write_test_file(self, file_name, content):
         with open(os.path.join(self._context.execution_folder_path, 'testing_area/src', file_name), 'w') as file:
             file.write(content)

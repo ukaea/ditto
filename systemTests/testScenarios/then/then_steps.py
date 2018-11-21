@@ -8,6 +8,9 @@ class ThenSteps:
         self.console_error = LogFileSteps(context, 'console-stderr.log')
         self.ditto_api_log = LogFileSteps(context, 'ditto_api_server.log')
 
+    def thing_is_true(self):
+        assert isinstance(self, ThenSteps)
+
     def simple_test_file_is_transferred(self):
         # example step that will check that files are transferred to the correct output directory
         assert 1 == 0
