@@ -13,7 +13,7 @@ class SystemTestContext:
     def __init__(self):
         self._execution_folder_path = '/home/vagrant/execution_space'
         self.ditto_api_process = None
-        self.console_logger = ProcessLogger('console')
+        self.console_logger = ProcessLogger('console', self.log_folder_path)
 
     def clean_up(self):
         print('cleaning up test')

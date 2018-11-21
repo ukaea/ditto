@@ -7,4 +7,4 @@ class TestTemplate2(BaseSystemTest):
 
         self.when.something_happens()
 
-        self.then.thing_is_true()
+        self.then.thing_is_false()

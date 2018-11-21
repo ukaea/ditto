@@ -11,10 +11,5 @@ class ThenSteps:
     def thing_is_true(self):
         assert isinstance(self, ThenSteps)
 
-    def simple_test_file_is_transferred(self):
-        # example step that will check that files are transferred to the correct output directory
-        assert 1 == 0
-
-    def contents_of_copied_file_unchanged(self):
-        # example step that will check that a file copied across has the same contents as the input file
-        assert 1 == 0
+    def thing_is_false(self):
+        assert isinstance(self, list)
