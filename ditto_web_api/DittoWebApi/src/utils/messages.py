@@ -54,7 +54,7 @@ def directory_exists(directory, skipped_files):
     return "Directory {} already exists on S3, {} files skipped".format(directory, skipped_files)
 
 
-def bucket_exists(bucket_name):
+def bucket_already_exists(bucket_name):
     return "Warning, bucket already exists ({})".format(bucket_name)
 
 

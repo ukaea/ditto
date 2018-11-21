@@ -3,7 +3,6 @@ from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
-from DittoWebApi.src.models.bucket_warning import BucketWarning
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils import messages
 
@@ -15,33 +14,31 @@ class DataReplicationService:
         self._storage_difference_processor = storage_difference_processor
         self._logger = logger
 
-    def _check_bucket_warnings(self, bucket_name):
-        bucket_warning = BucketWarning()
+    def _check_bucket_warning(self, bucket_name):
+        bucket_warning = None
         if not is_valid_bucket(bucket_name):
-            bucket_warning.message = messages.bucket_breaks_s3_convention(bucket_name)
+            bucket_warning = messages.bucket_breaks_s3_convention(bucket_name)
         elif not self._external_data_service.does_bucket_match_standard(bucket_name):
-            bucket_warning.message = messages.bucket_breaks_config(bucket_name)
+            bucket_warning = messages.bucket_breaks_config(bucket_name)
         elif not self._external_data_service.does_bucket_exist(bucket_name):
-            bucket_warning.message = messages.bucket_not_exists(bucket_name)
-        if bucket_warning.message != "":
-            bucket_warning.is_warning_found = True
-            self._logger.warning(bucket_warning.message)
+            bucket_warning = messages.bucket_not_exists(bucket_name)
+        if bucket_warning is not None:
+            self._logger.warning(bucket_warning)
         return bucket_warning
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
-        bucket_warnings = self._check_bucket_warnings(bucket_name)
-        if bucket_warnings.is_warning_found is True:
-            return {"message": bucket_warnings.message, "objects": []}
+        bucket_warning = self._check_bucket_warning(bucket_name)
+        if bucket_warning is not None:
+            return {"message": bucket_warning, "objects": []}
         self._logger.info("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
         objects = self._external_data_service.get_objects(bucket_name, dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
         return {"message": "objects returned successfully", "objects": object_dicts}
 
     def copy_dir(self, bucket_name, dir_path):
-        warnings = self._check_bucket_warnings(bucket_name)
-
-        if warnings.is_warning_found is True:
-            return return_transfer_summary(message=warnings.message)
+        bucket_warning = self._check_bucket_warning(bucket_name)
+        if bucket_warning is not None:
+            return return_transfer_summary(message=bucket_warning)
         files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
 
         if not files_summary.files_in_directory:
@@ -64,8 +61,8 @@ class DataReplicationService:
             return return_bucket_message(messages.bucket_breaks_config(bucket_name), bucket_name)
         try:
             if self._external_data_service.does_bucket_exist(bucket_name):
-                self._logger.warning(messages.bucket_exists(bucket_name))
-                return return_bucket_message(messages.bucket_exists(bucket_name), bucket_name)
+                self._logger.warning(messages.bucket_already_exists(bucket_name))
+                return return_bucket_message(messages.bucket_already_exists(bucket_name), bucket_name)
         except InvalidBucketError:
             self._logger.warning(messages.bucket_breaks_s3_convention(bucket_name))
             return return_bucket_message(messages.bucket_breaks_s3_convention(bucket_name), bucket_name)
@@ -74,9 +71,9 @@ class DataReplicationService:
         return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
 
     def try_delete_file(self, bucket_name, file_name):
-        bucket_warnings = self._check_bucket_warnings(bucket_name)
-        if bucket_warnings.is_warning_found:
-            return return_delete_file_helper(message=bucket_warnings.message,
+        bucket_warning = self._check_bucket_warning(bucket_name)
+        if bucket_warning is not None:
+            return return_delete_file_helper(message=bucket_warning,
                                              file_name=file_name,
                                              bucket_name=bucket_name)
         if not self._external_data_service.does_object_exist(bucket_name, file_name):
@@ -89,10 +86,9 @@ class DataReplicationService:
         return return_delete_file_helper(message=message, file_name=file_name, bucket_name=bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
-        bucket_warnings = self._check_bucket_warnings(bucket_name)
-
-        if bucket_warnings.is_warning_found:
-            return return_transfer_summary(message=bucket_warnings.message)
+        bucket_warning = self._check_bucket_warning(bucket_name)
+        if bucket_warning is not None:
+            return return_transfer_summary(message=bucket_warning)
         directory = dir_path if dir_path else "root"
         files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
 
@@ -111,9 +107,10 @@ class DataReplicationService:
                                                                                       completed_files_summary))
 
     def copy_new_and_update(self, bucket_name, dir_path):
-        bucket_warnings = self._check_bucket_warnings(bucket_name)
-        if bucket_warnings.is_warning_found:
-            return return_transfer_summary(message=bucket_warnings.message)
+        bucket_warning = self._check_bucket_warning(bucket_name)
+        if bucket_warning is not None:
+            return return_transfer_summary(message=bucket_warning)
+
         directory = dir_path if dir_path else "root"
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         files_summary = FilesStorageSummary(self._internal_data_service.find_files(dir_path))
