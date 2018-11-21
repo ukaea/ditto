@@ -50,7 +50,7 @@ class DataReplicationService:
 
         if self._external_data_service.does_dir_exist(bucket_name, dir_path):
             self._logger.warning(messages.directory_exists(dir_path, len(files_summary.files_in_directory)))
-            return return_transfer_summary(message=messages.directory_exists(dir_path, 
+            return return_transfer_summary(message=messages.directory_exists(dir_path,
                                                                              len(files_summary.files_in_directory)),
                                            files_skipped=len(files_summary.files_to_be_skipped()))
         return return_transfer_summary(**self._external_data_service.perform_transfer(bucket_name, files_summary))

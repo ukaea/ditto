@@ -87,7 +87,6 @@ class TestSorageDifferenceProcessor:
     def test_return_difference_comparison_returns_only_new_files_when_extra_file_in_bucket_but_not_in_dir(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2, self.s3_object_4]
-        files_in_directory = [self.file_1, self.file_2, self.file_3]
         file_summary = mock.create_autospec(FilesSummary)
         file_summary.files_in_directory = [self.file_1, self.file_2, self.file_3]
         file_summary.updated_files = []
@@ -168,10 +167,9 @@ class TestSorageDifferenceProcessor:
         # Assert
         assert result is False
 
-    def test_return_difference_comparison_returns_only_new_files_when_new_files_and_none_to_update_but_some_copies(self):
+    def test_return_difference_comparison_returns_only_new_files_when_new_files_and_none_to_update_but_some_copy(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2, self.s3_object_4]
-        files_in_directory = [self.file_1, self.file_2, self.file_3]
         file_summary = mock.create_autospec(FilesSummary)
         file_summary.files_in_directory = [self.file_1, self.file_2, self.file_3]
         file_summary.updated_files = []
@@ -191,7 +189,6 @@ class TestSorageDifferenceProcessor:
     def test_return_difference_comparison_returns_only_files_to_update_when_no_new_but_some_changed(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2, self.s3_object_3]
-        files_in_directory = [self.file_1, self.file_2, self.file_3]
         file_summary = mock.create_autospec(FilesSummary)
         file_summary.files_in_directory = [self.file_1, self.file_2, self.file_3]
         file_summary.updated_files = []
@@ -211,7 +208,6 @@ class TestSorageDifferenceProcessor:
     def test_return_difference_comparison_returns_both_new_and_updated_when_present(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2, self.s3_object_4]
-        files_in_directory = [self.file_1, self.file_2, self.file_3, self.file_4]
         file_summary = mock.create_autospec(FilesSummary)
         file_summary.files_in_directory = [self.file_1, self.file_2, self.file_3, self.file_4]
         file_summary.updated_files = []
@@ -232,7 +228,6 @@ class TestSorageDifferenceProcessor:
     def test_difference_comparison_returns_none_when_neither_present(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2, self.s3_object_3, self.s3_object_4]
-        files_in_directory = [self.file_1, self.file_2, self.file_3, self.file_4]
         file_summary = mock.create_autospec(FilesSummary)
         file_summary.files_in_directory = [self.file_1, self.file_2, self.file_3, self.file_4]
         file_summary.updated_files = []
