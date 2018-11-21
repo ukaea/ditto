@@ -1,3 +1,4 @@
+# pylint: disable=W0201
 import pytest
 import mock
 from DittoWebApi.src.models.file_information import FileInformation
