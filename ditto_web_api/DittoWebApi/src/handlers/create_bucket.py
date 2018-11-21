@@ -11,14 +11,14 @@ class CreateBucketHandler(APIHandler):
         self._data_replication_service = data_replication_service
 
     @schema.validate(
-        input_schema=schema_builder.create_object_schema(["bucket"], ["bucket"]),
+        input_schema=schema_builder.create_object_schema_with_string_properties(["bucket"], ["bucket"]),
         input_example={
             "type": "object",
             "properties": {
                 "bucket": {"type": "string"}
             },
         },
-        output_schema=schema_builder.create_object_schema(["message", "bucket"], []),
+        output_schema=schema_builder.create_object_schema_with_string_properties(["message", "bucket"]),
         output_example={
             "type": "object",
             "properties": {

@@ -11,12 +11,12 @@ class ListPresentHandler(APIHandler):
         self._data_replication_service = data_replication_service
 
     @schema.validate(
-        input_schema=schema_builder.create_object_schema(["bucket", "directory"], ["bucket"]),
+        input_schema=schema_builder.create_object_schema_with_string_properties(["bucket", "directory"], ["bucket"]),
         input_example={
             "bucket": "test-bucket-name",
             "directory": "testdir/testsubdir",
         },
-        output_schema=schema_builder.create_list_present_schame(),
+        output_schema=schema_builder.create_list_present_output_schema(),
         output_example={
             "message": "objects retrieved successfully",
             "objects": [{"object_name": "testdir/file1.txt", "bucket_name": "test_bucket_1"},
