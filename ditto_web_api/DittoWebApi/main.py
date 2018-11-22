@@ -15,6 +15,7 @@ from DittoWebApi.src.services.external.storage_adapters.boto_adapter import Boto
 from DittoWebApi.src.services.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
+from DittoWebApi.src.utils.route_helper import format_route_specification
 
 
 def setup_logger(log_file_location, level):
@@ -57,13 +58,14 @@ if __name__ == "__main__":
                                                       LOGGER)
 
     # Launch app
+    app_context = dict(data_replication_service=DATA_REPLICATION_SERVICE)
     APP = tornado.web.Application([
-        (r"/listpresent/", ListPresentHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/copydir/", CopyDirHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/createbucket/", CreateBucketHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/deletefile/", DeleteFileHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/copynew/", CopyNewHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
-        (r"/copyupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
+        (format_route_specification("listpresent"), ListPresentHandler, app_context),
+        (format_route_specification("copydir"), CopyDirHandler, app_context),
+        (format_route_specification("createbucket"), CreateBucketHandler, app_context),
+        (format_route_specification("deletefile"), DeleteFileHandler, app_context),
+        (format_route_specification("copynew"), CopyNewHandler, app_context),
+        (format_route_specification("copyupdate"), CopyUpdateHandler, app_context),
     ])
     APP.listen(8888)
     tornado.ioloop.IOLoop.current().start()

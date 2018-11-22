@@ -5,6 +5,7 @@ import tornado.web
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
+from DittoWebApi.src.utils.route_helper import format_route_specification
 
 
 MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
@@ -13,19 +14,24 @@ MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
 @pytest.fixture(autouse=True)
 def app():
     application = tornado.web.Application([
-        (r"/deletefile/", DeleteFileHandler, dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE),)
+        (
+            format_route_specification("deletefile"),
+            DeleteFileHandler,
+            dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE),
+        )
     ])
     return application
 
 
 @pytest.mark.gen_test
-def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_client, base_url):
+@pytest.mark.parametrize("route", ["/deletefile/", "/deletefile"])
+def test_delete_returns_summary_of_deleted_files_as_json_when_successful(http_client, base_url, route):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.try_delete_file.return_value = return_delete_file_helper(
         "File some_file.txt, successfully deleted from bucket bucket_1", "some_file.txt", "bucket_1"
     )
     # Act
-    url = base_url + "/deletefile/"
+    url = base_url + route
     body = json.dumps({'bucket': "bucket_1", 'file': "some_file.txt"})
     response = yield http_client.fetch(url, method="DELETE", body=body, allow_nonstandard_methods=True)
     # Assert

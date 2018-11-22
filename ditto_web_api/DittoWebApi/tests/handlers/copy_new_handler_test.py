@@ -5,6 +5,7 @@ import tornado.web
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
+from DittoWebApi.src.utils.route_helper import format_route_specification
 
 
 MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
@@ -13,13 +14,17 @@ MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
 @pytest.fixture(autouse=True)
 def app():
     application = tornado.web.Application([
-        (r"/copynew/", CopyNewHandler, dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE))
+        (
+            format_route_specification("copynew"),
+            CopyNewHandler,
+            dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE))
     ])
     return application
 
 
 @pytest.mark.gen_test
-def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, base_url):
+@pytest.mark.parametrize("route", ["/copynew/", "/copynew"])
+def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, base_url, route):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.copy_new.return_value = {'message': 'Transfer successful',
                                                            'new files transferred': 1,
@@ -27,7 +32,7 @@ def test_post_returns_summary_of_transfer_as_json_when_successful(http_client, b
                                                            'files skipped': 3,
                                                            'data transferred (bytes)': 100}
     # Act
-    url = base_url + "/copynew/"
+    url = base_url + route
     body = json.dumps({'bucket': "bucket_1", 'directory': "some_directory"})
     response = yield http_client.fetch(url, method="POST", body=body)
     # Assert
