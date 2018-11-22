@@ -46,7 +46,7 @@
     owner: minio
     group: minio
     recurse: yes
-    mode: '0705'
+    mode: '0707'
   become: true
 
 - name: Copy Minio service file

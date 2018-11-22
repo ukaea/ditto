@@ -89,6 +89,7 @@ class BaseSystemTest(unittest.TestCase):
         print("setting up test")
         self.context = SystemTestContext()
         self._clean_up_working_folders()
+        self._clear_up_s3_data()
         self._set_up_loggers()
         self.given = GivenSteps(self.context)
         self.when = WhenSteps(self.context)
@@ -106,3 +107,20 @@ class BaseSystemTest(unittest.TestCase):
         # Clear out the local data
         shutil.rmtree(self.context.local_data_folder_path)
         os.makedirs(self.context.local_data_folder_path)
+
+    def _clear_up_s3_data(self):
+        # Find everything in the s3_data_folder_path
+        s3_items = os.listdir(self.context.s3_data_folder_path)
+        s3_items = [os.path.join(self.context.s3_data_folder_path, s3_item) for s3_item in s3_items]
+        # Filter this to just directories that match the bucket standardisation
+        s3_dirs = [s3_dir for s3_dir in s3_items if os.path.isdir(s3_dir)]
+        s3_dirs = [s3_dir for s3_dir in s3_dirs if self._s3_dir_belongs_to_system_tests(s3_dir)]
+        # Delete these directories
+        for s3_dir in s3_dirs:
+            shutil.rmtree(s3_dir)
+
+    def _s3_dir_belongs_to_system_tests(self,s3_dir):
+        base_name = os.path.basename(s3_dir)
+        nchar = len(self.context.bucket_standardisation)+1
+        target = self.context.bucket_standardisation + '-'
+        return base_name[:nchar] == target
