@@ -3,15 +3,14 @@ import dateutil.parser
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
-from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
 class ExternalDataService:
-    def __init__(self, configuration, logger, s3_adapter):
+    def __init__(self, configuration, logger, s3_adapter, file_system_helper):
         self._logger = logger
         self._bucket_standard = configuration.bucket_standard
         self._s3_client = s3_adapter
-        self._file_system_helper = FileSystemHelper()
+        self._file_system_helper = file_system_helper
 
     # Buckets
 

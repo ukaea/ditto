@@ -26,10 +26,12 @@ class TestExternalDataServices:
         mock_configuration.s3_use_secure = "example"
         self.mock_s3_client = mock.create_autospec(IS3Adapter)
         self.mock_logger = mock.create_autospec(logging.Logger)
+        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         self.test_service = ExternalDataService(
             mock_configuration,
             self.mock_logger,
-            self.mock_s3_client
+            self.mock_s3_client,
+            self.mock_file_system_helper
         )
 
     @staticmethod
@@ -337,16 +339,17 @@ class TestExternalDataServices:
         bucket_name = "bucket"
         mock_file_1 = mock.create_autospec(FileInformation)
         mock_file_1.rel_path = "test_file_1.txt"
+        mock_file_1.abs_path = "C:/root/test_file_1.txt"
         mock_boto_bucket = mock.create_autospec(BotoBucket)
         mock_boto_key = mock.create_autospec(BotoKey)
         mock_boto_bucket.get_key.return_value = mock_boto_key
         self.mock_s3_client.get_bucket.return_value = mock_boto_bucket
-        self.test_service._file_system_helper.file_size = mock.create_autospec(FileSystemHelper)
-        self.test_service._file_system_helper.file_size.return_value = 12
+        self.mock_file_system_helper.file_size.return_value = 12
         # Act
         output = self.test_service.upload_file(bucket_name, mock_file_1)
         # Assert
         self.mock_logger.debug.assert_any_call('File "test_file_1.txt" uploaded, 12 bytes transferred')
+        mock_boto_key.set_contents_from_filename.assert_called_once_with("C:/root/test_file_1.txt")
         assert output == 12
 
     def test_upload_creates_returns_false_when_bucket_does_not_exist(self):
