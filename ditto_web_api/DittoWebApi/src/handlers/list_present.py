@@ -19,8 +19,8 @@ class ListPresentHandler(APIHandler):
         output_schema=SCHEMA_BUILDER.create_list_present_output_schema(),
         output_example={
             "message": "objects retrieved successfully",
-            "objects": [{"object_name": "testdir/file1.txt", "bucket_name": "test_bucket_1"},
-                        {"object_name": "testdir/subdir/file2.txt", "bucket_name": "test_bucket_1"}]
+            "objects": [{"object": "testdir/file1.txt", "bucket": "test_bucket_1"},
+                        {"object": "testdir/subdir/file2.txt", "bucket": "test_bucket_1"}]
         },
     )
     def post(self, *args, **kwargs):

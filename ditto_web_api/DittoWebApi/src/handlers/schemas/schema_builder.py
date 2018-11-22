@@ -18,7 +18,7 @@ class SchemaBuilder:
             "properties": {
                 "message": {"type": "string"},
                 "objects": {"type": "array",
-                            "items": self.create_object_schema_with_string_properties(["object_name", "bucket_name"])
+                            "items": self.create_object_schema_with_string_properties(["object", "bucket"])
                             },
             },
         }
