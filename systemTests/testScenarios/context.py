@@ -44,7 +44,7 @@ class SystemTestContext:
 
     @property
     def app_port(self):
-        return 8888
+        return 8080
 
     @property
     def s3host(self):
