@@ -50,7 +50,7 @@ if __name__ == "__main__":
     S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
     FILE_SYSTEM_HELPER = FileSystemHelper()
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER, S3_ADAPTER, FILE_SYSTEM_HELPER)
-    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
+    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
     STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
