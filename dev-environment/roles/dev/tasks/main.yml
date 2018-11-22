@@ -11,6 +11,7 @@
     - kernel-headers 
     - dkms 
     - git
+    - lsof
     - zip
     - unzip
 

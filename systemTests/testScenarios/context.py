@@ -1,5 +1,6 @@
 import os
 import shutil
+import signal
 import unittest
 import pytest
 
@@ -11,22 +12,75 @@ from testScenarios.tools.process_logger import ProcessLogger
 
 class SystemTestContext:
     def __init__(self):
-        self.execution_folder_path = os.path.abspath(os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            '..',
-            'execution_space'
-        ))
+        self._execution_folder_path = '/home/vagrant/systemTests/execution_space'
         self.ditto_api_process = None
-        self.console_logger = ProcessLogger('console')
+        self.console_logger = ProcessLogger('console', self.log_folder_path)
 
     def clean_up(self):
         print('cleaning up test')
-        self.console_logger.clean_up()
         self.shut_down_ditto_api()
+        self.console_logger.clean_up()
 
     def shut_down_ditto_api(self):
+        print(f'Shutting down DITTO API process on port {self.app_port}')
+        process_id = os.getpgid(self.ditto_api_process.pid)
+        print(f'Process has ID {process_id}')
+        os.killpg(process_id, signal.SIGTERM)
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
+
+    @property
+    def ditto_web_api_folder_path(self):
+        return os.path.join(self._execution_folder_path, 'ditto_web_api')
+        # return '/home/vagrant/ditto_web_api'
+
+    @property
+    def log_folder_path(self):
+        return os.path.join(self._execution_folder_path, 'logs')
+
+    @property
+    def log_level(self):
+        return 'DEBUG'
+
+    @property
+    def app_port(self):
+        return 8080
+
+    @property
+    def s3host(self):
+        # This is set in Vagrantfile
+        return '172.28.129.160'
+
+    @property
+    def s3port(self):
+        # This is the Minio default
+        return 9000
+
+    @property
+    def s3access(self):
+        # This is set in minio.conf
+        return 'AKIAIOSFODNN7EXAMPLE'
+
+    @property
+    def s3secret(self):
+        # This is set in minio.conf
+        return 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+
+    @property
+    def s3secure(self):
+        return 'FALSE'
+
+    @property
+    def bucket_standardisation(self):
+        return 'systemtest'
+
+    @property
+    def local_data_folder_path(self):
+        return os.path.join(self._execution_folder_path, 'data')
+
+    @property
+    def s3_data_folder_path(self):
+        return '/opt/minio/data'
 
 
 class BaseSystemTest(unittest.TestCase):
@@ -35,6 +89,7 @@ class BaseSystemTest(unittest.TestCase):
         print("setting up test")
         self.context = SystemTestContext()
         self._clean_up_working_folders()
+        self._clear_up_s3_data()
         self._set_up_loggers()
         self.given = GivenSteps(self.context)
         self.when = WhenSteps(self.context)
@@ -45,14 +100,27 @@ class BaseSystemTest(unittest.TestCase):
         self.context.console_logger.set_up()
 
     def _clean_up_working_folders(self):
-        # clear out the old logs
+        # Clear out the logs
+        shutil.rmtree(self.context.log_folder_path)
+        os.makedirs(self.context.log_folder_path)
 
-        #the following two lines should probably be uncommented but, when they are,the first test gets an error
-        #shutil.rmtree(self.context.execution_folder_path + '/logs')
-        #os.makedirs(self.context.execution_folder_path + '/logs')
+        # Clear out the local data
+        shutil.rmtree(self.context.local_data_folder_path)
+        os.makedirs(self.context.local_data_folder_path)
 
-        shutil.rmtree(self.context.execution_folder_path + '/testing_area')
-        os.makedirs(self.context.execution_folder_path + '/testing_area/src')
-        os.makedirs(self.context.execution_folder_path + '/testing_area/staging')
-        os.makedirs(self.context.execution_folder_path + '/testing_area/target')
+    def _clear_up_s3_data(self):
+        # Find everything in the s3_data_folder_path
+        s3_items = os.listdir(self.context.s3_data_folder_path)
+        s3_items = [os.path.join(self.context.s3_data_folder_path, s3_item) for s3_item in s3_items]
+        # Filter this to just directories that match the bucket standardisation
+        s3_dirs = [s3_dir for s3_dir in s3_items if os.path.isdir(s3_dir)]
+        s3_dirs = [s3_dir for s3_dir in s3_dirs if self._s3_dir_belongs_to_system_tests(s3_dir)]
+        # Delete these directories
+        for s3_dir in s3_dirs:
+            shutil.rmtree(s3_dir)
 
+    def _s3_dir_belongs_to_system_tests(self,s3_dir):
+        base_name = os.path.basename(s3_dir)
+        nchar = len(self.context.bucket_standardisation)+1
+        target = self.context.bucket_standardisation + '-'
+        return base_name[:nchar] == target

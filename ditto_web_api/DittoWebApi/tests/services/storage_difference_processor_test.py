@@ -43,7 +43,7 @@ class TestSorageDifferenceProcessor:
         self.s3_object_3.last_modified = 345.345
         self.s3_object_4.last_modified = 456.456
 
-    def test_return_new_files_returns_all_files_when_only_new_files_are_present(self):
+    def test_return_difference_comparison_returns_all_files_when_only_new_files_are_present(self):
         # Arrange
         objects_in_bucket = []
         files_in_directory = [self.file_1, self.file_2]
@@ -55,7 +55,7 @@ class TestSorageDifferenceProcessor:
         assert result.new_files[0] == self.file_1
         assert result.new_files[1] == self.file_2
 
-    def test_return_new_files_returns_empty_array_when_all_files_are_already_present(self):
+    def test_return_difference_comparison_returns_empty_array_when_all_files_are_already_present(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2]
         files_in_directory = [self.file_1, self.file_2]
@@ -65,7 +65,7 @@ class TestSorageDifferenceProcessor:
         assert result.new_files == []
         assert result.updated_files == []
 
-    def test_return_new_files_returns_only_new_files_when_some_are_new_some_are_present_including_non_unix_paths(self):
+    def test_return_difference_comparison_returns_only_new_files_when_some_new_some_not_including_non_unix_paths(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
@@ -77,7 +77,7 @@ class TestSorageDifferenceProcessor:
         assert result.new_files[0] == self.file_1
         assert result.new_files[1] == self.file_3
 
-    def test_return_new_files_returns_only_new_files_when_there_is_extra_file_in_bucket_but_not_in_dir(self):
+    def test_return_difference_comparison_returns_only_new_files_when_extra_file_in_bucket_but_not_in_dir(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2, self.s3_object_4]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
@@ -158,7 +158,7 @@ class TestSorageDifferenceProcessor:
         # Assert
         assert result is False
 
-    def test_return_new_files_returns_only_new_files_when_new_files_and_none_to_update_but_some_copies(self):
+    def test_return_difference_comparison_returns_only_new_files_when_new_files_and_none_to_update_but_some_copy(self):
         # Arrange
         objects_in_bucket = [self.s3_object_2, self.s3_object_4]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
@@ -175,7 +175,7 @@ class TestSorageDifferenceProcessor:
         assert new_files[0] == self.file_1
         assert new_files[1] == self.file_3
 
-    def test_return_new_files_returns_only_files_to_update_when_no_new_but_some_changed(self):
+    def test_return_difference_comparison_returns_only_files_to_update_when_no_new_but_some_changed(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2, self.s3_object_3]
         files_in_directory = [self.file_1, self.file_2, self.file_3]
@@ -192,7 +192,7 @@ class TestSorageDifferenceProcessor:
         assert files_to_update[0] == self.file_1
         assert files_to_update[1] == self.file_3
 
-    def test_return_new_and_updated_files_returns_both_when_present(self):
+    def test_return_difference_comparison_returns_both_new_and_updated_when_present(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2, self.s3_object_4]
         files_in_directory = [self.file_1, self.file_2, self.file_3, self.file_4]
@@ -210,7 +210,7 @@ class TestSorageDifferenceProcessor:
         assert files_to_update[0] == self.file_2
         assert files_to_update[1] == self.file_4
 
-    def test_return_new_and_updated_files_returns_none_when_neither_present(self):
+    def test_difference_comparison_returns_none_when_neither_present(self):
         # Arrange
         objects_in_bucket = [self.s3_object_1, self.s3_object_2, self.s3_object_3, self.s3_object_4]
         files_in_directory = [self.file_1, self.file_2, self.file_3, self.file_4]

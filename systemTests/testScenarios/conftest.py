@@ -5,17 +5,25 @@ import pytest
 
 @pytest.fixture(scope="session", autouse=True)
 def set_up_system_test_environment():
-    print("setting up a system test environment")
+    print("Setting up a system test environment")
 
-    # clear out the old programs
-    execution_space = os.join('..', 'execution_space')
-    if os.path.isdir(execution_space):
-        shutil.rmtree(execution_space)
+    home = '/home/vagrant'
+    execution_space = os.path.join(home, 'systemTests', 'execution_space')
+    copied_src_path = os.path.join(execution_space, 'ditto_web_api', 'DittoWebApi')
+    logs_path = os.path.join(execution_space, 'logs')
+    local_data_path = os.path.join(execution_space, 'data')
 
-    os.makedirs(execution_space)
+    # Clear out the old programs
+    if os.path.isdir(copied_src_path):
+        shutil.rmtree(copied_src_path)
+    if os.path.isdir(logs_path):
+        shutil.rmtree(logs_path)
+    if os.path.isdir(local_data_path):
+        shutil.rmtree(local_data_path)
 
-    os.makedirs(execution_space + '/logs')
-    os.makedirs(execution_space + '/testing_area/src')
-    os.makedirs(execution_space + '/testing_area/staging')
-    os.makedirs(execution_space + '/testing_area/target')
+    # Copy the web API source code
+    shutil.copytree(os.path.join(home, 'ditto_web_api', 'DittoWebApi'), copied_src_path)
 
+    # Create the logging and local data directories
+    os.makedirs(logs_path)
+    os.makedirs(local_data_path)

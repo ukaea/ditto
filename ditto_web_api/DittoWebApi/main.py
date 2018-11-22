@@ -48,8 +48,9 @@ if __name__ == "__main__":
 
     # Set up services
     S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER, S3_ADAPTER)
-    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FileSystemHelper(), LOGGER)
+    FILE_SYSTEM_HELPER = FileSystemHelper()
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER, S3_ADAPTER, FILE_SYSTEM_HELPER)
+    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
     STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
@@ -65,5 +66,6 @@ if __name__ == "__main__":
         (r"/copynew/", CopyNewHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/copyupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
-    APP.listen(8888)
+    LOGGER.info(f'DITTO Web API listening on port {CONFIGURATION.app_port}')
+    APP.listen(CONFIGURATION.app_port)
     tornado.ioloop.IOLoop.current().start()

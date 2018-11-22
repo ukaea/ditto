@@ -47,7 +47,7 @@ def bucket_breaks_config(bucket_name):
 
 
 def bucket_breaks_s3_convention(bucket_name):
-    return "Bucket name breaks S3 ({})".format(bucket_name)
+    return "Bucket name breaks S3 naming convention ({})".format(bucket_name)
 
 
 def directory_exists(directory, skipped_files):

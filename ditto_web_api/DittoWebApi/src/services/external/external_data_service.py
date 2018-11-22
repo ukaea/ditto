@@ -1,4 +1,3 @@
-import os
 import dateutil.parser
 
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
@@ -7,10 +6,11 @@ from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 
 
 class ExternalDataService:
-    def __init__(self, configuration, logger, s3_adapter):
+    def __init__(self, configuration, logger, s3_adapter, file_system_helper):
         self._logger = logger
         self._bucket_standard = configuration.bucket_standard
         self._s3_client = s3_adapter
+        self._file_system_helper = file_system_helper
 
     # Buckets
 
@@ -53,6 +53,7 @@ class ExternalDataService:
     # Objects
 
     def get_objects(self, bucket_name, dir_path):
+        self._logger.debug("Going to find objects from directory '{}' in bucket '{}'".format(dir_path, bucket_name))
         bucket = self._s3_client.get_bucket(bucket_name)
         if bucket is None:
             self._logger.warning(
@@ -86,11 +87,11 @@ class ExternalDataService:
         key = bucket.get_key(object_name)
         key = bucket.new_key(key_name=object_name) if key is None else key
         key.set_contents_from_filename(file_information.abs_path)
-        file_length = os.stat(file_information.abs_path).st_size
+        file_length = self._file_system_helper.file_size(file_information.abs_path)
         self._logger.debug(
             f'File "{object_name}" uploaded, {file_length} bytes transferred'
         )
-        return True
+        return file_length
 
     def delete_file(self, bucket_name, file_rel_path):
         object_name = to_posix(file_rel_path)
@@ -122,3 +123,20 @@ class ExternalDataService:
             boto_object.etag,
             dateutil.parser.parse(boto_object.last_modified)
         )
+
+    def perform_transfer(self, bucket_name, file_summary):
+        data_transferred = 0
+        files_to_transfer = file_summary.new_files + file_summary.files_to_update
+        self._logger.debug(f"About to transfer {len(files_to_transfer)} files: {len(file_summary.new_files)} new files "
+                           f"and {len(file_summary.files_to_update)} files to be updated")
+        for file in files_to_transfer:
+            data_transferred += self.upload_file(bucket_name, file)
+        self._logger.debug(f"New files transferred: {[file.rel_path for file in file_summary.new_files] }")
+        self._logger.debug(f"Files updated: {[file.rel_path for file in file_summary.files_to_update]}")
+        self._logger.debug(f"Files not uploaded or updated: "
+                           f"{[file.rel_path for file in file_summary.files_to_be_skipped]}")
+        return {"message": "Transfer successful",
+                "new_files_uploaded": len(file_summary.new_files),
+                "files_updated": len(file_summary.files_to_update),
+                "files_skipped": len(file_summary.files_to_be_skipped),
+                "data_transferred": data_transferred}
