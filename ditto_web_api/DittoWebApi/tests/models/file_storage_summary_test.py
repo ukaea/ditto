@@ -21,7 +21,7 @@ class TestFileStorageSummary:
         # Arrange
         self.file_summary.new_files = [self.mock_file_information_1, self.mock_file_information_2]
         # Act
-        files_to_skip = self.file_summary.number_of_files_to_be_skipped()
+        files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
         assert files_to_skip == [self.mock_file_information_3, self.mock_file_information_4]
 
@@ -29,7 +29,7 @@ class TestFileStorageSummary:
         # Arrange
         self.file_summary.updated_files = [self.mock_file_information_3, self.mock_file_information_2]
         # Act
-        files_to_skip = self.file_summary.number_of_files_to_be_skipped()
+        files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
         assert files_to_skip == [self.mock_file_information_1, self.mock_file_information_4]
 
@@ -38,13 +38,13 @@ class TestFileStorageSummary:
         self.file_summary.new_files = [self.mock_file_information_2]
         self.file_summary.updated_files = [self.mock_file_information_1, self.mock_file_information_4]
         # Act
-        files_to_skip = self.file_summary.number_of_files_to_be_skipped()
+        files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
         assert files_to_skip == [self.mock_file_information_3]
 
     def test_files_to_be_skipped_excludes_all_when_none_new_or_updated(self):
         # Act
-        files_to_skip = self.file_summary.number_of_files_to_be_skipped()
+        files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
         assert files_to_skip == [self.mock_file_information_1,
                                  self.mock_file_information_2,
@@ -56,6 +56,6 @@ class TestFileStorageSummary:
         self.file_summary.new_files = [self.mock_file_information_2, self.mock_file_information_4]
         self.file_summary.updated_files = [self.mock_file_information_1, self.mock_file_information_3]
         # Act
-        files_to_skip = self.file_summary.number_of_files_to_be_skipped()
+        files_to_skip = self.file_summary.files_to_be_skipped()
         # Assert
         assert files_to_skip == []
