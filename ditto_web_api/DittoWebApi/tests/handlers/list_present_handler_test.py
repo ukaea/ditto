@@ -38,10 +38,10 @@ def test_post_returns_objects_from_server_as_json(http_client, base_url):
 def test_post_returns_multiple_objects_as_a_json_array(http_client, base_url):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.retrieve_object_dicts.return_value = {"message": "objects returned succesfully",
-                                                                        "objects": [{"object_name": "file_1.txt",
-                                                                                     "bucket_name": "bucket_1"},
-                                                                                    {"object_name": "file_2.txt",
-                                                                                     "bucket_name": "bucket_1"}]}
+                                                                        "objects": [{"object": "file_1.txt",
+                                                                                     "bucket": "bucket_1"},
+                                                                                    {"object": "file_2.txt",
+                                                                                     "bucket": "bucket_1"}]}
     # Act
     url = base_url + "/listpresent/"
     body = json.dumps({'bucket': "bucket_1", })
@@ -49,8 +49,8 @@ def test_post_returns_multiple_objects_as_a_json_array(http_client, base_url):
     # Assert
     response_body = json.loads(response.body, encoding='utf-8')
     assert response_body["status"] == "success"
-    assert response_body["data"]["objects"] == [{"object_name": "file_1.txt", "bucket_name": "bucket_1"},
-                                                {"object_name": "file_2.txt", "bucket_name": "bucket_1"}]
+    assert response_body["data"]["objects"] == [{"object": "file_1.txt", "bucket": "bucket_1"},
+                                                {"object": "file_2.txt", "bucket": "bucket_1"}]
     assert response_body["data"]["message"] == "objects returned succesfully"
 
 
