@@ -37,6 +37,10 @@ class SystemTestContext:
         return 'DEBUG'
 
     @property
+    def app_port(self):
+        return 8888
+
+    @property
     def s3host(self):
         # This is set in Vagrantfile
         return '172.28.129.160'

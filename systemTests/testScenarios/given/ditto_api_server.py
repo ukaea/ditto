@@ -19,6 +19,7 @@ class DittoApiServer:
             '[Settings]\n' \
             f'LogFolderLocation = {self._context.log_folder_path}\n'\
             f'LoggingLevel = {self._context.log_level}\n'\
+            f'ApplicationPort = {self._context.app_port}\n'\
             f'S3Host = {self._context.s3host}\n'\
             f'S3Port = {self._context.s3port}\n'\
             f'S3AccessKey = {self._context.s3access}\n'\
