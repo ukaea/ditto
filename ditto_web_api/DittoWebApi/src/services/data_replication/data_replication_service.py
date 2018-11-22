@@ -28,6 +28,7 @@ class DataReplicationService:
         return bucket_warning
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
+        self._logger.debug("Called list-present handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return {"message": bucket_warning, "objects": []}
@@ -36,6 +37,7 @@ class DataReplicationService:
         return {"message": "objects returned successfully", "objects": object_dicts}
 
     def copy_dir(self, bucket_name, dir_path):
+        self._logger.debug("Called copy-dir handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
@@ -56,6 +58,7 @@ class DataReplicationService:
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name):
+        self._logger.debug("Called create-bucket handler")
         if not bucket_name:
             warning = messages.no_bucket_name()
             self._logger.warning(warning)
@@ -77,6 +80,7 @@ class DataReplicationService:
         return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
 
     def try_delete_file(self, bucket_name, file_name):
+        self._logger.debug("Called delete-file handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return return_delete_file_helper(message=bucket_warning,
@@ -95,6 +99,7 @@ class DataReplicationService:
                                          bucket_name=bucket_name)
 
     def copy_new(self, bucket_name, dir_path):
+        self._logger.debug("Called copy new handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
@@ -119,6 +124,7 @@ class DataReplicationService:
         return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
+        self._logger.debug("Called copy-update handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)

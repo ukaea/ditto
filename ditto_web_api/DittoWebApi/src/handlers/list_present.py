@@ -1,6 +1,8 @@
 # pylint: disable=W0221,W0223
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
+from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
+from DittoWebApi.src.handlers.schemas.schema_helpers import create_list_present_output_schema
 
 
 class ListPresentHandler(APIHandler):
@@ -8,31 +10,16 @@ class ListPresentHandler(APIHandler):
         self._data_replication_service = data_replication_service
 
     @schema.validate(
-        input_schema={
-            "type": "object",
-            "properties": {
-                "bucket": {"type": "string"},
-                "directory": {"type": "string"},
-            },
-            "required": ["bucket"]
-        },
+        input_schema=create_object_schema_with_string_properties(["bucket", "directory"], ["bucket"]),
         input_example={
             "bucket": "test-bucket-name",
             "directory": "testdir/testsubdir",
         },
-        output_schema={
-            "type": "object",
-            "items": {
-                "properties": {
-                    "message": {"type": "string"},
-                    "objects": {"type": "array"},
-                },
-                "required": ["message", "objects"]
-            }
-        },
+        output_schema=create_list_present_output_schema(),
         output_example={
             "message": "objects retrieved successfully",
-            "objects": ["testdir/file1.txt", "testdir/subdir/file2.txt"]
+            "objects": [{"object": "testdir/file1.txt", "bucket": "test_bucket_1"},
+                        {"object": "testdir/subdir/file2.txt", "bucket": "test_bucket_1"}]
         },
     )
     def post(self, *args, **kwargs):
