@@ -11,6 +11,7 @@ class SampleConfigurationCreator:
     @staticmethod
     def create_configuration(log_folder_loc,
                              logging_level,
+                             app_port,
                              s3_host,
                              s3_port,
                              s3_access_key,
@@ -25,6 +26,9 @@ class SampleConfigurationCreator:
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "LoggingLevel",
                                                                        logging_level)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "ApplicationPort",
+                                                                       app_port)
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "S3host",
                                                                        s3_host)
@@ -81,6 +85,7 @@ def test_configuration_can_be_read_when_s3_secure():
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
                                                                          "INFO",
+                                                                         "8888",
                                                                          "0.0.0.0",
                                                                          "9000",
                                                                          "access",
@@ -111,6 +116,7 @@ def test_configuration_can_be_read_when_s3_not_secure():
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
                                                                          "INFO",
+                                                                         "8888",
                                                                          "0.0.0.0",
                                                                          "9000",
                                                                          "access",

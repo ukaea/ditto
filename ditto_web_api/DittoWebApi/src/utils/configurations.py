@@ -17,6 +17,9 @@ class Configuration:
         self._log_folder_location = None
         self._logging_level = "NOTSET"
 
+        # Application
+        self._app_port = None
+
         # S3 client
         self._s3_host = None
         self._s3_port = None
@@ -36,6 +39,10 @@ class Configuration:
     @property
     def logging_level(self):
         return self._logging_level
+
+    @property
+    def app_port(self):
+        return self._app_port
 
     @property
     def s3_host(self):
@@ -73,6 +80,9 @@ class Configuration:
         # Logging
         self._log_folder_location = self.get_directory(settings, "LogFolderLocation")
         self._logging_level = settings["LoggingLevel"]
+
+        # Application
+        self._app_port = str2non_negative_int(settings['ApplicationPort'])
 
         # S3 client
         self._s3_host = settings['S3Host']
