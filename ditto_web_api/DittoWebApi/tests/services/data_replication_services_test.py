@@ -325,6 +325,33 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'files skipped': 0,
                             'data transferred (bytes)': 0}
 
+    def test_copy_new_transfers_all_files_when_no_objects_in_s3(self):
+        # Arrange
+        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_external_data_service.get_objects.return_value = []
+        self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_2,
+                                                                   self.mock_file_information_3]
+        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary.files_in_directory = [self.mock_file_information_2,
+                                                self.mock_file_information_3]
+        mock_file_summary.new_files = [self.mock_file_information_2, self.mock_file_information_3]
+        mock_file_summary.updated_files = []
+        self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
+        self.mock_external_data_service.perform_transfer.return_value = {"message": "Transfer successful",
+                                                                         "new_files_uploaded": 2,
+                                                                         "files_updated": 0,
+                                                                         "files_skipped": 0,
+                                                                         "data_transferred": 52}
+        # Act
+        response = self.test_service.copy_new("bucket", None)
+        # Assert
+        assert self.mock_external_data_service.perform_transfer.call_count == 1
+        assert response == {'message': 'Transfer successful',
+                            'new files uploaded': 2,
+                            'files updated': 0,
+                            'files skipped': 0,
+                            'data transferred (bytes)': 52}
+
     def test_copy_new_return_message_when_new_files_transferred(self):
         # Arrange
         self.mock_external_data_service.does_bucket_exist.return_value = True
@@ -376,7 +403,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         mock_file_summary.files_in_directory = [self.mock_file_information_1]
         mock_file_summary.new_files = []
         mock_file_summary.updated_files = []
-        mock_file_summary.number_of_files_to_be_skipped = 1
+        mock_file_summary.number_of_files_to_be_skipped = [self.mock_file_information_1]
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
@@ -416,7 +443,7 @@ class DataReplicationServiceTest(unittest.TestCase):
                                                 self.mock_file_information_3]
         mock_file_summary.new_files = [self.mock_file_information_2]
         mock_file_summary.updated_files = [self.mock_file_information_3]
-        mock_file_summary.number_of_files_to_be_skipped = 1
+        mock_file_summary.number_of_files_to_be_skipped = [self.mock_file_information_1]
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         self.mock_external_data_service.perform_transfer.return_value = {'message': 'Transfer successful',
                                                                          'new_files_uploaded': 1,
@@ -431,4 +458,30 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 1,
                             'files updated': 1,
                             'files skipped': 1,
+                            'data transferred (bytes)': 46}
+
+    def test_copy_new_and_update_transfers_all_files_when_no_objects_already_in_bucket(self):
+        # Arrange
+        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_external_data_service.get_objects.return_value = []
+        self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
+                                                                   self.mock_file_information_2]
+        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary.new_files = [self.mock_file_information_1, self.mock_file_information_2]
+        mock_file_summary.updated_files = []
+        mock_file_summary.number_of_files_to_be_skipped = []
+        self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
+        self.mock_external_data_service.perform_transfer.return_value = {'message': 'Transfer successful',
+                                                                         'new_files_uploaded': 2,
+                                                                         'files_updated': 0,
+                                                                         'files_skipped': 0,
+                                                                         'data_transferred': 46}
+        # Act
+        response = self.test_service.copy_new_and_update("bucket", None)
+        # Assert
+        assert self.mock_external_data_service.perform_transfer.call_count == 1
+        assert response == {'message': 'Transfer successful',
+                            'new files uploaded': 2,
+                            'files updated': 0,
+                            'files skipped': 0,
                             'data transferred (bytes)': 46}

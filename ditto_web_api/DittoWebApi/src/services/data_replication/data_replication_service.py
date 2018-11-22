@@ -2,6 +2,7 @@ from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
+from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils import messages
 
 
@@ -107,16 +108,17 @@ class DataReplicationService:
 
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         if not objects_already_in_bucket:
-            transfer_summary = self._external_data_service.perform_transfer(files_in_directory)
-            return_transfer_summary(transfer_summary)
+            files_summary = FilesStorageSummary(files_in_directory)
+            transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
+            return return_transfer_summary(**transfer_summary)
 
         files_summary = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory
         )
         if not files_summary.new_files:
-            warning = messages.no_new_files(directory)
-            self._logger.warning(warning)
-            return return_transfer_summary(message=warning,
+            message = messages.no_new_files(directory)
+            self._logger.info(message)
+            return return_transfer_summary(message=message,
                                            files_skipped=len(files_in_directory))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         return return_transfer_summary(**transfer_summary)
@@ -137,17 +139,18 @@ class DataReplicationService:
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
 
         if not objects_already_in_bucket:
-            transfer_summary = self._external_data_service.perform_transfer(files_in_directory)
-            return_transfer_summary(transfer_summary)
+            files_summary = FilesStorageSummary(files_in_directory)
+            transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
+            return return_transfer_summary(**transfer_summary)
 
         files_summary = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory, check_for_updates=True
         )
 
         if not files_summary.new_files and not files_summary.updated_files:
-            warning = messages.no_new_or_updates(directory)
-            self._logger.warning(warning)
-            return return_transfer_summary(message=warning,
-                                           files_skipped=files_summary.number_of_files_to_be_skipped)
+            message = messages.no_new_or_updates(directory)
+            self._logger.info(message)
+            return return_transfer_summary(message=message,
+                                           files_skipped=len(files_summary.number_of_files_to_be_skipped))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         return return_transfer_summary(**transfer_summary)

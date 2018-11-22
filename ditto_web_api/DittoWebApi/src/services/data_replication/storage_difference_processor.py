@@ -12,6 +12,7 @@ class StorageDifferenceProcessor:
     def return_difference_comparison(self, objects_in_bucket, files_in_directory, check_for_updates=False):
         self._logger.debug("Comparing objects in directory with those already in bucket")
         if not objects_in_bucket:
+            self._logger.debug("No objects already in bucket, all files are new")
             file_summary = FilesStorageSummary(files_in_directory)
             file_summary.new_files = files_in_directory
             return file_summary

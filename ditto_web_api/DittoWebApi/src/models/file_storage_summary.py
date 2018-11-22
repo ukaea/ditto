@@ -6,4 +6,4 @@ class FilesStorageSummary:
         self.updated_files = []
 
     def number_of_files_to_be_skipped(self):
-        return len([file for file in self.files_in_directory if file not in self.new_files + self.updated_files])
+        return [file for file in self.files_in_directory if file not in self.new_files + self.updated_files]
