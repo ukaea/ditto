@@ -11,10 +11,11 @@ class InternalDataService:
         dir_to_search = self._file_system_helper.join_paths(self._root_dir, dir_path) \
             if dir_path \
             else self._root_dir
-        self._logger.debug("Finding files in directory {}".format(dir_to_search))
+        self._logger.debug(f"Finding files in directory {dir_to_search}")
         list_of_files = self._file_system_helper.find_all_files_in_folder(dir_to_search)
-        self._logger.debug("Found {} files, converting to file information objects".format(len(list_of_files)))
+        self._logger.debug(f"Found {len(list_of_files)} files, converting to file information objects")
         file_information_list = [self.build_file_information(full_file_name) for full_file_name in list_of_files]
+        self._logger.info(f"{len(file_information_list)} files found in {dir_path}")
         return file_information_list
 
     def build_file_information(self, file_path):

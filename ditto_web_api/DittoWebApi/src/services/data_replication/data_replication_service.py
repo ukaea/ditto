@@ -24,7 +24,7 @@ class DataReplicationService:
         if bucket_warning is not None:
             self._logger.warning(bucket_warning)
             return bucket_warning
-        self._logger.debug("No warnings found")
+        self._logger.debug("No bucket related warnings found")
         return bucket_warning
 
     def retrieve_object_dicts(self, bucket_name, dir_path):
@@ -107,10 +107,6 @@ class DataReplicationService:
             return return_transfer_summary(message=warning)
 
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-        if not objects_already_in_bucket:
-            self._logger.debug(f"No files found in S3 bucket {bucket_name}, all files are new. "
-                               f"About to perform transfer for all files in {directory}")
-
         files_summary = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory
         )
@@ -136,11 +132,6 @@ class DataReplicationService:
             return return_transfer_summary(message=warning)
 
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
-
-        if not objects_already_in_bucket:
-            self._logger.debug(f"No files found in S3 bucket {bucket_name}, all files are new. "
-                               f"About to perform transfer for all files in {directory}")
-
         files_summary = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory, check_for_updates=True
         )

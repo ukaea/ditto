@@ -131,6 +131,8 @@ class ExternalDataService:
                            f"and {len(file_summary.files_to_update)} files to be updated")
         for file in files_to_transfer:
             data_transferred += self.upload_file(bucket_name, file)
+        self._logger.debug(f"New files transferred: {file_summary.new_files}")
+        self._logger.debug(f"Files updated: {file_summary.files_to_update}")
         self._logger.debug(f"Files not uploaded or updated: {file_summary.files_to_be_skipped}")
         return {"message": "Transfer successful",
                 "new_files_uploaded": len(file_summary.new_files),
