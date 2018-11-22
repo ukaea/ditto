@@ -16,6 +16,7 @@
   file:
     path: /opt/minio/data
     state: directory
+    mode: '0777'
   become: true
 
 - name: Download Minio server
@@ -45,6 +46,7 @@
     owner: minio
     group: minio
     recurse: yes
+    mode: '0705'
   become: true
 
 - name: Copy Minio service file
