@@ -6,6 +6,7 @@ Vagrant.configure("2") do |config|
     ditto.vm.box_version = "7.2.0"
     ditto.vm.synced_folder "./ditto_web_api/DittoWebApi", "/home/vagrant/ditto_web_api/DittoWebApi"
     ditto.vm.synced_folder "./systemTests/testScenarios", "/home/vagrant/systemTests/testScenarios"
+	ditto.vm.synced_folder "./systemTests/execution_space", "/home/vagrant/systemTests/execution_space"
     ditto.vm.network "private_network", ip: "172.28.129.160"
 	
     ditto.vm.provider "virtualbox" do |vb|

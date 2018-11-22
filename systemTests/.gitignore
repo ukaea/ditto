@@ -1,6 +1,8 @@
 results
 stagingArea
-execution_space
+execution_space/data
+execution_space/logs
+execution_space/ditto_web_api
 .idea
 **/__pycache__
 venv
