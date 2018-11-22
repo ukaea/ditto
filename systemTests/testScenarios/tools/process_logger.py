@@ -3,12 +3,9 @@ import io
 
 
 class ProcessLogger:
-    def __init__(self, process_name):
-        execution_folder_path = \
-          os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + '/../../execution_space/')
-
-        self._stdout_log_path = os.path.join(execution_folder_path, 'logs', f'{process_name}-stdout.log')
-        self._stderr_log_path = os.path.join(execution_folder_path, 'logs', f'{process_name}-stderr.log')
+    def __init__(self, process_name, log_folder_path):
+        self._stdout_log_path = os.path.join(log_folder_path, f'{process_name}-stdout.log')
+        self._stderr_log_path = os.path.join(log_folder_path, f'{process_name}-stderr.log')
         self.stdout_log_writer = None
         self.stderr_log_writer = None
 

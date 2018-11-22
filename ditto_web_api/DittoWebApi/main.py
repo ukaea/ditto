@@ -65,5 +65,6 @@ if __name__ == "__main__":
         (r"/copynew/", CopyNewHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
         (r"/copyupdate/", CopyUpdateHandler, dict(data_replication_service=DATA_REPLICATION_SERVICE)),
     ])
-    APP.listen(8888)
+    LOGGER.info(f'DITTO Web API listening on port {CONFIGURATION.app_port}')
+    APP.listen(CONFIGURATION.app_port)
     tornado.ioloop.IOLoop.current().start()
