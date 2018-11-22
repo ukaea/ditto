@@ -1,9 +1,9 @@
-import os
 import dateutil.parser
 
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
 class ExternalDataService:
@@ -11,6 +11,7 @@ class ExternalDataService:
         self._logger = logger
         self._bucket_standard = configuration.bucket_standard
         self._s3_client = s3_adapter
+        self._file_system_helper = FileSystemHelper()
 
     # Buckets
 
@@ -87,7 +88,7 @@ class ExternalDataService:
         key = bucket.get_key(object_name)
         key = bucket.new_key(key_name=object_name) if key is None else key
         key.set_contents_from_filename(file_information.abs_path)
-        file_length = os.stat(file_information.abs_path).st_size
+        file_length = self._file_system_helper.file_size(file_information.abs_path)
         self._logger.debug(
             f'File "{object_name}" uploaded, {file_length} bytes transferred'
         )
@@ -131,9 +132,10 @@ class ExternalDataService:
                            f"and {len(file_summary.files_to_update)} files to be updated")
         for file in files_to_transfer:
             data_transferred += self.upload_file(bucket_name, file)
-        self._logger.debug(f"New files transferred: {file_summary.new_files.rel_path}")
-        self._logger.debug(f"Files updated: {file_summary.files_to_update.rel_path}")
-        self._logger.debug(f"Files not uploaded or updated: {file_summary.files_to_be_skipped.rel_path}")
+        self._logger.debug(f"New files transferred: {[file.rel_path for file in file_summary.new_files] }")
+        self._logger.debug(f"Files updated: {[file.rel_path for file in file_summary.files_to_update]}")
+        self._logger.debug(f"Files not uploaded or updated: "
+                           f"{[file.rel_path for file in file_summary.files_to_be_skipped]}")
         return {"message": "Transfer successful",
                 "new_files_uploaded": len(file_summary.new_files),
                 "files_updated": len(file_summary.files_to_update),
