@@ -2,7 +2,6 @@ from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
-from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils import messages
 
 

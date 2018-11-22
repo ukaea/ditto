@@ -282,7 +282,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
-        self.mock_external_data_service.perform_transfer.assert_not_called
+        self.mock_external_data_service.perform_transfer.assert_not_called()
         assert response == {'message': 'Warning, bucket does not exist (bucket)',
                             'new files uploaded': 0,
                             'files updated': 0,
