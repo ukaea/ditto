@@ -23,6 +23,7 @@ class DataReplicationService:
             bucket_warning = messages.bucket_not_exists(bucket_name)
         if bucket_warning is not None:
             self._logger.warning(bucket_warning)
+            return bucket_warning
         self._logger.debug("No warnings found")
         return bucket_warning
 
@@ -108,12 +109,7 @@ class DataReplicationService:
         objects_already_in_bucket = self._external_data_service.get_objects(bucket_name, dir_path)
         if not objects_already_in_bucket:
             self._logger.debug(f"No files found in S3 bucket {bucket_name}, all files are new. "
-                               f"About to perform transfer for all files in {dir_path}")
-            files_summary = self._storage_difference_processor.return_difference_comparison(
-                objects_already_in_bucket, files_in_directory, check_for_updates=False
-            )
-            transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
-            return return_transfer_summary(**transfer_summary)
+                               f"About to perform transfer for all files in {directory}")
 
         files_summary = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory
@@ -143,12 +139,7 @@ class DataReplicationService:
 
         if not objects_already_in_bucket:
             self._logger.debug(f"No files found in S3 bucket {bucket_name}, all files are new. "
-                               f"About to perform transfer for all files in {dir_path}")
-            files_summary = self._storage_difference_processor.return_difference_comparison(
-                objects_already_in_bucket, files_in_directory, check_for_updates=True
-            )
-            transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
-            return return_transfer_summary(**transfer_summary)
+                               f"About to perform transfer for all files in {directory}")
 
         files_summary = self._storage_difference_processor.return_difference_comparison(
             objects_already_in_bucket, files_in_directory, check_for_updates=True
