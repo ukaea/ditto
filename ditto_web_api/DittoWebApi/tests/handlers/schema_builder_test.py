@@ -41,7 +41,7 @@ class TestSchemaBuilder:
         # Arrange
         properties = []
         # Assert
-        with pytest.raises(Exception, message="No properties provided for the schema"):
+        with pytest.raises(ValueError, message="No properties provided for the schema"):
             create_object_schema_with_string_properties(properties)
 
     def test_create_list_present_output_schema(self):
