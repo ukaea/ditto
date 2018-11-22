@@ -5,6 +5,7 @@ import tornado.web
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.utils.return_helper import return_bucket_message
+from DittoWebApi.src.utils.route_helper import format_route_specification
 
 
 MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
@@ -13,18 +14,23 @@ MOCK_DATA_REPLICATION_SERVICE = mock.create_autospec(DataReplicationService)
 @pytest.fixture(autouse=True)
 def app():
     application = tornado.web.Application([
-        (r"/createbucket/", CreateBucketHandler, dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE))
+        (
+            format_route_specification("createbucket"),
+            CreateBucketHandler,
+            dict(data_replication_service=MOCK_DATA_REPLICATION_SERVICE)
+        )
     ])
     return application
 
 
 @pytest.mark.gen_test
-def test_create_bucket_returns_summary_of_new_bucket_when_successful(http_client, base_url):
+@pytest.mark.parametrize("route", ["/createbucket/", "/createbucket"])
+def test_create_bucket_returns_summary_of_new_bucket_when_successful(http_client, base_url, route):
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.create_bucket.return_value = return_bucket_message("Bucket Created (some-bucket)",
                                                                                      "some-bucket")
     # Act
-    url = base_url + "/createbucket/"
+    url = base_url + route
     body = json.dumps({'bucket': "bucket_1"})
     response = yield http_client.fetch(url, method="POST", body=body)
     # Assert
