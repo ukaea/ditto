@@ -1,17 +1,15 @@
+# pylint: disable=R0201
 import pytest
-from DittoWebApi.src.handlers.schemas.schema_builder import SchemaBuilder
+from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
+from DittoWebApi.src.handlers.schemas.schema_helpers import create_list_present_output_schema
 
 
 class TestSchemaBuilder:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        self.schema_builder = SchemaBuilder()
-
     def test_create_object_schema_with_string_properties_returns_schema_with_all_properties_with_none_required(self):
         # Arrange
         properties = ["name", "bucket", "message", "file"]
         # Act
-        schema = self.schema_builder.create_object_schema_with_string_properties(properties)
+        schema = create_object_schema_with_string_properties(properties)
         # Assert
         assert schema == {"type": "object",
                           "properties": {
@@ -27,7 +25,7 @@ class TestSchemaBuilder:
         properties = ["name", "bucket", "message", "file"]
         required = ["bucket", "file"]
         # Act
-        schema = self.schema_builder.create_object_schema_with_string_properties(properties, required)
+        schema = create_object_schema_with_string_properties(properties, required)
         # Assert
         assert schema == {"type": "object",
                           "properties": {
@@ -42,16 +40,13 @@ class TestSchemaBuilder:
     def test_create_object_schema_creates_blank_properties_section_when_none_given(self):
         # Arrange
         properties = []
-        # Act
-        schema = self.schema_builder.create_object_schema_with_string_properties(properties)
         # Assert
-        assert schema == {"type": "object",
-                          "properties": {},
-                          }
+        with pytest.raises(Exception, message="No properties provided for the schema"):
+            create_object_schema_with_string_properties(properties)
 
     def test_create_list_present_output_schema(self):
         # Act
-        schema = self.schema_builder.create_list_present_output_schema()
+        schema = create_list_present_output_schema()
         # Assert
         assert schema == {
             "type": "object",
