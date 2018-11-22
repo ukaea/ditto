@@ -5,7 +5,6 @@ from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_transfer_output_schema
 
 
-
 class CopyUpdateHandler(APIHandler):
     def initialize(self, data_replication_service):
         self._data_replication_service = data_replication_service
