@@ -45,7 +45,7 @@ def test_post_returns_summary_of_transfer_as_json_when_successful_with_return_ha
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.copy_new_and_update.return_value = return_transfer_summary(
         message='Transfer successful',
-        files_transferred=3,
+        new_files_uploaded=3,
         files_updated=4,
         files_skipped=7,
         data_transferred=2560
@@ -92,7 +92,7 @@ def test_post_returns_summary_of_failed_transfer_as_json_with_coupling_return_ha
     # Arrange
     MOCK_DATA_REPLICATION_SERVICE.copy_new_and_update.return_value = return_transfer_summary(
         message="No new or updated files found in directory some_directory",
-        files_transferred=0,
+        new_files_uploaded=0,
         files_updated=0,
         files_skipped=5,
         data_transferred=0

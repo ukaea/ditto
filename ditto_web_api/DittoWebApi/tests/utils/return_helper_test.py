@@ -5,7 +5,7 @@ from DittoWebApi.src.utils.return_helper import return_transfer_summary
 class TestReturnHelper(unittest.TestCase):
     def test_correct_return_when_message_is_added_for_return_dict(self):
         message = "Some text"
-        test_dict = return_transfer_summary(files_transferred=5,
+        test_dict = return_transfer_summary(new_files_uploaded=5,
                                             files_skipped=2,
                                             files_updated=4,
                                             data_transferred=102,
@@ -17,7 +17,7 @@ class TestReturnHelper(unittest.TestCase):
                                      "data transferred (bytes)": 102})
 
     def test_correct_return_when__no_message_is_added_for_return_dict(self):
-        test_dict = return_transfer_summary(files_transferred=6,
+        test_dict = return_transfer_summary(new_files_uploaded=6,
                                             files_skipped=3,
                                             files_updated=1,
                                             data_transferred=2532, )

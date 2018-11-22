@@ -1,6 +1,6 @@
-def return_transfer_summary(files_transferred=0, files_updated=0, files_skipped=0, data_transferred=0, message=""):
+def return_transfer_summary(new_files_uploaded=0, files_updated=0, files_skipped=0, data_transferred=0, message=""):
     return {"message": message,
-            "new files uploaded": files_transferred,
+            "new files uploaded": new_files_uploaded,
             "files updated": files_updated,
             "files skipped": files_skipped,
             "data transferred (bytes)": data_transferred}

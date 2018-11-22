@@ -24,3 +24,6 @@ class FileSystemHelper:
 
     def last_modified(self, file_path):
         return os.path.getmtime(file_path)
+
+    def file_size(self, abs_file_path):
+        return os.stat(abs_file_path).st_size

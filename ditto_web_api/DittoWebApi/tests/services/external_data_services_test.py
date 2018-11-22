@@ -8,7 +8,10 @@ from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoB
 from DittoWebApi.src.services.external.storage_adapters.boto_bucket import BotoKey
 from DittoWebApi.src.services.external.storage_adapters.is3_adapter import IS3Adapter
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
+from DittoWebApi.src.models.file_information import FileInformation
+from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils.configurations import Configuration
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
 class TestExternalDataServices:
@@ -23,10 +26,12 @@ class TestExternalDataServices:
         mock_configuration.s3_use_secure = "example"
         self.mock_s3_client = mock.create_autospec(IS3Adapter)
         self.mock_logger = mock.create_autospec(logging.Logger)
+        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         self.test_service = ExternalDataService(
             mock_configuration,
             self.mock_logger,
-            self.mock_s3_client
+            self.mock_s3_client,
+            self.mock_file_system_helper
         )
 
     @staticmethod
@@ -328,3 +333,57 @@ class TestExternalDataServices:
         mock_key.delete.assert_called_once()
         self.mock_logger.debug.assert_called_once_with('Deleted object "test.txt" from bucket "test-bucket"')
         assert result is True
+
+    def test_upload_creates_correct_logging_and_returns_file_size_with_bucket_name(self):
+        # Arrange
+        bucket_name = "bucket"
+        mock_file_1 = mock.create_autospec(FileInformation)
+        mock_file_1.rel_path = "test_file_1.txt"
+        mock_file_1.abs_path = "C:/root/test_file_1.txt"
+        mock_boto_bucket = mock.create_autospec(BotoBucket)
+        mock_boto_key = mock.create_autospec(BotoKey)
+        mock_boto_bucket.get_key.return_value = mock_boto_key
+        self.mock_s3_client.get_bucket.return_value = mock_boto_bucket
+        self.mock_file_system_helper.file_size.return_value = 12
+        # Act
+        output = self.test_service.upload_file(bucket_name, mock_file_1)
+        # Assert
+        self.mock_logger.debug.assert_any_call('File "test_file_1.txt" uploaded, 12 bytes transferred')
+        mock_boto_key.set_contents_from_filename.assert_called_once_with("C:/root/test_file_1.txt")
+        assert output == 12
+
+    def test_upload_creates_returns_false_when_bucket_does_not_exist(self):
+        # Arrange
+        bucket_name = "bucket"
+        self.mock_s3_client.get_bucket.return_value = None
+        # Act
+        output = self.test_service.upload_file(bucket_name, "file_1")
+        # Assert
+        assert output is False
+
+    def test_perform_transfer_return_correct_summary_of_files(self):
+        # Arrange
+        bucket_name = "bucket"
+        file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_1 = mock.create_autospec(FileInformation)
+        mock_file_1.rel_path = "test_file_1.txt"
+        mock_file_2 = mock.create_autospec(FileInformation)
+        mock_file_2.rel_path = "test_file_2.txt"
+        mock_file_3 = mock.create_autospec(FileInformation)
+        mock_file_3.rel_path = "test_file_3.txt"
+        file_summary.new_files = [mock_file_1]
+        file_summary.files_to_update = [mock_file_2]
+        file_summary.files_to_be_skipped = [mock_file_3]
+        self.test_service.upload_file = mock.Mock()
+        self.test_service.upload_file.side_effect = [12, 14]
+        # Act
+        output = self.test_service.perform_transfer(bucket_name, file_summary)
+        # Assert
+        assert output == {"message": "Transfer successful",
+                          "new_files_uploaded": 1,
+                          "files_updated": 1,
+                          "files_skipped": 1,
+                          "data_transferred": 26}
+        self.mock_logger.debug.assert_any_call("New files transferred: ['test_file_1.txt']")
+        self.mock_logger.debug.assert_any_call("Files updated: ['test_file_2.txt']")
+        self.mock_logger.debug.assert_any_call("Files not uploaded or updated: ['test_file_3.txt']")
