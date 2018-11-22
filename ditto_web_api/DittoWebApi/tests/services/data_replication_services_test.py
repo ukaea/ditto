@@ -66,7 +66,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         output = self.test_service.retrieve_object_dicts("test-bucket", None)
         # Assert
-        assert self.mock_external_data_service.get_objects.call_count == 0
+        self.mock_external_data_service.get_objects.assert_not_called()
         assert output == {"message": "Warning, bucket does not exist (test-bucket)", "objects": []}
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects(self):
@@ -282,7 +282,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 0
+        self.mock_external_data_service.perform_transfer.assert_not_called
         assert response == {'message': 'Warning, bucket does not exist (bucket)',
                             'new files uploaded': 0,
                             'files updated': 0,
@@ -303,7 +303,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 0
+        self.mock_external_data_service.perform_transfer.assert_not_called()
         assert response == {'message': 'No new files found in directory (root)',
                             'new files uploaded': 0,
                             'files updated': 0,
@@ -345,7 +345,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 1
+        self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         assert response == {'message': 'Transfer successful',
                             'new files uploaded': 2,
                             'files updated': 0,
@@ -374,7 +374,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", "some_dir")
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 1
+        self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         assert response == {'message': 'Transfer successful',
                             'new files uploaded': 2,
                             'files updated': 0,
@@ -387,7 +387,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 0
+        self.mock_external_data_service.perform_transfer.assert_not_called()
         assert response == {'message': 'Warning, bucket does not exist (bucket)',
                             'new files uploaded': 0,
                             'files updated': 0,
@@ -408,7 +408,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 0
+        self.mock_external_data_service.perform_transfer.assert_not_called()
         assert response == {'message': 'No new or updated files found in directory (root)',
                             'new files uploaded': 0,
                             'files updated': 0,
@@ -423,7 +423,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 0
+        self.mock_external_data_service.perform_transfer.assert_not_called()
         assert response == {'message': 'No files found in directory or directory does not exist (root)',
                             'new files uploaded': 0,
                             'files updated': 0,
@@ -453,7 +453,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", "some_dir")
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 1
+        self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         assert response == {'message': 'Transfer successful',
                             'new files uploaded': 1,
                             'files updated': 1,
@@ -479,7 +479,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
-        assert self.mock_external_data_service.perform_transfer.call_count == 1
+        self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         assert response == {'message': 'Transfer successful',
                             'new files uploaded': 2,
                             'files updated': 0,
