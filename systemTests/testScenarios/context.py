@@ -1,5 +1,6 @@
 import os
 import shutil
+import signal
 import unittest
 import pytest
 
@@ -11,22 +12,27 @@ from testScenarios.tools.process_logger import ProcessLogger
 
 class SystemTestContext:
     def __init__(self):
-        self._execution_folder_path = '/home/vagrant/execution_space'
+        self._execution_folder_path = '/home/vagrant/systemTests/execution_space'
         self.ditto_api_process = None
         self.console_logger = ProcessLogger('console', self.log_folder_path)
 
     def clean_up(self):
         print('cleaning up test')
-        self.console_logger.clean_up()
         self.shut_down_ditto_api()
+        self.console_logger.clean_up()
 
     def shut_down_ditto_api(self):
+        print(f'Shutting down DITTO API process on port {self.app_port}')
+        process_id = os.getpgid(self.ditto_api_process.pid)
+        print(f'Process has ID {process_id}')
+        os.killpg(process_id, signal.SIGTERM)
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
 
     @property
     def ditto_web_api_folder_path(self):
         return os.path.join(self._execution_folder_path, 'ditto_web_api')
+        # return '/home/vagrant/ditto_web_api'
 
     @property
     def log_folder_path(self):
@@ -71,6 +77,10 @@ class SystemTestContext:
     @property
     def local_data_folder_path(self):
         return os.path.join(self._execution_folder_path, 'data')
+
+    @property
+    def s3_data_folder_path(self):
+        return '/opt/minio/data'
 
 
 class BaseSystemTest(unittest.TestCase):

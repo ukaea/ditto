@@ -2,6 +2,6 @@
 
 echo 'Running DITTO web api script'
 cd $1
-echo `pwd`
-source venv/bin/activate
+echo $PWD
+source /home/vagrant/ditto_web_api/venv/bin/activate
 PYTHONPATH=./ python DittoWebApi/main.py

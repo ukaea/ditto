@@ -7,7 +7,7 @@ import pytest
 def set_up_system_test_environment():
     print("Setting up a system test environment")
 
-    home = '/home/vagrant'
+    home = '/home/vagrant/systemTests'
 
     # Clear out the old programs
     execution_space = os.path.join(home, 'execution_space')

@@ -45,7 +45,7 @@ class DittoApiServer:
             [web_api_script, self._context.ditto_web_api_folder_path],
             stdout=self._context.console_logger.stdout_log_writer,
             stderr=self._context.console_logger.stderr_log_writer,
-            shell=True
+            preexec_fn=os.setsid
         )
 
         # Let the server start
