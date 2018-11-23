@@ -134,9 +134,9 @@ class ExternalDataService:
         self._logger.debug(f"New files transferred: {[file.rel_path for file in file_summary.new_files] }")
         self._logger.debug(f"Files updated: {[file.rel_path for file in file_summary.updated_files]}")
         self._logger.debug(f"Files not uploaded or updated: "
-                           f"{[file.rel_path for file in file_summary.files_to_be_skipped]}")
+                           f"{[file.rel_path for file in file_summary.files_to_be_skipped()]}")
         return {"message": "Transfer successful",
                 "new_files_uploaded": len(file_summary.new_files),
                 "files_updated": len(file_summary.updated_files),
-                "files_skipped": len(file_summary.files_to_be_skipped),
+                "files_skipped": len(file_summary.files_to_be_skipped()),
                 "data_transferred": data_transferred}

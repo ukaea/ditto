@@ -117,9 +117,11 @@ class BaseSystemTest(unittest.TestCase):
         s3_dirs = [s3_dir for s3_dir in s3_dirs if self._s3_dir_belongs_to_system_tests(s3_dir)]
         # Delete these directories
         for s3_dir in s3_dirs:
+            print(f'Deleting "{s3_dir}"')
             if s3_dir is "*":
                 raise SystemError
             os.system(f"sudo rm -rf {s3_dir}")
+            print(f'"{s3_dir}" {"still" if os.path.exists(s3_dir) else "no longer"} exists')
 
     def _s3_dir_belongs_to_system_tests(self,s3_dir):
         base_name = os.path.basename(s3_dir)
