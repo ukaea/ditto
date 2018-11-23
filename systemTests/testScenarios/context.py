@@ -3,6 +3,7 @@ import shutil
 import signal
 import unittest
 import pytest
+import json
 
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
@@ -82,6 +83,15 @@ class SystemTestContext:
     def s3_data_folder_path(self):
         return '/opt/minio/data'
 
+    @staticmethod
+    def _response_body_as_json(response):
+        return json.loads(response.text)
+
+    def response_status(self, response):
+        return self._response_body_as_json(response)["status"]
+
+    def response_data(self, response):
+        return self._response_body_as_json(response)["data"]
 
 class BaseSystemTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
@@ -123,8 +133,9 @@ class BaseSystemTest(unittest.TestCase):
             os.system(f"sudo rm -rf {s3_dir}")
             print(f'"{s3_dir}" {"still" if os.path.exists(s3_dir) else "no longer"} exists')
 
-    def _s3_dir_belongs_to_system_tests(self,s3_dir):
+    def _s3_dir_belongs_to_system_tests(self, s3_dir):
         base_name = os.path.basename(s3_dir)
         nchar = len(self.context.bucket_standardisation)+1
         target = self.context.bucket_standardisation + '-'
         return base_name[:nchar] == target
+
