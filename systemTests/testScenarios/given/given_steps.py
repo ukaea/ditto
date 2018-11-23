@@ -34,3 +34,10 @@ class GivenSteps:
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
         return response
+
+    def simple_test_file_is_setup_in_s3(self):
+        self._write_test_file_in_s3('testA.txt', 'example test content A')
+
+    def _write_test_file(self, file_name, content):
+        with open(os.path.join(self._context.local_data_folder_path, file_name), 'w') as file:
+            file.write(content)
