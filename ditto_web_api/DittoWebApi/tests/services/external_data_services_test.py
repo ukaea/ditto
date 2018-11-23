@@ -372,7 +372,7 @@ class TestExternalDataServices:
         mock_file_3 = mock.create_autospec(FileInformation)
         mock_file_3.rel_path = "test_file_3.txt"
         file_summary.new_files = [mock_file_1]
-        file_summary.files_to_update = [mock_file_2]
+        file_summary.updated_files = [mock_file_2]
         file_summary.files_to_be_skipped = [mock_file_3]
         self.test_service.upload_file = mock.Mock()
         self.test_service.upload_file.side_effect = [12, 14]

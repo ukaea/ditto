@@ -17,4 +17,17 @@ class WhenSteps:
         print(url)
         response = requests.post(url, json=body)
         print(response.status_code)
-        return response
+        self._context.response = response
+
+    def copy_dir_called_for_whole_directory(self):
+        url = f'http://{self._context.s3host}:{self._context.app_port}/copydir/'
+        body = {'bucket': 'systemtest-textbucket'}
+        response = requests.post(url, json=body)
+
+        self._context.response = response
+
+    def list_present_called_for_simple_bucket_whole_directory_structure(self):
+        url = f'http://{self._context.s3host}:{self._context.app_port}/listpresent/'
+        body = {'bucket': 'systemtest-textbucket'}
+        response = requests.post(url, json=body)
+        self._context.response = response

@@ -18,4 +18,4 @@ class ProcessLogger:
             self.stdout_log_writer.close()
         
         if self.stderr_log_writer is not None:
-            self.stdout_log_writer.close()
+            self.stderr_log_writer.close()
