@@ -19,7 +19,7 @@ class WhenSteps:
 
     def copy_dir_called_for_whole_directory(self):
         url = f'http://{self._context.s3host}:{self._context.app_port}/copydir/'
-        body = {'bucket': 'systemtest-textbucket'}
+        body = {'bucket': self._context.standard_bucket_name}
         response = requests.post(url, json=body)
         return response
 

@@ -93,6 +93,22 @@ class SystemTestContext:
     def response_data(self, response):
         return self._response_body_as_json(response)["data"]
 
+    def object_names_from_list_present_response_body(self, response):
+        return [self.response_data(response)["objects"][i]["object_name"]
+                for i in range(len(self.response_data(response)["objects"]))]
+
+    def file_name_in_objects_returned_in_list_present_body(self, file_name, response):
+        objects_in_response = self.object_names_from_list_present_response_body(response)
+        return file_name in objects_in_response
+
+    @property
+    def standard_bucket_name(self):
+        return 'systemtest-textbucket'
+
+    @property
+    def simple_file_name(self):
+        return "testA.txt"
+
 class BaseSystemTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self, request):

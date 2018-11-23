@@ -17,27 +17,32 @@ class ThenSteps:
     def thing_is_false(self):
         assert isinstance(self, list)
 
-    def simple_bucket_exists_in_s3(self, response):
+    def simple_bucket_exists_in_s3(self):
         bucket_dir_path = os.path.join(self._context.s3_data_folder_path, 'systemtest-textbucket')
         assert os.path.isdir(bucket_dir_path)
-        assert response.status_code == 200
 
-    def new_file_exists_in_s3_bucket(self):
-        file_path = os.path.join(self._context.s3_data_folder_path, 'systemtest-textbucket', 'testA.txt')
+    def new_simple_file_exists_in_s3_bucket(self):
+        file_path = os.path.join(self._context.s3_data_folder_path,
+                                 'systemtest-textbucket',
+                                 self._context.simple_file_name)
         assert os.path.exists(file_path)
 
-    def list_present_body_shows_newly_created_file(self, response):
-        assert response.status_code == 200
+    def list_present_response_body_shows_returned_newly_created_file(self, response):
         assert self._context.response_data(response)["message"] == "objects returned successfully"
-        assert self._context.response_data(response)["objects"][0]["object_name"] == "testA.txt"
-
-    def copy_dir_completed_successfully(self, response):
-        self.response_returns_status_code_200(response)
+        assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt', response)
+        assert self._context.file_name_in_objects_returned_in_list_present_body('sub_dir_A/testB.txt', response)
 
     def response_returns_status_code_200(self, response):
         assert response.status_code == 200
 
-    def copy_dir_copied_no_new_files_as_already_exists(self, response):
+    def response_status_is_success(self, response):
+        assert self._context.response_status(response) == "success"
+
+    def response_shows_request_was_completed_successfully(self, response):
+        self.response_returns_status_code_200(response)
+        self.response_status_is_success(response)
+
+    def response_shows_copy_dir_copied_no_new_files_as_directory_already_exists(self, response):
         print(json.loads(response.text))
         assert self._context.response_data(response)["new files uploaded"] == 0
         assert self._context.response_data(response)["message"] == "Directory None already exists on S3," \
@@ -45,6 +50,9 @@ class ThenSteps:
 
     def response_message_confirms_transfer(self, response):
         assert self._context.response_data(response)["message"] == "Transfer successful"
+
+    def response_message_body_indicates_one_new_file_uploaded(self, response):
         assert self._context.response_data(response)["new files uploaded"] == 1
+
 
 
