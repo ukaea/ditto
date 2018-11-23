@@ -29,6 +29,7 @@ class ThenSteps:
 
     def list_present_body_shows_newly_created_file(self):
         print(self._context.response.text)
+        assert self._context.response.status_code == 200
         assert self._context.response.text == {"status": "success",
                                                "data":
                                                    {"message": "objects returned successfully", "objects": []}
