@@ -26,7 +26,9 @@ class ConfigSecurityService(ISecurityService):
         config = configparser.ConfigParser()
         config.read(configuration_path)
         self._users = {ConfigSecurityService._format_name(name): User(config[name]) for name in config.sections()}
-        self._logger.info(f'Security Service found {len(self._users)} in configuration file "{configuration_path}"')
+        self._logger.info(
+            f'Security Service found {len(self._users)} users in configuration file "{configuration_path}"'
+        )
 
     def is_authenticated(self, name, password):
         self._logger.info(f'Trying to authenticate user "{name}"')
@@ -48,7 +50,7 @@ class ConfigSecurityService(ISecurityService):
 
     def _get_user(self, name):
         formatted_name = ConfigSecurityService._format_name(name)
-        if formatted_name not in self._users.keys():
+        if formatted_name not in self._users:
             self._logger.info(f'User "{name}" does not exist')
             return None
         return self._users[formatted_name]
