@@ -13,6 +13,7 @@ from DittoWebApi.src.services.data_replication.storage_difference_processor impo
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
 from DittoWebApi.src.services.internal_data_service import InternalDataService
+from DittoWebApi.src.services.security.config_security_service import ConfigSecurityService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.route_helper import format_route_specification
@@ -58,8 +59,15 @@ if __name__ == "__main__":
                                                       STORAGE_DIFFERENCE_PROCESSOR,
                                                       LOGGER)
 
+    # Security (PLACEHOLDER CODE)
+    SECURITY_CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
+    SECURITY_SERVICE = ConfigSecurityService(SECURITY_CONFIGURATION_PATH, LOGGER)
+
     # Launch app
-    app_context = dict(data_replication_service=DATA_REPLICATION_SERVICE)
+    app_context = dict(
+        data_replication_service=DATA_REPLICATION_SERVICE,
+        security_service=SECURITY_SERVICE
+    )
     APP = tornado.web.Application([
         (format_route_specification("listpresent"), ListPresentHandler, app_context),
         (format_route_specification("copydir"), CopyDirHandler, app_context),

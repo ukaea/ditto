@@ -6,8 +6,9 @@ from DittoWebApi.src.handlers.schemas.schema_helpers import create_list_present_
 
 
 class ListPresentHandler(APIHandler):
-    def initialize(self, data_replication_service):
+    def initialize(self, data_replication_service, security_service):
         self._data_replication_service = data_replication_service
+        self._security_service = security_service
 
     @schema.validate(
         input_schema=create_object_schema_with_string_properties(["bucket", "directory"], ["bucket"]),
