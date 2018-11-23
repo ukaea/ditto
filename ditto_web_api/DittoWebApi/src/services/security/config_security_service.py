@@ -25,9 +25,7 @@ class ConfigSecurityService(ISecurityService):
     def _parse(self, configuration_path):
         config = configparser.ConfigParser()
         config.read(configuration_path)
-        if len(config.keys()) > len(set(config.keys())):
-            raise ValueError('All user names must be unique')
-        self._users = {name: User(config[name]) for name in config.keys()}
+        self._users = {ConfigSecurityService._format_name(name): User(config[name]) for name in config.sections()}
         self._logger.info(f'Security Service found {len(self._users)} in configuration file "{configuration_path}"')
 
     def is_authenticated(self, name, password):
@@ -49,7 +47,12 @@ class ConfigSecurityService(ISecurityService):
         return is_in_group
 
     def _get_user(self, name):
-        if name not in self._users.keys():
+        formatted_name = ConfigSecurityService._format_name(name)
+        if formatted_name not in self._users.keys():
             self._logger.info(f'User "{name}" does not exist')
             return None
-        return self._users[name]
+        return self._users[formatted_name]
+
+    @staticmethod
+    def _format_name(name):
+        return name.lower().strip()
