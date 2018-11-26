@@ -16,6 +16,6 @@ class ProcessLogger:
     def clean_up(self):
         if self.stdout_log_writer is not None:
             self.stdout_log_writer.close()
-        
+
         if self.stderr_log_writer is not None:
             self.stderr_log_writer.close()

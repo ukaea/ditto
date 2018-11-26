@@ -1,5 +1,4 @@
 import os
-import json
 
 from .log_file_steps import LogFileSteps
 

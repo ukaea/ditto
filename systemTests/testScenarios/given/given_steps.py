@@ -52,4 +52,3 @@ class GivenSteps:
         new_content = ". A new bit of text"
         with open(file_path, 'a') as file:
             file.write(new_content)
-

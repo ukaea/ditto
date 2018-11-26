@@ -155,4 +155,3 @@ class BaseSystemTest(unittest.TestCase):
         nchar = len(self.context.bucket_standardisation)+1
         target = self.context.bucket_standardisation + '-'
         return base_name[:nchar] == target
-
