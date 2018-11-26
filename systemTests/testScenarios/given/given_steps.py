@@ -30,12 +30,11 @@ class GivenSteps:
             file.write(content)
 
     def standard_bucket_exists_in_s3(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/createbucket/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/createbucket/'
         body = {'bucket': 'systemtest-textbucket'}
-        response = requests.post(url, json=body)
-        assert response.status_code == 200
-        print(self._context.response_data(response)["message"])
-        assert self._context.response_data(response)["message"] == "Bucket Created (systemtest-textbucket)"
+        requests.post(url, json=body)
+        bucket_path = os.path.join(self._context.s3_data_folder_path, 'systemtest-textbucket')
+        assert os.path.exists(bucket_path)
 
     def update_simple_file(self):
         file_path = os.path.join(self._context.local_data_folder_path, 'testA.txt')

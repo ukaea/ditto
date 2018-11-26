@@ -29,20 +29,21 @@ class ThenSteps:
     def new_file_exists_in_sub_dir_of_s3_bucket(self):
         file_path = os.path.join(self._context.s3_data_folder_path,
                                  'systemtest-textbucket',
-                                 'sub_dir_A/testB.txt')
+                                 'sub_dir_A', 'testB.txt')
         assert os.path.exists(file_path)
 
-    def list_present_response_body_shows_simple_file_in_s3(self):
+    def response_body_shows_simple_file_in_s3(self):
         response = self._context.http_client_response
         assert self._context.response_data(response)["message"] == "objects returned successfully"
         assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt', response)
 
-    def list_present_response_body_shows_file_in_sub_dir_in_s3(self):
+    def response_body_shows_file_in_sub_dir_in_s3(self):
         response = self._context.http_client_response
+        sub_dir_file = os.path.join('sub_dir_A', 'testB.txt')
         assert self._context.response_data(response)["message"] == "objects returned successfully"
-        assert self._context.file_name_in_objects_returned_in_list_present_body('sub_dir_A/testB.txt', response)
+        assert self._context.file_name_in_objects_returned_in_list_present_body(sub_dir_file, response)
 
-    def list_present_response_body_shows_simple_file_not_in_s3(self):
+    def response_body_shows_simple_file_not_in_s3(self):
         response = self._context.http_client_response
         assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt', response) is False
 

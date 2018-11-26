@@ -49,7 +49,7 @@ class SystemTestContext:
         return 8080
 
     @property
-    def s3host(self):
+    def host_address(self):
         # This is set in Vagrantfile
         return '172.28.129.160'
 
@@ -84,9 +84,8 @@ class SystemTestContext:
     def s3_data_folder_path(self):
         return '/opt/minio/data'
 
-    @staticmethod
-    def _response_body_as_json(response):
-        return json.loads(response.text)
+    def _response_body_as_json(self):
+        return json.loads(self.http_client_response.text)
 
     def response_status(self, response):
         return self._response_body_as_json(response)["status"]
@@ -95,8 +94,8 @@ class SystemTestContext:
         return self._response_body_as_json(response)["data"]
 
     def object_names_from_list_present_response_body(self, response):
-        return [self.response_data(response)["objects"][i]["object_name"]
-                for i in range(len(self.response_data(response)["objects"]))]
+        objects = self.response_data(response)["objects"]
+        return [obj["object_name"] for obj in objects]
 
     def file_name_in_objects_returned_in_list_present_body(self, file_name, response):
         objects_in_response = self.object_names_from_list_present_response_body(response)
@@ -144,7 +143,7 @@ class BaseSystemTest(unittest.TestCase):
         s3_dirs = [s3_dir for s3_dir in s3_dirs if self._s3_dir_belongs_to_system_tests(s3_dir)]
         # Delete these directories
         for s3_dir in s3_dirs:
-            if s3_dir is "*":
+            if s3_dir.trim() == "*"
                 raise SystemError
             os.system(f"sudo rm -rf {s3_dir}")
 

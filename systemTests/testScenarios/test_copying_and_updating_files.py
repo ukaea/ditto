@@ -28,7 +28,7 @@ class TestCopyUpdate(BaseSystemTest):
         # list present shows file in s3
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
         self.then.response_shows_request_was_completed_successfully()
-        self.then.list_present_response_body_shows_simple_file_in_s3()
+        self.then.response_body_shows_simple_file_in_s3()
 
         # Failure for no new or updated file
         self.when.copy_update_called_for_whole_directory()
@@ -51,5 +51,5 @@ class TestCopyUpdate(BaseSystemTest):
         # list present shows both files in s3
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
         self.then.response_shows_request_was_completed_successfully()
-        self.then.list_present_response_body_shows_file_in_sub_dir_in_s3()
-        self.then.list_present_response_body_shows_simple_file_in_s3()
+        self.then.response_body_shows_file_in_sub_dir_in_s3()
+        self.then.response_body_shows_simple_file_in_s3()

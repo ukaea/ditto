@@ -18,7 +18,7 @@ class TestDeleteFile(BaseSystemTest):
         self.when.copy_dir_called_for_whole_directory()
         self.then.new_simple_file_exists_in_s3_bucket()
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
-        self.then.list_present_response_body_shows_simple_file_in_s3()
+        self.then.response_body_shows_simple_file_in_s3()
 
         # delete file
         self.when.delete_file_is_called_for_simple_file_in_s3()
@@ -26,7 +26,7 @@ class TestDeleteFile(BaseSystemTest):
         self.then.response_confirms_simple_file_deleted()
         self.then.simple_file_does_not_exist_in_s3_bucket()
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
-        self.then.list_present_response_body_shows_simple_file_not_in_s3()
+        self.then.response_body_shows_simple_file_not_in_s3()
 
         # delete file fails when file doesn't exist
         self.when.delete_file_is_called_for_simple_file_in_s3()

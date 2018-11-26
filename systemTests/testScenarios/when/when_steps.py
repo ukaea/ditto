@@ -12,43 +12,43 @@ class WhenSteps:
         print(self.__class__)
 
     def create_bucket_called_for_simple_bucket(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/createbucket/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/createbucket/'
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
         self._context.http_client_response = response
 
     def copy_dir_called_for_whole_directory(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/copydir/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/copydir/'
         body = {'bucket': self._context.standard_bucket_name}
         response = requests.post(url, json=body)
         self._context.http_client_response = response
 
     def copy_dir_called_for_sub_directory(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/copydir/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/copydir/'
         body = {'bucket': 'systemtest-textbucket', 'directory': 'sub_dir_A'}
         response = requests.post(url, json=body)
         self._context.http_client_response = response
 
     def list_present_called_for_simple_bucket_whole_directory_structure(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/listpresent/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/listpresent/'
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
         self._context.http_client_response = response
 
     def copy_new_called_for_whole_directory(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/copynew/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/copynew/'
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
         self._context.http_client_response = response
 
     def delete_file_is_called_for_simple_file_in_s3(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/deletefile/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/deletefile/'
         body = {'bucket': 'systemtest-textbucket', 'file': 'testA.txt'}
         response = requests.delete(url, json=body)
         self._context.http_client_response = response
 
     def copy_update_called_for_whole_directory(self):
-        url = f'http://{self._context.s3host}:{self._context.app_port}/copyupdate/'
+        url = f'http://{self._context.host_address}:{self._context.app_port}/copyupdate/'
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
         self._context.http_client_response = response

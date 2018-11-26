@@ -22,4 +22,4 @@ class TestListPresent(BaseSystemTest):
         self.when.copy_dir_called_for_whole_directory()
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
         self.then.response_shows_request_was_completed_successfully()
-        self.then.list_present_response_body_shows_simple_file_in_s3()
+        self.then.response_body_shows_simple_file_in_s3()
