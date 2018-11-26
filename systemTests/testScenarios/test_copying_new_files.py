@@ -26,6 +26,10 @@ class TestCopyNew(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.list_present_response_body_shows_simple_file_in_s3()
 
+        # Failure for no new file
+        self.when.copy_new_called_for_whole_directory()
+        self.then.response_shows_old_file_skipped()
+
         # Create new file in subdir
         self.given.simple_sub_dir_with_test_file_is_setup()
 

@@ -46,3 +46,9 @@ class WhenSteps:
         body = {'bucket': 'systemtest-textbucket', 'file': 'testA.txt'}
         response = requests.delete(url, json=body)
         self._context.http_client_response = response
+
+    def copy_update_called_for_whole_directory(self):
+        url = f'http://{self._context.s3host}:{self._context.app_port}/copyupdate/'
+        body = {'bucket': 'systemtest-textbucket'}
+        response = requests.post(url, json=body)
+        self._context.http_client_response = response

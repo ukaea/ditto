@@ -93,4 +93,27 @@ class ThenSteps:
         response = self._context.http_client_response
         assert self._context.response_data(response)["files skipped"] == 1
 
+    def response_indicates_no_new_file_uploaded(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["new files uploaded"] == 0
+
+    def response_indicates_no_files_updated(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["files updated"] == 0
+
+    def response_message_body_indicates_one_file_updated(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["files updated"] == 1
+
+    def simple_file_content_is_updated_on_s3(self):
+        file_path = os.path.join(self._context.s3_data_folder_path,
+                                 'systemtest-textbucket',
+                                 self._context.simple_file_name)
+        with open(file_path, 'r') as file:
+            content = file.read()
+            print(content)
+        assert content == 'example test content A. A new bit of text'
+
+
+
 

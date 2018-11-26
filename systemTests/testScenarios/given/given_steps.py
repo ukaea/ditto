@@ -46,3 +46,10 @@ class GivenSteps:
                                  file_name)
         with open(file_path, 'w') as file:
             file.write(content)
+
+    def update_simple_file(self):
+        file_path = os.path.join(self._context.local_data_folder_path, 'testA.txt')
+        new_content = ". A new bit of text"
+        with open(file_path, 'a') as file:
+            file.write(new_content)
+
