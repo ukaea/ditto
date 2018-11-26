@@ -6,6 +6,10 @@ class TestDeleteFile(BaseSystemTest):
         # Start the api
         self.given.ditto_web_api.is_started()
 
+        # fail when bucket doesn't exist
+        self.when.delete_file_is_called_for_simple_file_in_s3()
+        self.then.response_shows_warning_as_bucket_does_not_exist()
+
         # Create a bucket in s3
         self.given.standard_bucket_exists_in_s3()
 
@@ -23,3 +27,7 @@ class TestDeleteFile(BaseSystemTest):
         self.then.simple_file_does_not_exist_in_s3_bucket()
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
         self.then.list_present_response_body_shows_simple_file_not_in_s3()
+
+        # delete file fails when file doesn't exist
+        self.when.delete_file_is_called_for_simple_file_in_s3()
+        self.then.response_message_complains_simple_file_does_not_exist()

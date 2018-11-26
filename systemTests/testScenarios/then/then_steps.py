@@ -62,7 +62,7 @@ class ThenSteps:
     def response_shows_copy_dir_copied_no_new_files_as_directory_already_exists(self):
         response = self._context.http_client_response
         assert self._context.response_data(response)["new files uploaded"] == 0
-        assert self._context.response_data(response)["message"] == "Directory None already exists on S3," \
+        assert self._context.response_data(response)["message"] == "Directory root already exists on S3," \
                                                                    " 2 files skipped"
 
     def response_message_confirms_transfer(self):
@@ -111,9 +111,18 @@ class ThenSteps:
                                  self._context.simple_file_name)
         with open(file_path, 'r') as file:
             content = file.read()
-            print(content)
         assert content == 'example test content A. A new bit of text'
 
+    def response_message_complains_simple_file_does_not_exist(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["message"] == "File testA.txt does not exist" \
+                                                                   " in bucket systemtest-textbucket"
 
+    def response_message_complains_directory_does_not_exist(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["message"] == "No files found in directory" \
+                                                                   " or directory does not exist (root)"
 
-
+    def response_shows_no_objects_in_bucket(self):
+        response = self._context.http_client_response
+        assert self._context.object_names_from_list_present_response_body(response) == []

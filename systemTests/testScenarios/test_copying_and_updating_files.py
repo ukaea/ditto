@@ -6,15 +6,19 @@ class TestCopyUpdate(BaseSystemTest):
         # Start the api
         self.given.ditto_web_api.is_started()
 
-        # Create a basic file
-        self.given.simple_test_file_is_setup()
-
         # Try copy_dir before bucket is created
         self.when.copy_new_called_for_whole_directory()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
         # Create a bucket in s3
         self.given.standard_bucket_exists_in_s3()
+
+        # try copy-update before directory formed
+        self.when.copy_update_called_for_whole_directory()
+        self.then.response_message_complains_directory_does_not_exist()
+
+        # Create a basic file
+        self.given.simple_test_file_is_setup()
 
         # Copy whole directory to s3 bucket
         self.when.copy_update_called_for_whole_directory()
