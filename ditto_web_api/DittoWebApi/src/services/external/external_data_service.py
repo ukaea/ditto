@@ -86,13 +86,11 @@ class ExternalDataService:
         object_name = to_posix(file_information.rel_path)
         key = bucket.get_key(object_name)
         key = bucket.new_key(key_name=object_name) if key is None else key
-        self._logger.debug(f"KEY: {key}")
         try:
             key.set_contents_from_filename(file_information.abs_path)
         except Exception as exception:
             self._logger.error(exception)
             raise
-        self._logger.debug("Here?")
         file_length = self._file_system_helper.file_size(file_information.abs_path)
         self._logger.debug(
             f'File "{object_name}" uploaded, {file_length} bytes transferred'
