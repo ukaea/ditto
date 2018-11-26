@@ -11,10 +11,6 @@ class DittoHandler(APIHandler):
     def prepare(self):
         self._check_credentials()
 
-    def post(self, *args, **kwargs):
-        user = self._current_user
-        self.write(f'Hello {user}')
-
     def _check_credentials(self):
         auth_header = self.request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Basic '):
