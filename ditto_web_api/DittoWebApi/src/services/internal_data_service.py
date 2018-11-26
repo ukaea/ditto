@@ -23,3 +23,7 @@ class InternalDataService:
         rel_path_to_file = self._file_system_helper.relative_file_path(file_path, self._root_dir)
         file_name = self._file_system_helper.file_name(abs_path_to_file)
         return FileInformation(abs_path_to_file, rel_path_to_file, file_name)
+
+    def create_archive_file(self, dir_path, content):
+        file_path = self._file_system_helper.join_paths(self._root_dir, dir_path, ".ditto_archived")
+        self._file_system_helper.create_file(file_path, content)

@@ -27,3 +27,7 @@ class FileSystemHelper:
 
     def file_size(self, abs_file_path):
         return os.stat(abs_file_path).st_size
+
+    def create_file(self, file_path, content):
+        with open(file_path, "w+") as file:
+            file.write(content)
