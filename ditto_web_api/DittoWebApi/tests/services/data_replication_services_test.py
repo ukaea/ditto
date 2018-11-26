@@ -259,16 +259,17 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_try_delete_file_returns_warning_message_when_bucket_doesnt_exist(self):
         # Arrange
-        bucket_name = "bucket-1"
+        bucket_name = "test-bucket"
+        file_rel_path = "test.txt"
         self.mock_external_data_service.does_bucket_exist.return_value = False
         # Act
-        response = self.test_service.try_delete_file(bucket_name, "some_file")
+        response = self.test_service.try_delete_file(bucket_name, file_rel_path)
         # Assert
-        self.mock_logger.warning.assert_called_with("Warning, bucket does not exist (bucket-1)")
+        self.mock_logger.warning.assert_called_with("Warning, bucket does not exist (test-bucket)")
         assert response == return_delete_file_helper(
-            bucket_name='bucket-1',
-            file_name='some_file',
-            message='Warning, bucket does not exist (bucket-1)'
+            bucket_name=bucket_name,
+            file_rel_path=file_rel_path,
+            message='Warning, bucket does not exist (test-bucket)'
         )
 
     def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):

@@ -11,7 +11,7 @@ def return_bucket_message(message, bucket_name=""):
             "bucket": bucket_name}
 
 
-def return_delete_file_helper(message, file_name, bucket_name):
+def return_delete_file_helper(message, file_rel_path, bucket_name):
     return {"message": message,
-            "file": file_name,
+            "file": file_rel_path,
             "bucket": bucket_name}
