@@ -27,11 +27,19 @@ class ThenSteps:
                                  self._context.simple_file_name)
         assert os.path.exists(file_path)
 
-    def list_present_response_body_shows_returned_newly_created_file(self):
+    def list_present_response_body_shows_simple_file_in_s3(self):
         response = self._context.http_client_response
         assert self._context.response_data(response)["message"] == "objects returned successfully"
         assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt', response)
+
+    def list_present_response_body_shows_file_in_sub_dir_in_s3(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["message"] == "objects returned successfully"
         assert self._context.file_name_in_objects_returned_in_list_present_body('sub_dir_A/testB.txt', response)
+
+    def list_present_response_body_shows_simple_file_not_in_s3(self):
+        response = self._context.http_client_response
+        assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt', response) is False
 
     def response_returns_status_code_200(self):
         response = self._context.http_client_response
@@ -64,5 +72,13 @@ class ThenSteps:
         assert self._context.response_data(response)["message"] == "Warning, bucket does not exist " \
                                                                    "(systemtest-textbucket)"
 
+    def response_confirms_simple_file_deleted(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["message"] == 'File testA.txt successfully deleted ' \
+                                                                   'from bucket systemtest-textbucket'
 
-
+    def simple_file_does_not_exist_in_s3_bucket(self):
+        file_path = os.path.join(self._context.s3_data_folder_path,
+                                 'systemtest-textbucket',
+                                 self._context.simple_file_name)
+        assert os.path.exists(file_path) is False

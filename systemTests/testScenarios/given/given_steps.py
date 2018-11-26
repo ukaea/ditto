@@ -40,6 +40,9 @@ class GivenSteps:
     def simple_test_file_is_setup_in_s3(self):
         self._write_test_file_in_s3('testA.txt', 'example test content A')
 
-    def _write_test_file(self, file_name, content):
-        with open(os.path.join(self._context.local_data_folder_path, file_name), 'w') as file:
+    def _write_test_file_in_s3(self, file_name, content):
+        file_path = os.path.join(self._context.s3_data_folder_path,
+                                 self._context.standard_bucket_name,
+                                 file_name)
+        with open(file_path, 'w') as file:
             file.write(content)

@@ -40,3 +40,9 @@ class WhenSteps:
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
         self._context.http_client_response = response
+
+    def delete_file_is_called_for_simple_file_in_s3(self):
+        url = f'http://{self._context.s3host}:{self._context.app_port}/deletefile/'
+        body = {'bucket': 'systemtest-textbucket', 'file': 'testA.txt'}
+        response = requests.delete(url, json=body)
+        self._context.http_client_response = response
