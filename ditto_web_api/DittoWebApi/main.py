@@ -65,18 +65,18 @@ if __name__ == "__main__":
     SECURITY_SERVICE = ConfigSecurityService(SECURITY_CONFIGURATION_PATH, LOGGER)
 
     # Launch app
-    app_context = dict(
+    CONTAINER = dict(
         data_replication_service=DATA_REPLICATION_SERVICE,
         security_service=SECURITY_SERVICE
     )
     APP = tornado.web.Application([
-        (format_route_specification("help"), DittoHandler, app_context),
-        (format_route_specification("listpresent"), ListPresentHandler, app_context),
-        (format_route_specification("copydir"), CopyDirHandler, app_context),
-        (format_route_specification("createbucket"), CreateBucketHandler, app_context),
-        (format_route_specification("deletefile"), DeleteFileHandler, app_context),
-        (format_route_specification("copynew"), CopyNewHandler, app_context),
-        (format_route_specification("copyupdate"), CopyUpdateHandler, app_context),
+        (format_route_specification("help"), DittoHandler, CONTAINER),
+        (format_route_specification("listpresent"), ListPresentHandler, CONTAINER),
+        (format_route_specification("copydir"), CopyDirHandler, CONTAINER),
+        (format_route_specification("createbucket"), CreateBucketHandler, CONTAINER),
+        (format_route_specification("deletefile"), DeleteFileHandler, CONTAINER),
+        (format_route_specification("copynew"), CopyNewHandler, CONTAINER),
+        (format_route_specification("copyupdate"), CopyUpdateHandler, CONTAINER),
     ])
     LOGGER.info(f'DITTO Web API listening on port {CONFIGURATION.app_port}')
     APP.listen(CONFIGURATION.app_port)
