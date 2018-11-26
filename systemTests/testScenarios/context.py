@@ -87,18 +87,18 @@ class SystemTestContext:
     def _response_body_as_json(self):
         return json.loads(self.http_client_response.text)
 
-    def response_status(self, response):
-        return self._response_body_as_json(response)["status"]
+    def response_status(self):
+        return self._response_body_as_json()["status"]
 
-    def response_data(self, response):
-        return self._response_body_as_json(response)["data"]
+    def response_data(self):
+        return self._response_body_as_json()["data"]
 
-    def object_names_from_list_present_response_body(self, response):
-        objects = self.response_data(response)["objects"]
+    def object_names_from_list_present_response_body(self):
+        objects = self.response_data()["objects"]
         return [obj["object_name"] for obj in objects]
 
-    def file_name_in_objects_returned_in_list_present_body(self, file_name, response):
-        objects_in_response = self.object_names_from_list_present_response_body(response)
+    def file_name_in_objects_returned_in_list_present_body(self, file_name):
+        objects_in_response = self.object_names_from_list_present_response_body()
         return file_name in objects_in_response
 
     @property
@@ -143,7 +143,7 @@ class BaseSystemTest(unittest.TestCase):
         s3_dirs = [s3_dir for s3_dir in s3_dirs if self._s3_dir_belongs_to_system_tests(s3_dir)]
         # Delete these directories
         for s3_dir in s3_dirs:
-            if s3_dir.trim() == "*"
+            if s3_dir.strip() == "*":
                 raise SystemError
             os.system(f"sudo rm -rf {s3_dir}")
 
