@@ -1,7 +1,7 @@
 from testScenarios.context import BaseSystemTest
 
 
-class TestTemplate(BaseSystemTest):
+class TestDeleteFile(BaseSystemTest):
     def test_delete_file(self):
         # Start the api
         self.given.ditto_web_api.is_started()
