@@ -437,7 +437,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         mock_file_summary.files_in_directory = [self.mock_file_information_1]
         mock_file_summary.new_files = []
         mock_file_summary.updated_files = []
-        mock_file_summary.files_to_be_skipped = [self.mock_file_information_1]
+        mock_file_summary.files_to_be_skipped.return_value = [self.mock_file_information_1]
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
