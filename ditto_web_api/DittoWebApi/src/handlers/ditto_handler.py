@@ -4,6 +4,7 @@ from tornado_json.requesthandlers import APIHandler
 
 
 class DittoHandler(APIHandler):
+    # pylint: disable=arguments-differ
     def initialize(self, data_replication_service, security_service):
         self._data_replication_service = data_replication_service
         self._security_service = security_service
@@ -12,6 +13,7 @@ class DittoHandler(APIHandler):
         self._check_credentials()
 
     def get_body_attribute(self, key, default=None, required=False):
+        # pylint: disable=no-member
         attrs = dict(self.body)
         if key in attrs.keys():
             return attrs[key]
@@ -31,6 +33,7 @@ class DittoHandler(APIHandler):
 
         credentials_accepted = self._security_service.check_credentials(username, password)
         if credentials_accepted:
+            # pylint: disable=attribute-defined-outside-init
             self._current_user = username
         else:
             self._authentication_failed()

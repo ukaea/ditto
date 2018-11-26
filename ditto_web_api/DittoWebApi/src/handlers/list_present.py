@@ -20,8 +20,7 @@ class ListPresentHandler(DittoHandler):
         },
     )
     def post(self, *args, **kwargs):
-        attrs = dict(self.body)
-        bucket_name = attrs["bucket"]
-        dir_path = attrs["directory"] if "directory" in attrs.keys() else None
+        bucket_name = self.get_body_attribute("bucket", required=True)
+        dir_path = self.get_body_attribute("directory", default=None)
         object_dicts = self._data_replication_service.retrieve_object_dicts(bucket_name, dir_path)
         return object_dicts

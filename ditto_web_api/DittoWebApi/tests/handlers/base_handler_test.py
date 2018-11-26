@@ -1,10 +1,10 @@
 from abc import ABCMeta, abstractmethod
 import json
+import mock
 import pytest
 from tornado.httpclient import HTTPClientError
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
-import unittest.mock as mock
 
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.security.isecurity_service import ISecurityService
