@@ -32,4 +32,5 @@ class DittoHandler(APIHandler):
             self._authentication_failed()
 
     def _authentication_failed(self):
-        super(APIHandler, self).write_error(401)
+        self.set_status(401)
+        self.finish({'reason': 'Authentication required'})
