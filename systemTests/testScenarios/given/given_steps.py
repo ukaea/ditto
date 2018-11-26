@@ -37,16 +37,6 @@ class GivenSteps:
         print(self._context.response_data(response)["message"])
         assert self._context.response_data(response)["message"] == "Bucket Created (systemtest-textbucket)"
 
-    def simple_test_file_is_setup_in_s3(self):
-        self._write_test_file_in_s3('testA.txt', 'example test content A')
-
-    def _write_test_file_in_s3(self, file_name, content):
-        file_path = os.path.join(self._context.s3_data_folder_path,
-                                 self._context.standard_bucket_name,
-                                 file_name)
-        with open(file_path, 'w') as file:
-            file.write(content)
-
     def update_simple_file(self):
         file_path = os.path.join(self._context.local_data_folder_path, 'testA.txt')
         new_content = ". A new bit of text"
