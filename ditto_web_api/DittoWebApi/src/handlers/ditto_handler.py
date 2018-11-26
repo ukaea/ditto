@@ -11,6 +11,14 @@ class DittoHandler(APIHandler):
     def prepare(self):
         self._check_credentials()
 
+    def get_body_attribute(self, key, default=None, required=False):
+        attrs = dict(self.body)
+        if key in attrs.keys():
+            return attrs[key]
+        if required:
+            raise ValueError('Attribute missing')
+        return default
+
     def _check_credentials(self):
         auth_header = self.request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Basic '):

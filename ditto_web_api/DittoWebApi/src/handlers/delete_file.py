@@ -20,8 +20,7 @@ class DeleteFileHandler(DittoHandler):
 
     )
     def delete(self, *args, **kwargs):
-        attrs = dict(self.body)
-        bucket_name = attrs["bucket"]
-        file_name = attrs["file"]
-        result = self._data_replication_service.try_delete_file(bucket_name, file_name)
+        bucket_name = self.get_body_attribute("bucket", required=True)
+        file_rel_path = self.get_body_attribute("file", required=True)
+        result = self._data_replication_service.try_delete_file(bucket_name, file_rel_path)
         return result

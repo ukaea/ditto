@@ -23,8 +23,7 @@ class CopyUpdateHandler(DittoHandler):
         },
     )
     def post(self, *args, **kwargs):
-        attrs = dict(self.body)
-        bucket_name = attrs["bucket"]
-        dir_path = attrs["directory"] if "directory" in attrs.keys() else None
+        bucket_name = self.get_body_attribute("bucket", required=True)
+        dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_new_and_update(bucket_name, dir_path)
         return result

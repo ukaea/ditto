@@ -21,7 +21,6 @@ class CreateBucketHandler(DittoHandler):
         }
     )
     def post(self, *args, **kwargs):
-        attrs = dict(self.body)
-        bucket_name = attrs["bucket"]
+        bucket_name = self.get_body_attribute("bucket", required=True)
         result = self._data_replication_service.create_bucket(bucket_name)
         return result
