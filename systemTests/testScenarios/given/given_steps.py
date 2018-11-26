@@ -30,14 +30,21 @@ class GivenSteps:
             file.write(content)
 
     def standard_bucket_exists_in_s3(self):
-        url = f'http://{self._context.host_address}:{self._context.app_port}/createbucket/'
-        body = {'bucket': 'systemtest-textbucket'}
-        requests.post(url, json=body)
-        bucket_path = os.path.join(self._context.s3_data_folder_path, 'systemtest-textbucket')
-        assert os.path.exists(bucket_path)
+        self._make_s3_bucket(self._context.standard_bucket_name)
 
     def update_simple_file(self):
         file_path = os.path.join(self._context.local_data_folder_path, 'testA.txt')
         new_content = ". A new bit of text"
         with open(file_path, 'a') as file:
             file.write(new_content)
+
+    def _make_s3_bucket(self, bucket):
+        bucket_path = os.path.join(self._context.s3_data_folder_path, bucket)
+        os.system(f"mkdir {bucket_path}")
+        os.system(f"sudo chown 'minio':'minio' {bucket_path}/")
+        os.system(f"sudo chmod 0777 {bucket_path}/")
+
+    def _create_file_in_s3(self, bucket, file_name, content):
+        file_path = os.path.join(self._context.s3_data_folder_path, bucket, file_name)
+        os.system(f"sudo echo {content} >> {file_path}")
+        os.system(f"sudo chown -R 'minio':'minio' {file_path}")
