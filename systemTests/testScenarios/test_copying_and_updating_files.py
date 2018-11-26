@@ -7,7 +7,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.ditto_web_api.is_started()
 
         # Try copy_dir before bucket is created
-        self.when.copy_new_called_for_whole_directory()
+        self.when.copy_update_called_for_whole_directory()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
         # Create a bucket in s3

@@ -78,7 +78,7 @@ class SystemTestContext:
 
     @property
     def local_data_folder_path(self):
-        return os.path.join(self._execution_folder_path, 'data')
+        return "/usr/tmp/data"
 
     @property
     def s3_data_folder_path(self):
