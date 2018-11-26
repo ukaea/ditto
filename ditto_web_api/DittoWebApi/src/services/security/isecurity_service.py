@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 class ISecurityService(metaclass=ABCMeta):
 
     @abstractmethod
-    def is_authenticated(self, name, password):
+    def check_credentials(self, name, password):
         pass
 
     @abstractmethod

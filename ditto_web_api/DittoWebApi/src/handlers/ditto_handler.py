@@ -25,7 +25,7 @@ class DittoHandler(APIHandler):
         auth_data = b64decode(auth_data).decode('ascii')
         username, password = auth_data.split(':', 1)
 
-        credentials_accepted = self._security_service.is_authenticated(username, password)
+        credentials_accepted = self._security_service.check_credentials(username, password)
         if credentials_accepted:
             self._current_user = username
         else:

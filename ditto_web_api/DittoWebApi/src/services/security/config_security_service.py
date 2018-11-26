@@ -30,7 +30,7 @@ class ConfigSecurityService(ISecurityService):
             f'Security Service found {len(self._users)} users in configuration file "{configuration_path}"'
         )
 
-    def is_authenticated(self, name, password):
+    def check_credentials(self, name, password):
         self._logger.info(f'Trying to authenticate user "{name}"')
         user = self._get_user(name)
         if user is None:
