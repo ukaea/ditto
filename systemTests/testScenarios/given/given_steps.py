@@ -33,7 +33,9 @@ class GivenSteps:
         url = f'http://{self._context.s3host}:{self._context.app_port}/createbucket/'
         body = {'bucket': 'systemtest-textbucket'}
         response = requests.post(url, json=body)
-        return response
+        assert response.status_code == 200
+        print(self._context.response_data(response)["message"])
+        assert self._context.response_data(response)["message"] == "Bucket Created (systemtest-textbucket)"
 
     def simple_test_file_is_setup_in_s3(self):
         self._write_test_file_in_s3('testA.txt', 'example test content A')

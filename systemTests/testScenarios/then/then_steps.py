@@ -42,9 +42,8 @@ class ThenSteps:
         assert self._context.response_status(response) == "success"
 
     def response_shows_request_was_completed_successfully(self):
-        response = self._context.http_client_response
-        self.response_returns_status_code_200(response)
-        self.response_status_is_success(response)
+        self.response_returns_status_code_200()
+        self.response_status_is_success()
 
     def response_shows_copy_dir_copied_no_new_files_as_directory_already_exists(self):
         response = self._context.http_client_response
@@ -59,6 +58,11 @@ class ThenSteps:
     def response_message_body_indicates_one_new_file_uploaded(self):
         response = self._context.http_client_response
         assert self._context.response_data(response)["new files uploaded"] == 1
+
+    def response_shows_warning_as_bucket_does_not_exist(self):
+        response = self._context.http_client_response
+        assert self._context.response_data(response)["message"] == "Warning, bucket does not exist " \
+                                                                   "(systemtest-textbucket)"
 
 
 

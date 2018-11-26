@@ -11,6 +11,7 @@ class TestCopyDir(BaseSystemTest):
 
         # Try copy_dir before bucket is created
         self.when.copy_dir_called_for_whole_directory()
+        self.then.response_shows_warning_as_bucket_does_not_exist()
 
         # Create a bucket in s3
         self.given.standard_bucket_exists_in_s3()
@@ -35,4 +36,4 @@ class TestCopyDir(BaseSystemTest):
         # List present shows both files in s3 bucket
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
         self.then.response_shows_request_was_completed_successfully()
-        self.then.list_present_response_body_shows_returned_newly_created_files()
+        self.then.list_present_response_body_shows_returned_newly_created_file()
