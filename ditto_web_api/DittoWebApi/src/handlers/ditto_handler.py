@@ -14,9 +14,8 @@ class DittoHandler(APIHandler):
 
     def get_body_attribute(self, key, default=None, required=False):
         # pylint: disable=no-member
-        attrs = dict(self.body)
-        if key in attrs.keys():
-            return attrs[key]
+        if key in self.body:
+            return self.body[key]
         if required:
             raise ValueError('Attribute missing')
         return default
