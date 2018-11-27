@@ -17,15 +17,15 @@ class DittoApiServer:
     def _write_configuration(self):
         file_contents = \
             '[Settings]\n' \
-            f'LogFolderLocation = {self._context.log_folder_path}\n'\
-            f'LoggingLevel = {self._context.log_level}\n'\
-            f'ApplicationPort = {self._context.app_port}\n'\
-            f'S3Host = {self._context.s3host}\n'\
-            f'S3Port = {self._context.s3port}\n'\
-            f'S3AccessKey = {self._context.s3access}\n'\
-            f'S3SecretKey = {self._context.s3secret}\n'\
-            f'S3Secure = {self._context.s3secure}\n'\
-            f'RootDirectory = {self._context.local_data_folder_path}\n'\
+            f'LogFolderLocation = {self._context.log_folder_path}\n' \
+            f'LoggingLevel = {self._context.log_level}\n' \
+            f'ApplicationPort = {self._context.app_port}\n' \
+            f'S3Host = {self._context.host_address}\n' \
+            f'S3Port = {self._context.s3port}\n' \
+            f'S3AccessKey = {self._context.s3access}\n' \
+            f'S3SecretKey = {self._context.s3secret}\n' \
+            f'S3Secure = {self._context.s3secure}\n' \
+            f'RootDirectory = {self._context.local_data_folder_path}\n' \
             f'BucketStandardisation = {self._context.bucket_standardisation}\n'
 
         config_file_path = os.path.join(
