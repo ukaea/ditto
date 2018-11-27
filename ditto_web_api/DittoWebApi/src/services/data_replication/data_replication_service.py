@@ -55,6 +55,7 @@ class DataReplicationService:
 
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary)
+        self._internal_data_service.create_archive_file(dir_path, "test")
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name):
