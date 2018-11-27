@@ -96,4 +96,3 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_archiver.update_content.assert_called_once_with("Some old content ", "test_content")
         self.mock_file_system_helper.create_file.assert_called_once_with("root/.ditto_archived",
                                                                          "Some old content test_content")
-

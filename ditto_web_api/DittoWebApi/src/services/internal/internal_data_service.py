@@ -39,5 +39,3 @@ class InternalDataService:
             content_to_write = new_content
         self._logger.info("Creating archive file")
         self._file_system_helper.create_file(file_path, content_to_write)
-
-
