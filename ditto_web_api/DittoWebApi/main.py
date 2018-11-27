@@ -13,7 +13,7 @@ from DittoWebApi.src.services.data_replication.data_replication_service import D
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
-from DittoWebApi.src.services.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
 from DittoWebApi.src.services.security.config_security_service import ConfigSecurityService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper

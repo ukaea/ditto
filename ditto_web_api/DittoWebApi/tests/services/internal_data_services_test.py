@@ -3,7 +3,7 @@ import logging
 import unittest
 import mock
 import pytest
-from DittoWebApi.src.services.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
