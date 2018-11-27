@@ -12,17 +12,17 @@ class Archiver:
         for file in file_summary.new_files:
             name = file.rel_path
             size = self._file_system_helper.file_size(file.abs_path)
-            type_of_transfer = "new"
             content[file.rel_path] = {"file": name,
                                       "size": size,
-                                      "time_transferred": time_of_transfer,
-                                      "type_of_transfer": type_of_transfer}
+                                      "first transferred": time_of_transfer,
+                                      "last updated": time_of_transfer,
+                                      "type of transfer": "new upload"}
         for file in file_summary.updated_files:
-            name = file.rel_path
-            size = self._file_system_helper.file_size(file.abs_path)
-            type_of_transfer = "update"
-            content[file.rel_path] = {"file": name,
-                                      "size": size,
-                                      "time_transferred": time_of_transfer,
-                                      "type_of_transfer": type_of_transfer}
+            self.update_content(content, file)
         return content
+
+    def update_details(self, content, file):
+        size = self._file_system_helper.file_size(file.abs_path)
+        content[file.rel_path]["last updated"] = current_time()
+        content[file.rel_path]["type of transfer"] = "update"
+        content[file.rel_path]["size"] = size
