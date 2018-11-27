@@ -44,6 +44,12 @@ class GivenSteps:
         os.system(f"sudo chown 'minio':'minio' {bucket_path}/")
         os.system(f"sudo chmod 0777 {bucket_path}/")
 
+    def _make_s3_sub_dir(self, bucket, sub_dir_name):
+        sub_dir_path = os.path.join(self._context.s3_data_folder_path, bucket, sub_dir_name)
+        os.system(f"mkdir {sub_dir_path}")
+        os.system(f"sudo chown 'minio':'minio' {sub_dir_path}/")
+        os.system(f"sudo chmod 0777 {sub_dir_path}/")
+
     def _create_file_in_s3(self, bucket, file_name, content):
         file_path = os.path.join(self._context.s3_data_folder_path, bucket, file_name)
         os.system(f"sudo echo {content} >> {file_path}")
@@ -53,6 +59,7 @@ class GivenSteps:
         self._create_file_in_s3(self._context.standard_bucket_name, 'testA.txt', 'example test content A')
 
     def simple_sub_dir_with_test_file_is_setup_in_s3(self):
+        self._make_s3_sub_dir(self._context.standard_bucket_name, 'sub_dir_A')
         self._create_file_in_s3(self._context.standard_bucket_name,
                                 os.path.join('sub_dir_A', 'testB.txt'),
                                 'example test content B')

@@ -8,6 +8,7 @@ class TestTemplate(BaseSystemTest):
 
         self.when.create_bucket_called_for_simple_bucket()
 
+        self.then.response_shows_request_was_completed_successfully()
         self.then.simple_bucket_exists_in_s3()
 
     def test_trying_to_create_a_bucket_with_invalid_name(self):

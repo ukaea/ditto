@@ -9,6 +9,7 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.when.copy_update_called_for_whole_directory()
 
+        self.then.response_shows_request_was_completed_successfully()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
     def test_copy_update_fails_when_no_file_in_directory(self):
@@ -18,6 +19,7 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.when.copy_update_called_for_whole_directory()
 
+        self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_complains_directory_does_not_exist()
 
     def test_copy_update_copies_across_whole_dir_that_is_new(self):
@@ -54,7 +56,6 @@ class TestCopyUpdate(BaseSystemTest):
         time.sleep(1)
         self.given.update_simple_file()
 
-        # Copy and update files
         self.when.copy_update_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
