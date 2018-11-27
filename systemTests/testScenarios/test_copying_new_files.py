@@ -19,7 +19,6 @@ class TestCopyNew(BaseSystemTest):
 
         self.when.copy_new_called_for_whole_directory()
 
-        self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_reports_directory_does_not_exist()
 
@@ -31,6 +30,7 @@ class TestCopyNew(BaseSystemTest):
 
         self.when.copy_new_called_for_whole_directory()
 
+        self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_request_was_completed_successfully()
         self.then.new_simple_file_exists_in_s3_bucket()
 
