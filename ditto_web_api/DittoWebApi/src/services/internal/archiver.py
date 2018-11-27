@@ -6,20 +6,23 @@ class Archiver:
         self._logger = logger
         self._file_system_helper = file_system_helper
 
-    # Current placeholder for processing contents of the archive files
-    def update_content(self, old_content, new_content):
-        return old_content + new_content
-
-    def to_json(self, file_summary):
+    def update_content(self, file_summary, old_content):
+        content = {} if old_content is None else old_content
+        time_of_transfer = current_time()
         for file in file_summary.new_files:
             name = file.rel_path
             size = self._file_system_helper.file_size(file.abs_path)
-            time_of_transfer = current_time()
             type_of_transfer = "new"
+            content[file.rel_path] = {"file": name,
+                                      "size": size,
+                                      "time_transferred": time_of_transfer,
+                                      "type_of_transfer": type_of_transfer}
         for file in file_summary.updated_files:
             name = file.rel_path
             size = self._file_system_helper.file_size(file.abs_path)
-            time_of_transfer = current_time()
             type_of_transfer = "update"
-            
-
+            content[file.rel_path] = {"file": name,
+                                      "size": size,
+                                      "time_transferred": time_of_transfer,
+                                      "type_of_transfer": type_of_transfer}
+        return content

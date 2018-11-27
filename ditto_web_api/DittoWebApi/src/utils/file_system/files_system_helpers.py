@@ -1,5 +1,6 @@
 # pylint: disable=R0201
 import os
+import json
 
 
 class FileSystemHelper:
@@ -37,5 +38,5 @@ class FileSystemHelper:
 
     def load_content(self, file_path):
         with open(file_path, 'rt') as file:
-            content = file.read()
+            content = json.loads(file)
         return content
