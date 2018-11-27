@@ -8,6 +8,7 @@ class TestDeleteFile(BaseSystemTest):
 
         self.when.delete_file_is_called_for_simple_file_in_s3()
 
+        self.then.standard_s3_bucket_does_not_exist()
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
@@ -31,4 +32,4 @@ class TestDeleteFile(BaseSystemTest):
         self.when.delete_file_is_called_for_simple_file_in_s3()
 
         self.then.response_shows_request_was_completed_successfully()
-        self.then.response_message_complains_simple_file_does_not_exist()
+        self.then.response_message_reports_simple_file_does_not_exist()

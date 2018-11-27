@@ -8,6 +8,7 @@ class TestListPresent(BaseSystemTest):
 
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()
 
+        self.then.standard_s3_bucket_does_not_exist()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
     def test_list_present_shows_content_of_directory(self):

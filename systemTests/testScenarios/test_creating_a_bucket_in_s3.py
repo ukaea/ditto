@@ -1,7 +1,7 @@
 from testScenarios.context import BaseSystemTest
 
 
-class TestTemplate(BaseSystemTest):
+class CreateBucket(BaseSystemTest):
     def test_creating_a_bucket(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
