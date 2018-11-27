@@ -119,7 +119,6 @@ class CopyNewHandlerTest(BaseHandlerTest):
         body = {'bucket': "test-bucket", }
         response_body, response_code = yield self.send_authorised_POST_request(body)
         # Assert
-        self.mock_security_service.check_credentials.assert_called_once_with(self.auth_username, self.auth_password)
         self.mock_data_replication_service.copy_new.assert_called_once_with("test-bucket", None)
         assert response_code == 200
         assert response_body['status'] == 'success'

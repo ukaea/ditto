@@ -18,11 +18,11 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         pass
 
     @property
-    def auth_username(self):
+    def _auth_username(self):
         return 'testuser'
 
     @property
-    def auth_password(self):
+    def _auth_password(self):
         return 'password'
 
     def get_app(self):
@@ -46,8 +46,8 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
     def send_authorised_DELETE_request(self, body):
         return self._send_request("DELETE",
                                   body,
-                                  self.auth_username,
-                                  self.auth_password,
+                                  self._auth_username,
+                                  self._auth_password,
                                   allow_nonstandard_methods=True)
 
     # pylint: disable=invalid-name
@@ -56,7 +56,7 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
 
     # pylint: disable=invalid-name
     def send_authorised_POST_request(self, body):
-        return self._send_request("POST", body, self.auth_username, self.auth_password)
+        return self._send_request("POST", body, self._auth_username, self._auth_password)
 
     def assert_post_returns_401_when_no_credentials_given(self):
         # Arrange
@@ -76,6 +76,7 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         with pytest.raises(HTTPClientError) as error:
             yield self.send_authorised_POST_request(body)
         # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
         assert error.value.response.code == 401
 
     def assert_post_returns_200_when_credentials_accepted(self):
@@ -86,7 +87,7 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         body = {'bucket': "test-bucket", }
         response_body, response_code = yield self.send_authorised_POST_request(body)
         # Assert
-        self.mock_security_service.check_credentials.assert_called_once_with(self.auth_username, self.auth_password)
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
         assert response_code == 200
         assert response_body['status'] == 'success'
 

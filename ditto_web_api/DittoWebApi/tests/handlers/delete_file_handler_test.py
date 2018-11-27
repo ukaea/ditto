@@ -35,7 +35,6 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         with pytest.raises(tornado.httpclient.HTTPClientError) as error:
             yield self.send_authorised_DELETE_request(body)
         # Assert
-        self.mock_security_service.check_credentials.assert_called_once_with(self.auth_username, self.auth_password)
         assert error.value.response.code == 401
 
     @gen_test
@@ -47,7 +46,6 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         body = {'bucket': "test-bucket", 'file': 'test.txt'}
         response_body, response_code = yield self.send_authorised_DELETE_request(body)
         # Assert
-        self.mock_security_service.check_credentials.assert_called_once_with(self.auth_username, self.auth_password)
         assert response_code == 200
         assert response_body['status'] == 'success'
 

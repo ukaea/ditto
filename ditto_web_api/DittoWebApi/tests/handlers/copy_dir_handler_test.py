@@ -118,7 +118,6 @@ class CopyDirHandlerTest(BaseHandlerTest):
         body = {'bucket': "test-bucket", 'directory': "test_dir/test_sub_dir"}
         response_body, response_code = yield self.send_authorised_POST_request(body)
         # Assert
-        self.mock_security_service.check_credentials.assert_called_once_with(self.auth_username, self.auth_password)
         self.mock_data_replication_service.copy_dir.assert_called_once_with("test-bucket", "test_dir/test_sub_dir")
         assert response_code == 200
         assert response_body['status'] == 'success'
