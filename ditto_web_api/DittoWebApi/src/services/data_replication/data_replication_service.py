@@ -79,24 +79,24 @@ class DataReplicationService:
         self._external_data_service.create_bucket(bucket_name)
         return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
 
-    def try_delete_file(self, bucket_name, file_name):
+    def try_delete_file(self, bucket_name, file_rel_path):
         self._logger.debug("Called delete-file handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
         if bucket_warning is not None:
             return return_delete_file_helper(message=bucket_warning,
-                                             file_name=file_name,
+                                             file_rel_path=file_rel_path,
                                              bucket_name=bucket_name)
 
-        if not self._external_data_service.does_object_exist(bucket_name, file_name):
-            warning = messages.file_existence_warning(file_name, bucket_name)
+        if not self._external_data_service.does_object_exist(bucket_name, file_rel_path):
+            warning = messages.file_existence_warning(file_rel_path, bucket_name)
             self._logger.warning(warning)
             return return_delete_file_helper(message=warning,
-                                             file_name=file_name,
+                                             file_rel_path=file_rel_path,
                                              bucket_name=bucket_name)
-        self._external_data_service.delete_file(bucket_name, file_name)
-        return return_delete_file_helper(message=messages.file_deleted(file_name, bucket_name),
-                                         file_name=file_name,
-                                         bucket_name=bucket_name)
+        self._external_data_service.delete_file(bucket_name, file_rel_path)
+        msg = messages.file_deleted(file_rel_path, bucket_name)
+        action_summary = return_delete_file_helper(message=msg, file_rel_path=file_rel_path, bucket_name=bucket_name)
+        return action_summary
 
     def copy_new(self, bucket_name, dir_path):
         self._logger.debug("Called copy new handler")
