@@ -74,3 +74,26 @@ class TestInternalDataServices(unittest.TestCase):
         assert self.mock_logger.debug.call_count == 2
         self.mock_logger.debug.assert_any_call("Finding files in directory test_root_dir/file_1")
         self.mock_logger.debug.assert_any_call("Found 2 files, converting to file information objects")
+
+    def test_create_archive_file_calls_archiver_with_given_content_when_archive_file_does_not_exist(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.return_value = False
+        self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
+        # Act
+        self.internal_data_services.create_archive_file(None, "test_content")
+        # Assert
+        self.mock_file_system_helper.create_file.assert_called_once_with("root/.ditto_archived", "test_content")
+
+    def test_create_archive_file_calls_archiver_with_updated_content_when_archive_filet_exist(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.return_value = True
+        self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
+        self.mock_file_system_helper.load_content.return_value = "Some old content "
+        self.mock_archiver.update_content.return_value = "Some old content test_content"
+        # Act
+        self.internal_data_services.create_archive_file(None, "test_content")
+        # Assert
+        self.mock_archiver.update_content.assert_called_once_with("Some old content ", "test_content")
+        self.mock_file_system_helper.create_file.assert_called_once_with("root/.ditto_archived",
+                                                                         "Some old content test_content")
+
