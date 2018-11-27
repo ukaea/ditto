@@ -1,14 +1,11 @@
 # pylint: disable=W0221,W0223
-from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
+from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_list_present_output_schema
 
 
-class ListPresentHandler(APIHandler):
-    def initialize(self, data_replication_service):
-        self._data_replication_service = data_replication_service
-
+class ListPresentHandler(DittoHandler):
     @schema.validate(
         input_schema=create_object_schema_with_string_properties(["bucket", "directory"], ["bucket"]),
         input_example={
@@ -23,8 +20,7 @@ class ListPresentHandler(APIHandler):
         },
     )
     def post(self, *args, **kwargs):
-        attrs = dict(self.body)
-        bucket_name = attrs["bucket"]
-        dir_path = attrs["directory"] if "directory" in attrs.keys() else None
+        bucket_name = self.get_body_attribute("bucket", required=True)
+        dir_path = self.get_body_attribute("directory", default=None)
         object_dicts = self._data_replication_service.retrieve_object_dicts(bucket_name, dir_path)
         return object_dicts

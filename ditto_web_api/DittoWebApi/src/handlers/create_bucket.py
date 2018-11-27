@@ -1,13 +1,10 @@
 # pylint: disable=W0221,W0223
-from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
+from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 
 
-class CreateBucketHandler(APIHandler):
-    def initialize(self, data_replication_service):
-        self._data_replication_service = data_replication_service
-
+class CreateBucketHandler(DittoHandler):
     @schema.validate(
         input_schema=create_object_schema_with_string_properties(["bucket"], ["bucket"]),
         input_example={
@@ -24,7 +21,6 @@ class CreateBucketHandler(APIHandler):
         }
     )
     def post(self, *args, **kwargs):
-        attrs = dict(self.body)
-        bucket_name = attrs["bucket"]
+        bucket_name = self.get_body_attribute("bucket", required=True)
         result = self._data_replication_service.create_bucket(bucket_name)
         return result
