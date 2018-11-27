@@ -4,6 +4,7 @@ from testScenarios.context import BaseSystemTest
 class TestListPresent(BaseSystemTest):
     def test_list_present(self):
         # Start the api
+        self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
         # Try list present for invalid bucket
@@ -18,6 +19,7 @@ class TestListPresent(BaseSystemTest):
         self.then.response_shows_no_objects_in_bucket()
 
         # Create file
+
         self.given.simple_test_file_is_setup()
         self.when.copy_dir_called_for_whole_directory()
         self.when.list_present_called_for_simple_bucket_whole_directory_structure()

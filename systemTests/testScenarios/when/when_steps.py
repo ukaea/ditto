@@ -53,6 +53,7 @@ class WhenSteps:
 
     def _make_request(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
+        print(url)
         if handler == "deletefile":
             response = requests.delete(url, json=body)
         else:

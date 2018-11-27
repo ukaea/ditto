@@ -70,7 +70,10 @@ class ThenSteps:
                                                                    "(systemtest-textbucket)"
 
     def response_shows_error_that_bad_bucket_name_given(self):
-        assert "Bucket name breaks S3 naming convention" in self._context.response_data()["message"] or "Bucket breaks local naming standard" in self._context.response_data()["message"]
+        assert "Bucket name breaks S3 naming convention" in \
+               self._context.response_data()["message"] or \
+               "Bucket breaks local naming standard" in\
+               self._context.response_data()["message"]
 
     def response_confirms_simple_file_deleted(self):
         assert self._context.response_data()["message"] == 'File testA.txt successfully deleted ' \

@@ -2,32 +2,27 @@ from testScenarios.context import BaseSystemTest
 
 
 class TestDeleteFile(BaseSystemTest):
-    def test_delete_file(self):
-        # Start the api
+    def test_delete_file_fails_when_bucket_does_not_exist(self):
+        self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
-        # fail when bucket doesn't exist
         self.when.delete_file_is_called_for_simple_file_in_s3()
+
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
-        # Create a bucket in s3
+    def test_delete_file_removes_simple_file_from_s3(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_is_setup_in_s3()
 
-        # Create a basic file in s3
-        self.given.simple_test_file_is_setup()
-        self.when.copy_dir_called_for_whole_directory()
-        self.then.new_simple_file_exists_in_s3_bucket()
-        self.when.list_present_called_for_simple_bucket_whole_directory_structure()
-        self.then.response_body_shows_simple_file_in_s3()
-
-        # delete file
         self.when.delete_file_is_called_for_simple_file_in_s3()
+
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_confirms_simple_file_deleted()
         self.then.simple_file_does_not_exist_in_s3_bucket()
-        self.when.list_present_called_for_simple_bucket_whole_directory_structure()
-        self.then.response_body_shows_simple_file_not_in_s3()
 
-        # delete file fails when file doesn't exist
+    def test_delete_file_fails_when_bucket_does_not_exist(self):
+        self.given.s3_interface_is_running()
         self.when.delete_file_is_called_for_simple_file_in_s3()
         self.then.response_message_complains_simple_file_does_not_exist()

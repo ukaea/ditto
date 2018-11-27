@@ -48,3 +48,15 @@ class GivenSteps:
         file_path = os.path.join(self._context.s3_data_folder_path, bucket, file_name)
         os.system(f"sudo echo {content} >> {file_path}")
         os.system(f"sudo chown -R 'minio':'minio' {file_path}")
+
+    def simple_test_file_is_setup_in_s3(self):
+        self._create_file_in_s3(self._context.standard_bucket_name, 'testA.txt', 'example test content A')
+
+    def simple_sub_dir_with_test_file_is_setup_in_s3(self):
+        self._create_file_in_s3(self._context.standard_bucket_name,
+                                os.path.join('sub_dir_A', 'testB.txt'),
+                                'example test content B')
+
+    @staticmethod
+    def s3_interface_is_running():
+        os.system("sudo systemctl start minio")
