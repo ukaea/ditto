@@ -4,6 +4,7 @@ import unittest
 import mock
 import pytest
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.archiver import Archiver
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
@@ -13,6 +14,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         mock_configuration = mock.Mock()
         self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
+        self.mock_archiver = mock.create_autospec(Archiver)
         mock_configuration.root_dir = "test_root_dir"
         self.mock_file_system_helper.join_paths.return_value = "test_root_dir/file_1"
         self.mock_file_system_helper.find_all_files_in_folder.return_value = ["test_root_dir/file_1.txt",
@@ -25,6 +27,7 @@ class TestInternalDataServices(unittest.TestCase):
                                                               "file_2.txt"]
         self.internal_data_services = InternalDataService(mock_configuration,
                                                           self.mock_file_system_helper,
+                                                          self.mock_archiver,
                                                           self.mock_logger)
 
     def test_find_files_finds_files_in_a_directories(self):
