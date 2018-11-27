@@ -17,7 +17,7 @@ class GivenSteps:
         with open(os.path.join(self._context.local_data_folder_path, file_name), 'w') as file:
             file.write(content)
 
-    def simple_test_file_is_setup(self):
+    def simple_test_file_is_setup_locally(self):
         self._write_test_file('testA.txt', 'example test content A')
 
     def simple_sub_dir_with_test_file_is_setup(self):
@@ -52,7 +52,7 @@ class GivenSteps:
 
     def _create_file_in_s3(self, bucket, file_name, content):
         file_path = os.path.join(self._context.s3_data_folder_path, bucket, file_name)
-        os.system(f"sudo echo {content} >> {file_path}")
+        os.system(f"sudo echo {content} > {file_path}")
         os.system(f"sudo chown -R 'minio':'minio' {file_path}")
 
     def simple_test_file_is_setup_in_s3(self):
