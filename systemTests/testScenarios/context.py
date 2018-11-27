@@ -3,6 +3,7 @@ import shutil
 import signal
 import unittest
 import pytest
+import json
 
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
@@ -15,6 +16,7 @@ class SystemTestContext:
         self._execution_folder_path = '/home/vagrant/systemTests/execution_space'
         self.ditto_api_process = None
         self.console_logger = ProcessLogger('console', self.log_folder_path)
+        self.http_client_response = None
 
     def clean_up(self):
         print('cleaning up test')
@@ -47,7 +49,7 @@ class SystemTestContext:
         return 8080
 
     @property
-    def s3host(self):
+    def host_address(self):
         # This is set in Vagrantfile
         return '172.28.129.160'
 
@@ -76,12 +78,36 @@ class SystemTestContext:
 
     @property
     def local_data_folder_path(self):
-        return os.path.join(self._execution_folder_path, 'data')
+        return "/usr/tmp/data"
 
     @property
     def s3_data_folder_path(self):
         return '/opt/minio/data'
 
+    def _response_body_as_json(self):
+        return json.loads(self.http_client_response.text)
+
+    def response_status(self):
+        return self._response_body_as_json()["status"]
+
+    def response_data(self):
+        return self._response_body_as_json()["data"]
+
+    def object_names_from_list_present_response_body(self):
+        objects = self.response_data()["objects"]
+        return [obj["object_name"] for obj in objects]
+
+    def file_name_in_objects_returned_in_list_present_body(self, file_name):
+        objects_in_response = self.object_names_from_list_present_response_body()
+        return file_name in objects_in_response
+
+    @property
+    def standard_bucket_name(self):
+        return 'systemtest-textbucket'
+
+    @property
+    def simple_file_name(self):
+        return "testA.txt"
 
 class BaseSystemTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
@@ -117,9 +143,11 @@ class BaseSystemTest(unittest.TestCase):
         s3_dirs = [s3_dir for s3_dir in s3_dirs if self._s3_dir_belongs_to_system_tests(s3_dir)]
         # Delete these directories
         for s3_dir in s3_dirs:
-            shutil.rmtree(s3_dir)
+            if s3_dir.strip() == "*":
+                raise SystemError
+            os.system(f"sudo rm -rf {s3_dir}")
 
-    def _s3_dir_belongs_to_system_tests(self,s3_dir):
+    def _s3_dir_belongs_to_system_tests(self, s3_dir):
         base_name = os.path.basename(s3_dir)
         nchar = len(self.context.bucket_standardisation)+1
         target = self.context.bucket_standardisation + '-'

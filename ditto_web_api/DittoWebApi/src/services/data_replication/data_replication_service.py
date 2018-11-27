@@ -39,17 +39,18 @@ class DataReplicationService:
     def copy_dir(self, bucket_name, dir_path):
         self._logger.debug("Called copy-dir handler")
         bucket_warning = self._check_bucket_warning(bucket_name)
+        directory = dir_path if dir_path else "root"
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
         files_in_directory = self._internal_data_service.find_files(dir_path)
 
         if not files_in_directory:
-            warning = messages.no_files_found(dir_path)
+            warning = messages.no_files_found(directory)
             self._logger.warning(warning)
             return return_transfer_summary(message=warning)
 
         if self._external_data_service.does_dir_exist(bucket_name, dir_path):
-            warning = messages.directory_exists(dir_path, len(files_in_directory))
+            warning = messages.directory_exists(directory, len(files_in_directory))
             self._logger.warning(warning)
             return return_transfer_summary(message=warning, files_skipped=len(files_in_directory))
 
@@ -147,6 +148,6 @@ class DataReplicationService:
             message = messages.no_new_or_updates(directory)
             self._logger.info(message)
             return return_transfer_summary(message=message,
-                                           files_skipped=len(files_summary.files_to_be_skipped))
+                                           files_skipped=len(files_summary.files_to_be_skipped()))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         return return_transfer_summary(**transfer_summary)
