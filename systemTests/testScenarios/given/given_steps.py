@@ -1,5 +1,4 @@
 import os
-import requests
 
 from testScenarios.given.ditto_api_server import DittoApiServer
 
