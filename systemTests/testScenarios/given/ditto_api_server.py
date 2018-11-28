@@ -51,7 +51,7 @@ class DittoApiServer:
 
         with open(security_file_path, 'w') as security_file:
             security_file.write(file_contents)
-    
+
     def _start_ditto(self):
         path_of_file = os.path.dirname(os.path.realpath(__file__))
         web_api_script = os.path.join(path_of_file, 'runDittoWebApi.sh')
