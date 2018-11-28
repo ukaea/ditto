@@ -4,7 +4,7 @@ from DittoWebApi.src.models.file_information import FileInformation
 
 
 class InternalDataService:
-    def __init__(self, configuration, file_system_helper, archiver, logger):
+    def __init__(self, archiver, configuration, file_system_helper, logger):
         self._root_dir = configuration.root_dir
         self._file_system_helper = file_system_helper
         self._archiver = archiver
