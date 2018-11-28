@@ -103,7 +103,6 @@ class SystemTestContext:
         return self._response_body_as_json()["status"]
 
     def response_data(self):
-        print(self._response_body_as_json())
         return self._response_body_as_json()["data"]
 
     def object_names_from_list_present_response_body(self):
