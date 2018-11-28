@@ -122,6 +122,7 @@ class SystemTestContext:
     def simple_file_name(self):
         return "testA.txt"
 
+
 class BaseSystemTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self, request):
