@@ -114,7 +114,7 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_sub_dir()
 
-    def test_when_archive_file_exists_it_is_not_copied(self):
+    def test_when_archive_file_exists_it_is_not_copied_but_is_updated(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
@@ -127,5 +127,6 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_does_not_exist_in_s3_bucket()
+        self.then.updated_archive_file_content_is_as_expected()
         self.then.new_simple_file_exists_in_s3_bucket()
 

@@ -139,3 +139,11 @@ class ThenSteps:
     def archive_file_does_not_exist_in_s3_bucket(self):
         file_path = os.path.join(self._context.s3_data_folder_path, ".ditto_archived")
         assert os.path.exists(file_path) is False
+
+    def updated_archive_file_content_is_as_expected(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        expected_content = "test test"
+        with open(file_path, 'rt') as file:
+            content = file.read()
+        assert content == expected_content
+
