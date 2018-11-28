@@ -98,14 +98,11 @@ class SystemTestContext:
     def authentication_groups(self):
         return 'group1'
 
-    def _response_body_as_json(self):
-        return json.loads(self.http_client_response.text)
-
     def response_status(self):
-        return self._response_body_as_json()["status"]
+        return self.http_client_response.json()["status"]
 
     def response_data(self):
-        return self._response_body_as_json()["data"]
+        return self.http_client_response.json()["data"]
 
     def object_names_from_list_present_response_body(self):
         objects = self.response_data()["objects"]
