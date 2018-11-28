@@ -65,3 +65,12 @@ class TestCopyUpdate(BaseSystemTest):
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_message_body_indicates_one_file_updated()
         self.then.simple_file_content_is_updated_on_s3()
+
+    def test_copy_update_fails_when_authentication_is_invalid(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.unauthorised_copy_update_called_for_whole_directory()
+
+        self.then.response_fails_with_reason_authentication_required()

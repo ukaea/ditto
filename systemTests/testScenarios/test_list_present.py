@@ -33,3 +33,12 @@ class TestListPresent(BaseSystemTest):
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_shows_no_objects_in_bucket()
+
+    def test_list_present_rejected_when_authentication_is_invalid(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.unauthorised_list_present_called_for_simple_bucket_whole_directory_structure()
+
+        self.then.response_fails_with_reason_authentication_required()

@@ -61,3 +61,12 @@ class TestCopyNew(BaseSystemTest):
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_one_file_skipped()
         self.then.new_file_exists_in_sub_dir_of_s3_bucket()
+
+    def test_copy_new_fails_when_authentication_is_invalid(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.unauthorised_copy_new_called_for_whole_directory()
+
+        self.then.response_fails_with_reason_authentication_required()

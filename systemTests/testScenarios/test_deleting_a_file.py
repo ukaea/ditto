@@ -33,3 +33,12 @@ class TestDeleteFile(BaseSystemTest):
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_reports_simple_file_does_not_exist()
+
+    def test_delete_file_is_rejected_when_authentication_is_invalid(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.unauthorised_delete_file_is_called_for_simple_file_in_s3()
+
+        self.then.response_fails_with_reason_authentication_required()
