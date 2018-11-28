@@ -1,5 +1,5 @@
 class Archiver:
-    def __init__(self, logger, file_system_helper):
+    def __init__(self, file_system_helper, logger):
         self._logger = logger
         self._file_system_helper = file_system_helper
 
