@@ -6,6 +6,7 @@ from tornado.httpclient import HTTPClientError
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
 
+from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.security.isecurity_service import ISecurityService
 from DittoWebApi.src.utils.route_helper import format_route_specification
@@ -25,10 +26,16 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
     def _auth_password(self):
         return 'password'
 
+    @property
+    def _user_group(self):
+        return 'group'
+
     def get_app(self):
+        self.mock_bucket_settings_service = mock.create_autospec(BucketSettingsService)
         self.mock_data_replication_service = mock.create_autospec(DataReplicationService)
         self.mock_security_service = mock.create_autospec(ISecurityService)
         self.container = {
+            'bucket_settings_service': self.mock_bucket_settings_service,
             'data_replication_service': self.mock_data_replication_service,
             'security_service': self.mock_security_service
         }
@@ -58,38 +65,68 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
     def send_authorised_POST_request(self, body):
         return self._send_request("POST", body, self._auth_username, self._auth_password)
 
-    def assert_post_returns_401_when_no_credentials_given(self):
+    def assert_post_returns_401_when_no_credentials_given(self, body):
         # Arrange
         self.mock_security_service.check_credentials.return_value = False
         # Act
-        body = {'bucket': "test-bucket", }
         with pytest.raises(HTTPClientError) as error:
             yield self.send_POST_request(body)
         # Assert
         assert error.value.response.code == 401
 
-    def assert_post_returns_401_when_invalid_credentials_given(self):
+    def assert_post_returns_401_when_invalid_credentials_given(self, body):
         # Arrange
         self.mock_security_service.check_credentials.return_value = False
         # Act
-        body = {'bucket': "test-bucket", }
         with pytest.raises(HTTPClientError) as error:
             yield self.send_authorised_POST_request(body)
         # Assert
         self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
         assert error.value.response.code == 401
 
-    def assert_post_returns_200_when_credentials_accepted(self):
+    def assert_post_returns_403_when_unauthorised_user(self, body):
         # Arrange
-        self.mock_data_replication_service.retrieve_object_dicts.return_value = {}
         self.mock_security_service.check_credentials.return_value = True
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = True
+        self.mock_bucket_settings_service.bucket_permitted_groups.return_value = ['other']
+        self.mock_security_service.is_in_group.return_value = False
         # Act
-        body = {'bucket': "test-bucket", }
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_POST_request(body)
+        # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_security_service.is_in_group.assert_called_once_with(self._auth_username, 'other')
+        assert error.value.response.code == 403
+
+    def assert_post_returns_404_when_unrecognised_bucket_named(self, body):
+        # Arrange
+        self.mock_security_service.check_credentials.return_value = True
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = False
+        # Act
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_POST_request(body)
+        # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_bucket_settings_service.is_bucket_recognised.assert_called_once_with('test-bucket')
+        assert error.value.response.code == 404
+
+    def assert_post_returns_200_when_credentials_accepted(self, body):
+        # Arrange
+        self._set_authentication_authorisation_ok()
+        # Act
         response_body, response_code = yield self.send_authorised_POST_request(body)
         # Assert
         self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_bucket_settings_service.is_bucket_recognised.assert_called_once_with('test-bucket')
+        self.mock_security_service.is_in_group.assert_called_once_with(self._auth_username, self._user_group)
         assert response_code == 200
         assert response_body['status'] == 'success'
+
+    def _set_authentication_authorisation_ok(self):
+        self.mock_security_service.check_credentials.return_value = True
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = True
+        self.mock_bucket_settings_service.bucket_permitted_groups.return_value = [self._user_group]
+        self.mock_security_service.is_in_group.return_value = True
 
     async def _send_request(self, method, body, username, password, allow_nonstandard_methods=False):
         response = await self.http_client.fetch(

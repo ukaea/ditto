@@ -9,6 +9,7 @@ from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
+from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
@@ -60,12 +61,17 @@ if __name__ == "__main__":
                                                       STORAGE_DIFFERENCE_PROCESSOR,
                                                       LOGGER)
 
+    # Bucket settings
+    BUCKET_SETTINGS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
+    BUCKET_SETTINGS_SERVICE = BucketSettingsService(BUCKET_SETTINGS_PATH, LOGGER)
+
     # Security (PLACEHOLDER CODE)
     SECURITY_CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
     SECURITY_SERVICE = ConfigSecurityService(SECURITY_CONFIGURATION_PATH, LOGGER)
 
     # Launch app
     CONTAINER = dict(
+        bucket_settings_service=BUCKET_SETTINGS_SERVICE,
         data_replication_service=DATA_REPLICATION_SERVICE,
         security_service=SECURITY_SERVICE
     )
