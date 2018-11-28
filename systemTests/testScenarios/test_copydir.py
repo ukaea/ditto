@@ -77,3 +77,13 @@ class TestCopyDir(BaseSystemTest):
         self.when.unauthorised_copy_dir_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
+
+    def test_copy_dir_fails_when_authentication_credentials_not_provided(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_is_setup_locally()
+
+        self.when.copy_dir_called_with_no_authorisation_credentials()
+
+        self.then.response_fails_with_reason_authentication_required()

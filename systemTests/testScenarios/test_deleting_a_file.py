@@ -42,3 +42,12 @@ class TestDeleteFile(BaseSystemTest):
         self.when.unauthorised_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.response_fails_with_reason_authentication_required()
+
+    def test_delete_file_is_rejected_when_authentication_credentials_are_not_provided(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.delete_file_called_with_no_authorisation_credentials()
+
+        self.then.response_fails_with_reason_authentication_required()

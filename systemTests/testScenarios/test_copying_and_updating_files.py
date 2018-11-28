@@ -74,3 +74,12 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.unauthorised_copy_update_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
+
+    def test_copy_update_fails_when_authentication_credentials_are_missing(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.copy_update_called_with_no_authorisation_credentials()
+
+        self.then.response_fails_with_reason_authentication_required()

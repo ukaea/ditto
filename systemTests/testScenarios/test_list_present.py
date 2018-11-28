@@ -42,3 +42,12 @@ class TestListPresent(BaseSystemTest):
         self.when.unauthorised_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_fails_with_reason_authentication_required()
+
+    def test_list_present_rejected_when_authentication_credentials_are_not_provided(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.list_present_called_with_no_authorisation_credentials()
+
+        self.then.response_fails_with_reason_authentication_required()

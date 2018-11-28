@@ -23,6 +23,11 @@ class WhenSteps:
         body = {'bucket': 'systemtest-textbucket'}
         self._make_unauthorised_request(handler, body)
 
+    def create_bucket_called_for_simple_bucket_with_no_authorisation_credentials(self):
+        handler = 'createbucket'
+        body = {'bucket': 'systemtest-textbucket'}
+        self._make_request_with_no_authorisation_credentials(handler, body)
+
     def authorised_create_bucket_called_with_name(self, name):
         handler = 'createbucket'
         body = {'bucket': name}
@@ -38,6 +43,11 @@ class WhenSteps:
         body = {'bucket': self._context.standard_bucket_name}
         self._make_unauthorised_request(handler, body)
 
+    def copy_dir_called_with_no_authorisation_credentials(self):
+        handler = 'copydir'
+        body = {'bucket': self._context.standard_bucket_name}
+        self._make_request_with_no_authorisation_credentials(handler, body)
+
     def authorised_copy_dir_called_for_sub_directory(self):
         handler = 'copydir'
         body = {'bucket': 'systemtest-textbucket', 'directory': 'sub_dir_A'}
@@ -47,6 +57,11 @@ class WhenSteps:
         handler = 'listpresent'
         body = {'bucket': 'systemtest-textbucket'}
         self._make_authorised_request(handler, body)
+
+    def list_present_called_with_no_authorisation_credentials(self):
+        handler = 'listpresent'
+        body = {'bucket': 'systemtest-textbucket'}
+        self._make_request_with_no_authorisation_credentials(handler, body)
 
     def unauthorised_list_present_called_for_simple_bucket_whole_directory_structure(self):
         handler = 'listpresent'
@@ -63,6 +78,11 @@ class WhenSteps:
         body = {'bucket': 'systemtest-textbucket'}
         self._make_unauthorised_request(handler, body)
 
+    def copy_new_called_with_no_authorisation_credentials(self):
+        handler = 'copynew'
+        body = {'bucket': 'systemtest-textbucket'}
+        self._make_request_with_no_authorisation_credentials(handler, body)
+
     def authorised_delete_file_is_called_for_simple_file_in_s3(self):
         handler = 'deletefile'
         body = {'bucket': 'systemtest-textbucket', 'file': 'testA.txt'}
@@ -73,6 +93,11 @@ class WhenSteps:
         body = {'bucket': 'systemtest-textbucket', 'file': 'testA.txt'}
         self._make_unauthorised_request(handler, body)
 
+    def delete_file_called_with_no_authorisation_credentials(self):
+        handler = 'deletefile'
+        body = {'bucket': 'systemtest-textbucket', 'file': 'testA.txt'}
+        self._make_request_with_no_authorisation_credentials(handler, body)
+
     def authorised_copy_update_called_for_whole_directory(self):
         handler = 'copyupdate'
         body = {'bucket': 'systemtest-textbucket'}
@@ -82,6 +107,11 @@ class WhenSteps:
         handler = 'copyupdate'
         body = {'bucket': 'systemtest-textbucket'}
         self._make_unauthorised_request(handler, body)
+
+    def copy_update_called_with_no_authorisation_credentials(self):
+        handler = 'copyupdate'
+        body = {'bucket': 'systemtest-textbucket'}
+        self._make_request_with_no_authorisation_credentials(handler, body)
 
     def _make_authorised_request(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
@@ -107,4 +137,12 @@ class WhenSteps:
             response = requests.post(url,
                                      json=body,
                                      auth=authentication)
+        self._context.http_client_response = response
+
+    def _make_request_with_no_authorisation_credentials(self, handler, body):
+        url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
+        if handler == "deletefile":
+            response = requests.delete(url, json=body)
+        else:
+            response = requests.post(url, json=body)
         self._context.http_client_response = response

@@ -26,3 +26,11 @@ class CreateBucket(BaseSystemTest):
         self.when.unauthorised_create_bucket_called_for_simple_bucket()
 
         self.then.response_fails_with_reason_authentication_required()
+
+    def test_create_bucket_fails_with_no_authorisation_credentials_provided(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+
+        self.when.create_bucket_called_for_simple_bucket_with_no_authorisation_credentials()
+
+        self.then.response_fails_with_reason_authentication_required()

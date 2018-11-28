@@ -94,7 +94,7 @@ class SystemTestContext:
 
     @property
     def authentication_groups(self):
-        return 'admin,group1'
+        return 'group1'
 
     def _response_body_as_json(self):
         return json.loads(self.http_client_response.text)
