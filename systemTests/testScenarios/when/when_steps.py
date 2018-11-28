@@ -10,9 +10,6 @@ class WhenSteps:
     def environment_is_stopped(self):
         self._context.shut_down_ditto_api()
 
-    def something_happens(self):
-        print(self.__class__)
-
     def authorised_create_bucket_called_for_simple_bucket(self):
         handler = 'createbucket'
         body = {'bucket': 'systemtest-textbucket'}
