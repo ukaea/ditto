@@ -79,3 +79,32 @@ class TestCopyNew(BaseSystemTest):
         self.when.copy_new_called_with_no_authorisation_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
+
+    def test_archive_file_is_created_when_copy_new_called_for_whole_dir(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_is_setup_locally()
+
+        self.when.authorised_copy_new_called_for_whole_directory()
+
+        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_message_body_indicates_one_new_file_uploaded()
+        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_content_is_as_expected()
+
+    def test_when_archive_file_exists_it_is_not_copied(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_is_setup_locally()
+        self.given.archive_file_already_exists_in_local_root()
+
+        self.when.authorised_copy_new_called_for_whole_directory()
+
+        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_message_body_indicates_one_new_file_uploaded()
+        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_file_does_not_exist_in_s3_bucket()
+        self.then.new_simple_file_exists_in_s3_bucket()
+
