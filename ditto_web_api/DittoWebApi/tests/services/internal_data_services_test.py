@@ -80,7 +80,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_system_helper.does_file_exist.return_value = False
         self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
         # Act
-        self.internal_data_services.create_archive_file(None, "test_content")
+        self.internal_data_services.archive_file_transfer(None, "test_content")
         # Assert
         self.mock_file_system_helper.create_file.assert_called_once_with("root/.ditto_archived", "test_content")
 
@@ -91,7 +91,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_system_helper.load_content.return_value = "Some old content "
         self.mock_archiver.update_content.return_value = "Some old content test_content"
         # Act
-        self.internal_data_services.create_archive_file(None, "test_content")
+        self.internal_data_services.archive_file_transfer(None, "test_content")
         # Assert
         self.mock_archiver.update_content.assert_called_once_with("Some old content ", "test_content")
         self.mock_file_system_helper.create_file.assert_called_once_with("root/.ditto_archived",
