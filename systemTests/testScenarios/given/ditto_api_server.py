@@ -9,6 +9,7 @@ class DittoApiServer:
 
     def is_started(self):
         self._write_configuration()
+        self._write_security()
         self._start_ditto()
 
     def is_started_without_configuration(self):
