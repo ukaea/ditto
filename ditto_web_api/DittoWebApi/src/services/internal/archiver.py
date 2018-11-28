@@ -15,8 +15,8 @@ class Archiver:
             archived_file.write(content)
 
         except Exception as exception:
-            self._logger.debug(f"Exception found: {exception}")
+            self._logger.error(f"Exception found: {exception}")
             raise
         finally:
             self._file_system_helper.close_file(archived_file)
-        self._logger.debug("Archive file updated")
+        self._logger.debug(f"Archive file updated: {file_path}")

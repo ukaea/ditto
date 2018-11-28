@@ -35,11 +35,6 @@ class FileSystemHelper:
     def does_file_exist(self, file_path):
         return os.path.exists(file_path)
 
-    def load_content(self, file_path):
-        with open(file_path, 'r') as file:
-            content = file.read()
-        return content
-
     def open_file(self, file_path):
         return open(file_path, 'w')
 

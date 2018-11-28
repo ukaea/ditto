@@ -17,6 +17,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
         self.mock_archiver = mock.create_autospec(Archiver)
         mock_configuration.root_dir = "test_root_dir"
+        mock_configuration.archive_file_name = ".ditto_archived"
         self.mock_file_system_helper.join_paths.return_value = "test_root_dir/file_1"
         self.mock_file_system_helper.find_all_files_in_folder.return_value = ["test_root_dir/file_1.txt",
                                                                               "test_root_dir/file_2.txt"]
@@ -90,7 +91,6 @@ class TestInternalDataServices(unittest.TestCase):
         # Arrange
         self.mock_file_system_helper.does_file_exist.return_value = True
         self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
-        self.mock_file_system_helper.load_content.return_value = "Some old content "
         self.mock_archiver.update_archive.return_value = "Some old content test_content"
         mock_file_summary = mock.create_autospec(FilesStorageSummary)
         # Act
