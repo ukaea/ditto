@@ -84,6 +84,18 @@ class SystemTestContext:
     def s3_data_folder_path(self):
         return '/opt/minio/data'
 
+    @property
+    def authentication_username(self):
+        return 'Tom'
+
+    @property
+    def authentication_password(self):
+        return 'potato'
+
+    @property
+    def authentication_groups(self):
+        return 'admin,group1'
+
     def _response_body_as_json(self):
         return json.loads(self.http_client_response.text)
 
