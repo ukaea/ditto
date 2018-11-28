@@ -21,9 +21,9 @@ class GivenSteps:
         self._write_test_file('testA.txt', 'example test content A')
 
     def simple_sub_dir_with_test_file_is_setup(self):
-        self._write_test_file_in_sub_dir(os.path.join('sub_dir_A', 'testB.txt'), 'example test content B')
+        self._write_test_file_locally_in_sub_dir(os.path.join('sub_dir_A', 'testB.txt'), 'example test content B')
 
-    def _write_test_file_in_sub_dir(self, file_name, content):
+    def _write_test_file_locally_in_sub_dir(self, file_name, content):
         filename = os.path.join(self._context.local_data_folder_path, file_name)
         os.makedirs(os.path.dirname(filename))
         with open(filename, 'w') as file:

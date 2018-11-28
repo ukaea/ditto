@@ -114,3 +114,18 @@ class ThenSteps:
 
     def response_shows_no_objects_in_bucket(self):
         assert self._context.object_names_from_list_present_response_body() == []
+
+    def archive_file_exists_in_root_dir(self):
+        file_path = os.path.join(self._context.local_data_folder, ".ditto_archived")
+        assert os.path.exists(file_path)
+
+    def archive_file_exists_in_sub_dir(self):
+        file_path = os.path.join(self._context.local_data_folder, "sub_dir_A", ".ditto_archived")
+        assert os.path.exists(file_path)
+
+    def archive_content_is_as_expected(self):
+        file_path = os.path.join(self._context.local_data_folder, ".ditto_archived")
+        expected_content = "test"
+        with open(file_path, 'rt') as file:
+            content = file.read()
+        assert content == expected_content

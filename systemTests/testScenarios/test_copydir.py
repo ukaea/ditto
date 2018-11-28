@@ -68,3 +68,16 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_shows_one_file_skipped()
         self.then.response_shows_request_was_completed_successfully()
 
+    def test_archive_file_is_created_when_copy_dir_called_for_whole_dir(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_is_setup_locally()
+
+        self.when.copy_dir_called_for_whole_directory()
+
+        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_message_body_indicates_one_new_file_uploaded()
+        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_content_is_as_expected()
+
