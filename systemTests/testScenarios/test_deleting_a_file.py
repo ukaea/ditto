@@ -6,7 +6,7 @@ class TestDeleteFile(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
-        self.when.delete_file_is_called_for_simple_file_in_s3()
+        self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.standard_s3_bucket_does_not_exist()
         self.then.response_shows_request_was_completed_successfully()
@@ -18,7 +18,7 @@ class TestDeleteFile(BaseSystemTest):
         self.given.standard_bucket_exists_in_s3()
         self.given.simple_test_file_is_setup_in_s3()
 
-        self.when.delete_file_is_called_for_simple_file_in_s3()
+        self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_confirms_simple_file_deleted()
@@ -29,7 +29,7 @@ class TestDeleteFile(BaseSystemTest):
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
 
-        self.when.delete_file_is_called_for_simple_file_in_s3()
+        self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_reports_simple_file_does_not_exist()

@@ -6,7 +6,7 @@ class CreateBucket(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
-        self.when.create_bucket_called_for_simple_bucket()
+        self.when.authorised_create_bucket_called_for_simple_bucket()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.simple_bucket_exists_in_s3()
@@ -15,6 +15,6 @@ class CreateBucket(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
-        self.when.create_bucket_called_with_name('BAD')
+        self.when.authorised_create_bucket_called_with_name('BAD')
 
         self.then.response_shows_error_that_bad_bucket_name_given()
