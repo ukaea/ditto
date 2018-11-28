@@ -52,7 +52,7 @@ class TestCopyNew(BaseSystemTest):
         self.given.standard_bucket_exists_in_s3()
         self.given.simple_test_file_is_setup_locally()
         self.given.simple_test_file_is_setup_in_s3()
-        self.given.simple_sub_dir_with_test_file_is_setup()
+        self.given.simple_sub_dir_with_test_file_is_setup_locally()
 
         self.when.authorised_copy_new_called_for_whole_directory()
 

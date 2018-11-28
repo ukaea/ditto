@@ -4,6 +4,7 @@ import signal
 import unittest
 import pytest
 import json
+import time
 
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
@@ -130,6 +131,7 @@ class BaseSystemTest(unittest.TestCase):
         self._clean_up_working_folders()
         self._clear_up_s3_data()
         self._set_up_loggers()
+        time.sleep(1)
         self.given = GivenSteps(self.context)
         self.when = WhenSteps(self.context)
         self.then = ThenSteps(self.context)

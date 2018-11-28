@@ -54,7 +54,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.standard_bucket_exists_in_s3()
         self.given.simple_test_file_is_setup_locally()
         self.given.simple_test_file_is_setup_in_s3()
-        self.given.simple_sub_dir_with_test_file_is_setup()
+        self.given.simple_sub_dir_with_test_file_is_setup_locally()
         time.sleep(1)
         self.given.update_simple_file()
 

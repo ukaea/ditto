@@ -1,4 +1,5 @@
 import os
+import time
 
 from testScenarios.given.ditto_api_server import DittoApiServer
 
@@ -19,7 +20,7 @@ class GivenSteps:
     def simple_test_file_is_setup_locally(self):
         self._write_test_file('testA.txt', 'example test content A')
 
-    def simple_sub_dir_with_test_file_is_setup(self):
+    def simple_sub_dir_with_test_file_is_setup_locally(self):
         self._write_test_file_locally_in_sub_dir(os.path.join('sub_dir_A', 'testB.txt'), 'example test content B')
 
     def _write_test_file_locally_in_sub_dir(self, file_name, content):
@@ -62,6 +63,13 @@ class GivenSteps:
         self._create_file_in_s3(self._context.standard_bucket_name,
                                 os.path.join('sub_dir_A', 'testB.txt'),
                                 'example test content B')
+
+    def archive_file_already_exists_in_local_root(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        content = "test"
+        with open(file_path, 'w') as file:
+            file.write(content)
+
 
     @staticmethod
     def s3_interface_is_running():
