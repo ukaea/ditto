@@ -28,13 +28,10 @@ class InternalDataService:
         file_name = self._file_system_helper.file_name(abs_path_to_file)
         return FileInformation(abs_path_to_file, rel_path_to_file, file_name)
 
-    def archive_file_transfer(self, dir_path, new_content):
+    def archive_file_transfer(self, dir_path, file_summary):
         full_dir_path = self._file_system_helper.join_paths(self._root_dir, dir_path) if dir_path else self._root_dir
         file_path = self._file_system_helper.join_paths(full_dir_path, ".ditto_archived")
         if self._file_system_helper.does_file_exist(file_path):
-            old_content = self._file_system_helper.load_content(file_path)
-            content_to_write = self._archiver.update_content(old_content, new_content)
+            self._archiver.update_archive(file_path, file_summary)
         else:
-            content_to_write = new_content
-        self._logger.info("Creating archive file")
-        self._file_system_helper.create_file(file_path, content_to_write)
+            self._archiver.write_archive(file_path, file_summary)

@@ -3,6 +3,17 @@ class Archiver:
         self._logger = logger
         self._file_system_helper = file_system_helper
 
+    def write_archive(self, file_path, file_summary):
+        content = "test"
+        self._file_system_helper.create_file(file_path, content)
+
     # Current placeholder for processing contents of the archive files
-    def update_content(self, old_content, new_content):
-        return old_content + new_content
+    def update_archive(self, file_path, file_summary):
+        content = "test test"
+        try:
+            archived_file = self._file_system_helper.open_file(file_path, content)
+            archived_file.write(content)
+        except Exception:
+            raise
+        finally:
+            self._file_system_helper.close()
