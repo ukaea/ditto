@@ -12,6 +12,7 @@
     - dkms 
     - git
     - lsof
+    - nmap
     - zip
     - unzip
 

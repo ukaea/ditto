@@ -2,6 +2,8 @@ import os
 import subprocess
 import time
 
+from testScenarios.tools.port_helper import is_port_in_use
+
 
 class DittoApiServer:
     def __init__(self, context):
@@ -57,6 +59,10 @@ class DittoApiServer:
         path_of_file = os.path.dirname(os.path.realpath(__file__))
         web_api_script = os.path.join(path_of_file, 'runDittoWebApi.sh')
 
+        print(f'Port {self._context.app_port} is {"" if is_port_in_use(self._context.host_address, self._context.app_port) else "not "}in use')
+
+        print(f'Starting up DITTO on port {self._context.app_port}')
+
         self._context.ditto_api_process = subprocess.Popen(
             [web_api_script, self._context.ditto_web_api_folder_path],
             stdout=self._context.console_logger.stdout_log_writer,
@@ -66,3 +72,5 @@ class DittoApiServer:
 
         # Let the server start
         time.sleep(2)
+
+        print(f'Port {self._context.app_port} is {"" if is_port_in_use(self._context.host_address, self._context.app_port) else "not "}in use')
