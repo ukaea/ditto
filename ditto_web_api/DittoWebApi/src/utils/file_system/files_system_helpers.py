@@ -31,7 +31,7 @@ class FileSystemHelper:
 
     def create_file(self, file_path, content):
         with open(file_path, "w+") as file:
-            file.write(content)
+            json.dump(content, file)
 
     def does_file_exist(self, file_path):
         return os.path.exists(file_path)

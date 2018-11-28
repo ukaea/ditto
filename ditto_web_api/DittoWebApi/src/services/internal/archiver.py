@@ -6,7 +6,7 @@ class Archiver:
         self._logger = logger
         self._file_system_helper = file_system_helper
 
-    def update_content(self, file_summary, old_content):
+    def archive_content(self, file_summary, old_content):
         content = {} if old_content is None else old_content
         time_of_transfer = current_time()
         for file in file_summary.new_files:
@@ -18,7 +18,7 @@ class Archiver:
                                       "last updated": time_of_transfer,
                                       "type of transfer": "new upload"}
         for file in file_summary.updated_files:
-            self.update_content(content, file)
+            self.update_details(content, file)
         return content
 
     def update_details(self, content, file):
