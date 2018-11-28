@@ -7,7 +7,6 @@ class Archiver:
         content = "test"
         self._file_system_helper.create_file(file_path, content)
 
-    # Current placeholder for processing contents of the archive files
     def update_archive(self, file_path, file_summary):
         content = "test test"
         try:
