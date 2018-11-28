@@ -16,8 +16,7 @@ class InternalDataService:
             else self._root_dir
         self._logger.debug(f"Finding files in directory {dir_to_search}")
         all_files = self._file_system_helper.find_all_files_in_folder(dir_to_search)
-        regex = re.compile(r'.*\.ditto_archived')
-        list_of_files = list(filter(lambda name: not regex.match(name), all_files))
+        list_of_files = list(filter(lambda name: not name.endswith('.ditto_archived'), all_files))
         self._logger.debug(f"Found {len(list_of_files)} files, converting to file information objects")
         file_information_list = [self.build_file_information(full_file_name) for full_file_name in list_of_files]
         self._logger.info(f"{len(file_information_list)} files found in {dir_path}")
