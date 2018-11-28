@@ -1,5 +1,3 @@
-import re
-
 from DittoWebApi.src.models.file_information import FileInformation
 
 
