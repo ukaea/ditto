@@ -9,6 +9,7 @@ class DittoApiServer:
 
     def is_started(self):
         self._write_configuration()
+        self._write_security()
         self._start_ditto()
 
     def is_started_without_configuration(self):
@@ -39,7 +40,7 @@ class DittoApiServer:
 
     def _write_security(self):
         file_contents = \
-            f'[{self._context.username}]\n' \
+            f'[{self._context.authentication_username}]\n' \
             f'password = {self._context.authentication_password}\n' \
             f'groups = {self._context.authentication_groups}\n'
 
