@@ -1,4 +1,5 @@
 import os
+import json
 
 from .log_file_steps import LogFileSteps
 
@@ -114,3 +115,7 @@ class ThenSteps:
 
     def response_shows_no_objects_in_bucket(self):
         assert self._context.object_names_from_list_present_response_body() == []
+
+    def response_fails_with_reason_authentication_required(self):
+        assert json.loads(self._context.http_client_response.text)["reason"] == "Authentication required"
+        assert self._context.http_client_response.status_code == 401
