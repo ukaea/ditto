@@ -1,4 +1,5 @@
 import os
+import json
 
 from .log_file_steps import LogFileSteps
 
@@ -44,15 +45,10 @@ class ThenSteps:
     def response_body_shows_simple_file_not_in_s3(self):
         assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt') is False
 
-    def response_returns_status_code_200(self):
-        assert self._context.http_client_response.status_code == 200
-
-    def response_status_is_success(self):
-        assert self._context.response_status() == "success"
-
     def response_shows_request_was_completed_successfully(self):
-        self.response_returns_status_code_200()
-        self.response_status_is_success()
+        print(self._context.http_client_response.status_code)
+        assert self._context.http_client_response.status_code == 200
+        assert self._context.response_status() == "success"
 
     def response_shows_copy_dir_copied_no_new_files_as_directory_already_exists(self):
         assert self._context.response_data()["new files uploaded"] == 0
@@ -85,7 +81,12 @@ class ThenSteps:
                                  self._context.simple_file_name)
         assert os.path.exists(file_path) is False
 
-    def response_shows_old_file_skipped(self):
+    def standard_s3_bucket_does_not_exist(self):
+        file_path = os.path.join(self._context.s3_data_folder_path,
+                                 'systemtest-textbucket')
+        assert os.path.exists(file_path) is False
+
+    def response_shows_one_file_skipped(self):
         assert self._context.response_data()["files skipped"] == 1
 
     def response_indicates_no_new_file_uploaded(self):
@@ -105,13 +106,44 @@ class ThenSteps:
             content = file.read()
         assert content == 'example test content A. A new bit of text'
 
-    def response_message_complains_simple_file_does_not_exist(self):
+    def response_message_reports_simple_file_does_not_exist(self):
         assert self._context.response_data()["message"] == "File testA.txt does not exist" \
                                                                    " in bucket systemtest-textbucket"
 
-    def response_message_complains_directory_does_not_exist(self):
+    def response_message_reports_directory_does_not_exist(self):
         assert self._context.response_data()["message"] == "No files found in directory" \
                                                                    " or directory does not exist (root)"
 
     def response_shows_no_objects_in_bucket(self):
         assert self._context.object_names_from_list_present_response_body() == []
+
+    def response_fails_with_reason_authentication_required(self):
+        assert json.loads(self._context.http_client_response.text)["reason"] == "Authentication required"
+        assert self._context.http_client_response.status_code == 401
+
+    def archive_file_exists_in_root_dir(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        assert os.path.exists(file_path)
+
+    def archive_file_exists_in_sub_dir(self):
+        file_path = os.path.join(self._context.local_data_folder_path, "sub_dir_A", ".ditto_archived")
+        assert os.path.exists(file_path)
+
+    def archive_content_is_as_expected(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        expected_content = "test"
+        with open(file_path, 'rt') as file:
+            content = file.read()
+        assert content == expected_content
+
+    def archive_file_does_not_exist_in_s3_bucket(self):
+        file_path = os.path.join(self._context.s3_data_folder_path, ".ditto_archived")
+        assert os.path.exists(file_path) is False
+
+    def updated_archive_file_content_is_as_expected(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        expected_content = "test test"
+        with open(file_path, 'rt') as file:
+            content = file.read()
+        assert content == expected_content
+

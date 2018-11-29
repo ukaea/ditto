@@ -1,5 +1,5 @@
 import os
-import requests
+import time
 
 from testScenarios.given.ditto_api_server import DittoApiServer
 
@@ -17,13 +17,13 @@ class GivenSteps:
         with open(os.path.join(self._context.local_data_folder_path, file_name), 'w') as file:
             file.write(content)
 
-    def simple_test_file_is_setup(self):
+    def simple_test_file_is_setup_locally(self):
         self._write_test_file('testA.txt', 'example test content A')
 
-    def simple_sub_dir_with_test_file_is_setup(self):
-        self._write_test_file_in_sub_dir(os.path.join('sub_dir_A', 'testB.txt'), 'example test content B')
+    def simple_sub_dir_with_test_file_is_setup_locally(self):
+        self._write_test_file_locally_in_sub_dir(os.path.join('sub_dir_A', 'testB.txt'), 'example test content B')
 
-    def _write_test_file_in_sub_dir(self, file_name, content):
+    def _write_test_file_locally_in_sub_dir(self, file_name, content):
         filename = os.path.join(self._context.local_data_folder_path, file_name)
         os.makedirs(os.path.dirname(filename))
         with open(filename, 'w') as file:
@@ -52,7 +52,7 @@ class GivenSteps:
 
     def _create_file_in_s3(self, bucket, file_name, content):
         file_path = os.path.join(self._context.s3_data_folder_path, bucket, file_name)
-        os.system(f"sudo echo {content} >> {file_path}")
+        os.system(f"sudo echo {content} > {file_path}")
         os.system(f"sudo chown -R 'minio':'minio' {file_path}")
 
     def simple_test_file_is_setup_in_s3(self):
@@ -63,6 +63,13 @@ class GivenSteps:
         self._create_file_in_s3(self._context.standard_bucket_name,
                                 os.path.join('sub_dir_A', 'testB.txt'),
                                 'example test content B')
+
+    def archive_file_already_exists_in_local_root(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        content = "test"
+        with open(file_path, 'w') as file:
+            file.write(content)
+
 
     @staticmethod
     def s3_interface_is_running():

@@ -72,6 +72,10 @@ class Configuration:
     def bucket_standard(self):
         return self._bucket_standard
 
+    @property
+    def archive_file_name(self):
+        return self._archive_file_name
+
     def _parse(self, path):
         config = configparser.ConfigParser()
         config.read(path)
@@ -94,6 +98,7 @@ class Configuration:
         # Local data
         self._root_dir = os.path.abspath(settings['RootDirectory'])
         self._bucket_standard = settings['BucketStandardisation']
+        self._archive_file_name = settings['ArchiveFileName']
 
     @staticmethod
     def get_directory(settings, key):
