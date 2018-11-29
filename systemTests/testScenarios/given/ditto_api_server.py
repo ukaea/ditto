@@ -2,7 +2,7 @@ import os
 import subprocess
 import time
 
-from testScenarios.tools.port_helper import print_port_state
+from testScenarios.tools.process_helper import print_port_state
 
 
 class DittoApiServer:
@@ -71,8 +71,13 @@ class DittoApiServer:
             preexec_fn=os.setsid
         )
 
-        # Let the server start
-        time.sleep(5)
-
-        # Confirm port now bound
-        print_port_state(self._context.host_address, self._context.app_port)
+        timeout_counter = 0
+        timeout_step = 0.5
+        timeout_limit = 20
+        while (not self._context.is_ditto_running()) and timeout_counter < timeout_limit:
+            timeout_counter += 1
+            time.sleep(timeout_step)
+        if timeout_counter >= timeout_limit:
+            print(f'Reached timeout of {timeout_step * timeout_limit} seconds waiting for DITTO to start up')
+        else:
+            print(f'DITTO took {timeout_counter * timeout_step} seconds to start up')

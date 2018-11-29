@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-from testScenarios.tools.port_helper import print_port_state
+from testScenarios.tools.process_helper import print_port_state
 
 # Standard request timeout, in seconds
 TIMEOUT = 5

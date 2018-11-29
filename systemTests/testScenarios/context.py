@@ -1,5 +1,6 @@
 import os
 import pytest
+import requests
 import shutil
 import signal
 import time
@@ -8,7 +9,6 @@ import unittest
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
 from testScenarios.then.then_steps import ThenSteps
-from testScenarios.tools.port_helper import print_port_state
 from testScenarios.tools.process_logger import ProcessLogger
 
 
@@ -34,10 +34,24 @@ class SystemTestContext:
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
 
-        # Let the server shut down
-        time.sleep(2)
+        timeout_counter = 0
+        timeout_step = 0.5
+        timeout_limit = 20
+        while (self.is_ditto_running()) and timeout_counter < timeout_limit:
+            timeout_counter += 1
+            time.sleep(timeout_step)
+        if timeout_counter >= timeout_limit:
+            print(f'Reached timeout of {timeout_step * timeout_limit} seconds waiting for DITTO to shut down')
+        else:
+            print(f'DITTO took {timeout_counter * timeout_step} seconds to shut down')
 
-        print_port_state(self.host_address, self.app_port)
+    def is_ditto_running(self):
+        url = f'http://{self.host_address}:{self.app_port}'
+        try:
+            response = requests.get(url)
+            return response.json()['status'] == 'success'
+        except Exception:
+            return False
 
     @property
     def test_group(self):
