@@ -11,7 +11,7 @@ def set_up_system_test_environment():
     execution_space = os.path.join(home, 'systemTests', 'execution_space')
     copied_src_path = os.path.join(execution_space, 'ditto_web_api', 'DittoWebApi')
     logs_path = os.path.join(execution_space, 'logs')
-    local_data_path = os.path.join(execution_space, 'data')
+    local_data_path = "/usr/tmp/data"
 
     # Clear out the old programs
     if os.path.isdir(copied_src_path):
