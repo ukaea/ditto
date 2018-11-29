@@ -7,7 +7,12 @@ class Archiver:
         self._file_system_helper = file_system_helper
 
     def write_archive(self, file_path, file_summary):
-        content = "test"
+        content = {}
+        time_of_transfer = current_time()
+        for file in file_summary.new_files:
+            self._archive_new_file(content, file, time_of_transfer)
+        for file in file_summary.updated_files:
+            self._archive_file_update(content, file, time_of_transfer)
         self._file_system_helper.create_file(file_path, content)
         self._logger.debug(f"Archive file created: {file_path}")
 
@@ -32,6 +37,14 @@ class Archiver:
                                   "first transferred": time_of_transfer,
                                   "latest update": time_of_transfer,
                                   "type of transfer": "new upload"}
+
+    def _archive_file_update(self, content, file, time_of_transfer):
+        size = self._file_system_helper.file_size(file.abs_path)
+        content[file.rel_path] = {"file": file.rel_path,
+                                  "size": size,
+                                  "first transferred": time_of_transfer,
+                                  "latest update": time_of_transfer,
+                                  "type of transfer": "file_update"}
 
     def _update_archive(self, content, file, time_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
