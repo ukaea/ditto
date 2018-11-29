@@ -8,6 +8,7 @@ import pytest
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.models.file_information import FileInformation
+from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
@@ -19,6 +20,7 @@ from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 class DataReplicationServiceTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self):
+        self.mock_bucket_settings_service = mock.create_autospec(BucketSettingsService)
         self.mock_external_data_service = mock.create_autospec(ExternalDataService)
         self.mock_internal_data_service = mock.create_autospec(InternalDataService)
         self.mock_storage_difference_processor = mock.create_autospec(StorageDifferenceProcessor)
@@ -26,10 +28,11 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_storage_difference_processor.return_difference_comparison.return_value = \
             self.mock_s3_object_file_comparison
         self.mock_logger = mock.create_autospec(logging.Logger)
-        self.test_service = DataReplicationService(self.mock_external_data_service,
+        self.test_service = DataReplicationService(self.mock_bucket_settings_service,
+                                                   self.mock_external_data_service,
                                                    self.mock_internal_data_service,
-                                                   self.mock_storage_difference_processor,
-                                                   self.mock_logger)
+                                                   self.mock_logger,
+                                                   self.mock_storage_difference_processor)
         # Mock_objects
         self.mock_object_1 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_1.to_dict.return_value = {"object_name": "test",

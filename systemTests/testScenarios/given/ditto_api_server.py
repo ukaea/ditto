@@ -12,6 +12,7 @@ class DittoApiServer:
     def is_started(self):
         self._write_configuration()
         self._write_security()
+        self._write_bucket_settings()
         self._start_ditto()
 
     def is_started_without_configuration(self):
@@ -55,6 +56,21 @@ class DittoApiServer:
 
         with open(security_file_path, 'w') as security_file:
             security_file.write(file_contents)
+
+    def _write_bucket_settings(self):
+        file_contents = \
+            f'[{self._context.standard_bucket_name}]\n' \
+                f'groups = {self._context.authentication_groups}\n'\
+                f'root = {self._context.local_data_folder_path}\n'
+
+        settings_file_path = os.path.join(
+            self._context.ditto_web_api_folder_path,
+            'DittoWebApi',
+            'bucket_settings.ini'
+        )
+
+        with open(settings_file_path, 'w') as settings_file:
+            settings_file.write(file_contents)
 
     def _start_ditto(self):
         path_of_file = os.path.dirname(os.path.realpath(__file__))

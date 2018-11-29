@@ -51,18 +51,6 @@ if __name__ == "__main__":
     LOGGER = setup_logger(CONFIGURATION.log_folder_location, CONFIGURATION.logging_level)
     LOGGER.info("Starting DITTO Web API")
 
-    # Set up services
-    S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
-    FILE_SYSTEM_HELPER = FileSystemHelper()
-    ARCHIVER = Archiver(FILE_SYSTEM_HELPER, LOGGER)
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
-    INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
-    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
-    DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
-                                                      INTERNAL_DATA_SERVICE,
-                                                      STORAGE_DIFFERENCE_PROCESSOR,
-                                                      LOGGER)
-
     # Bucket settings
     BUCKET_SETTINGS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
     BUCKET_SETTINGS_SERVICE = BucketSettingsService(BUCKET_SETTINGS_PATH, LOGGER)
@@ -70,6 +58,19 @@ if __name__ == "__main__":
     # Security (PLACEHOLDER CODE)
     SECURITY_CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
     SECURITY_SERVICE = ConfigSecurityService(SECURITY_CONFIGURATION_PATH, LOGGER)
+
+    # Set up services
+    S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
+    FILE_SYSTEM_HELPER = FileSystemHelper()
+    ARCHIVER = Archiver(FILE_SYSTEM_HELPER, LOGGER)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
+    INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
+    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
+    DATA_REPLICATION_SERVICE = DataReplicationService(BUCKET_SETTINGS_PATH,
+                                                      EXTERNAL_DATA_SERVICE,
+                                                      INTERNAL_DATA_SERVICE,
+                                                      LOGGER,
+                                                      STORAGE_DIFFERENCE_PROCESSOR)
 
     # Launch app
     CONTAINER = dict(

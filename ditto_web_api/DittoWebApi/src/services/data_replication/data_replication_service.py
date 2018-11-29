@@ -6,7 +6,13 @@ from DittoWebApi.src.utils import messages
 
 
 class DataReplicationService:
-    def __init__(self, external_data_service, internal_data_service, storage_difference_processor, logger):
+    def __init__(self,
+                 bucket_settings_service,
+                 external_data_service,
+                 internal_data_service,
+                 logger,
+                 storage_difference_processor):
+        self._bucket_settings_service = bucket_settings_service
         self._external_data_service = external_data_service
         self._internal_data_service = internal_data_service
         self._storage_difference_processor = storage_difference_processor
