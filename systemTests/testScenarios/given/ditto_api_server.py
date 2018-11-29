@@ -2,7 +2,7 @@ import os
 import subprocess
 import time
 
-from testScenarios.tools.port_helper import print_port_usage
+from testScenarios.tools.port_helper import print_port_state
 
 
 class DittoApiServer:
@@ -59,7 +59,7 @@ class DittoApiServer:
         path_of_file = os.path.dirname(os.path.realpath(__file__))
         web_api_script = os.path.join(path_of_file, 'runDittoWebApi.sh')
 
-        print_port_usage(self._context.host_address, self._context.app_port)
+        print_port_state(self._context.host_address, self._context.app_port)
 
         print(f'Starting up DITTO on port {self._context.app_port}')
 

@@ -7,7 +7,7 @@ import unittest
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
 from testScenarios.then.then_steps import ThenSteps
-from testScenarios.tools.port_helper import print_port_usage
+from testScenarios.tools.port_helper import print_port_state
 from testScenarios.tools.process_logger import ProcessLogger
 
 
@@ -33,7 +33,7 @@ class SystemTestContext:
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
 
-        print_port_usage(self.host_address, self.app_port)
+        print_port_state(self.host_address, self.app_port)
 
     @property
     def test_group(self):

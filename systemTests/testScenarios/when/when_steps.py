@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-from testScenarios.tools.port_helper import print_port_usage
+from testScenarios.tools.port_helper import print_port_state
 
 # Standard request timeout, in seconds
 TIMEOUT = 5
@@ -123,7 +123,8 @@ class WhenSteps:
             response = requests.request(method, url, json=body, auth=authentication, timeout=TIMEOUT)
             self._context.http_client_response = response
         except Exception as exception:
-            print_port_usage(self._context.host_address, self._context.app_port)
+            print_port_state(self._context.host_address, self._context.app_port)
+            print(f'Tried to connect to "{url}"')
             print(exception)
 
     def _make_unauthorised_request(self, handler, body):
@@ -135,7 +136,8 @@ class WhenSteps:
             response = requests.request(method, url, json=body, auth=authentication, timeout=TIMEOUT)
             self._context.http_client_response = response
         except Exception as exception:
-            print_port_usage(self._context.host_address, self._context.app_port)
+            print_port_state(self._context.host_address, self._context.app_port)
+            print(f'Tried to connect to "{url}"')
             print(exception)
 
     def _make_request_with_no_authorisation_credentials(self, handler, body):
@@ -146,5 +148,6 @@ class WhenSteps:
             response = requests.request(method, url, json=body, timeout=TIMEOUT)
             self._context.http_client_response = response
         except Exception as exception:
-            print_port_usage(self._context.host_address, self._context.app_port)
+            print_port_state(self._context.host_address, self._context.app_port)
+            print(f'Tried to connect to "{url}"')
             print(exception)
