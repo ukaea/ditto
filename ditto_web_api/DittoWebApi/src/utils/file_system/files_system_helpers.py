@@ -45,7 +45,7 @@ class FileSystemHelper:
 
     def write_to_file(self, open_file, content):
         json.dump(content, open_file)
-        open_file.write("\n")
+
 
     def file_directory(self, file_rel_path):
         return os.path.dirname(file_rel_path)
@@ -53,6 +53,10 @@ class FileSystemHelper:
     def load_json(self, open_file):
         pass
 
-    def read_line_as_json(self, open_file):
-        line = open_file.readline()
-        return json.loads(line)
+    def read_file_as_json(self, open_file):
+        return json.load(open_file)
+
+
+    def clear_file(self, open_file):
+        open_file.seek(0)
+        open_file.truncate()
