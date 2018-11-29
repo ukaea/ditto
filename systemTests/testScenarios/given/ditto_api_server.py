@@ -30,7 +30,7 @@ class DittoApiServer:
             f'S3Secure = {self._context.s3secure}\n' \
             f'RootDirectory = {self._context.local_data_folder_path}\n' \
             f'BucketStandardisation = {self._context.bucket_standardisation}\n' \
-            f'ArchiveFileName = .ditto-archive\n'
+            f'ArchiveFileName = .ditto_archived\n'
 
         config_file_path = os.path.join(
             self._context.ditto_web_api_folder_path,
