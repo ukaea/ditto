@@ -2,7 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import tornado
-from DittoWebApi.src.handlers.ditto_handler import DittoHandler
+from DittoWebApi.src.handlers.heartbeat import HeartbeatHandler
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
 from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         security_service=SECURITY_SERVICE
     )
     APP = tornado.web.Application([
-        (format_route_specification("help"), DittoHandler, CONTAINER),
+        ("(|/)", HeartbeatHandler),
         (format_route_specification("listpresent"), ListPresentHandler, CONTAINER),
         (format_route_specification("copydir"), CopyDirHandler, CONTAINER),
         (format_route_specification("createbucket"), CreateBucketHandler, CONTAINER),
