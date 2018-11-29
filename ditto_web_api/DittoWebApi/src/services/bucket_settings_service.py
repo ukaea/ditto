@@ -1,4 +1,5 @@
 import configparser
+import os
 
 from DittoWebApi.src.utils.parse_strings import str2list
 
@@ -18,11 +19,12 @@ class BucketSetting:
 
 
 class BucketSettingsService:
-    def __init__(self, settings_path, logger):
-        self._bucket_settings_path = settings_path
+    def __init__(self, bucket_settings_path, logger):
+        self._bucket_settings_path = bucket_settings_path
+        if not os.path.exists(self._bucket_settings_path):
+            raise RuntimeError(f'The bucket settings file "{self._bucket_settings_path}" does not seem to exist.')
         self._logger = logger
-
-        self._settings = None
+        self._settings = {}
         self._parse(self._bucket_settings_path)
 
     def _parse(self, bucket_settings_path):
