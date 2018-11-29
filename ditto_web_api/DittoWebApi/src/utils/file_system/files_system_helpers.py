@@ -42,3 +42,8 @@ class FileSystemHelper:
     def close_file(self, open_file):
         if not open_file.closed:
             open_file.close()
+
+    def write_to_file(self, open_file, content):
+        json.dump(content, open_file)
+        open_file.write("\n")
+
