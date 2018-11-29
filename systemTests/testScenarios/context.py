@@ -1,9 +1,8 @@
 import os
+import pytest
 import shutil
 import signal
 import unittest
-import pytest
-import json
 
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
@@ -13,7 +12,9 @@ from testScenarios.tools.process_logger import ProcessLogger
 
 
 class SystemTestContext:
-    def __init__(self):
+    def __init__(self, request):
+        self._test_group = request.node.parent.name.strip(".py")
+        self._test_name = request.node.name
         self._execution_folder_path = '/home/vagrant/systemTests/execution_space'
         self.ditto_api_process = None
         self.console_logger = ProcessLogger('console', self.log_folder_path)
@@ -35,12 +36,20 @@ class SystemTestContext:
         print_port_usage(self.host_address, self.app_port)
 
     @property
+    def test_group(self):
+        return self._test_group
+
+    @property
+    def test_name(self):
+        return self._test_name
+
+    @property
     def ditto_web_api_folder_path(self):
         return os.path.join(self._execution_folder_path, 'ditto_web_api')
 
     @property
     def log_folder_path(self):
-        return os.path.join(self._execution_folder_path, 'logs')
+        return os.path.join(self._execution_folder_path, 'logs', self.test_group, self.test_name)
 
     @property
     def log_level(self):
@@ -125,7 +134,7 @@ class BaseSystemTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self, request):
         print("setting up test")
-        self.context = SystemTestContext()
+        self.context = SystemTestContext(request)
         self._clean_up_working_folders()
         self._clear_up_s3_data()
         self._set_up_loggers()
@@ -139,7 +148,8 @@ class BaseSystemTest(unittest.TestCase):
 
     def _clean_up_working_folders(self):
         # Clear out the logs
-        shutil.rmtree(self.context.log_folder_path)
+        if os.path.isdir(self.context.log_folder_path):
+            shutil.rmtree(self.context.log_folder_path)
         os.makedirs(self.context.log_folder_path)
 
         # Clear out the local data
