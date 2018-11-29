@@ -2,6 +2,7 @@ import os
 import pytest
 import shutil
 import signal
+import time
 import unittest
 
 from testScenarios.given.given_steps import GivenSteps
@@ -32,6 +33,9 @@ class SystemTestContext:
         os.killpg(process_id, signal.SIGTERM)
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
+
+        # Let the server shut down
+        time.sleep(2)
 
         print_port_state(self.host_address, self.app_port)
 
