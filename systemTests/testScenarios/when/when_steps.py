@@ -3,6 +3,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 
+# Standard request timeout, in seconds
+TIMEOUT = 5
+
+
 class WhenSteps:
     def __init__(self, context):
         self._context = context
@@ -113,27 +117,14 @@ class WhenSteps:
     def _make_authorised_request(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
         authentication = HTTPBasicAuth(self._context.authentication_username, self._context.authentication_password)
-        if handler == "deletefile":
-            response = requests.delete(url,
-                                       json=body,
-                                       auth=authentication)
-        else:
-            response = requests.post(url,
-                                     json=body,
-                                     auth=authentication)
+        method = "DELETE" if handler == "deletefile" else "POST"
+        response = requests.request(method, url, json=body, auth=authentication, timeout=TIMEOUT)
         self._context.http_client_response = response
 
     def _make_unauthorised_request(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
-        authentication = HTTPBasicAuth('unknown_user', 'password')
-        if handler == "deletefile":
-            response = requests.delete(url,
-                                       json=body,
-                                       auth=authentication)
-        else:
-            response = requests.post(url,
-                                     json=body,
-                                     auth=authentication)
+        method = "DELETE" if handler == "deletefile" else "POST"
+        response = requests.request(method, url, json=body, timeout=TIMEOUT)
         self._context.http_client_response = response
 
     def _make_request_with_no_authorisation_credentials(self, handler, body):
