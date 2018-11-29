@@ -6,7 +6,7 @@ class Archiver:
     def write_archive(self, file_path, file_summary):
         content = "test"
         self._file_system_helper.create_file(file_path, content)
-        self._logger.debug("Archive file created")
+        self._logger.debug(f"Archive file created: {file_path}")
 
     def update_archive(self, file_path, file_summary):
         content = "test test"
