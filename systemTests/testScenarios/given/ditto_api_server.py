@@ -71,7 +71,7 @@ class DittoApiServer:
         )
 
         # Let the server start
-        time.sleep(2)
+        time.sleep(5)
 
         # Confirm port now bound
         print_port_state(self._context.host_address, self._context.app_port)
