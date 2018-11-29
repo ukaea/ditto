@@ -1,4 +1,4 @@
-from DittoWebApi.src.utils.system_helper import current_time
+from DittoWebApi.src.utils.system_helper import current_time_in_utc
 
 
 class Archiver:
@@ -7,7 +7,7 @@ class Archiver:
         self._file_system_helper = file_system_helper
 
     def write_archive(self, file_path, file_summary):
-        time_of_transfer = current_time()
+        time_of_transfer = current_time_in_utc()
         try:
             new_archive_file = self._file_system_helper.open_file(file_path)
             for file in file_summary.new_files:
@@ -39,7 +39,7 @@ class Archiver:
 
     def _archive_new_file(self, file, time_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
-        return {file.rel_path: {"file": file.rel_path,
+        return {file.file_name: {"file": file.file_name,
                                 "size": size,
                                 "first transferred": time_of_transfer,
                                 "latest update": time_of_transfer,
@@ -48,7 +48,7 @@ class Archiver:
 
     def _archive_file_update(self, file, time_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
-        return {file.rel_path: {"file": file.rel_path,
+        return {file.file_name: {"file": file.file_name,
                                 "size": size,
                                 "first transferred": time_of_transfer,
                                 "latest update": time_of_transfer,

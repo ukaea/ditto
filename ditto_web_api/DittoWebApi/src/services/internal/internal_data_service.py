@@ -34,18 +34,20 @@ class InternalDataService:
             full_sub_dir_path = \
                 self._file_system_helper.join_paths(self._root_dir, sub_dir) if sub_dir else self._root_dir
             archive_file_path = self._file_system_helper.join_paths(full_sub_dir_path, self._archive_file_name)
-
+            sub_dir_file_summary = sub_directory_file_summaries[sub_dir]
             if self._file_system_helper.does_file_exist(archive_file_path):
-                self._archiver.update_archive(archive_file_path, file_summary)
+                self._archiver.update_archive(archive_file_path, sub_dir_file_summary)
             else:
-                self._archiver.write_archive(archive_file_path, file_summary)
+                self._archiver.write_archive(archive_file_path, sub_dir_file_summary)
 
     def split_file_summary_by_sub_dir(self, file_summary):
         dict_of_sub_dir_summaries = {}
 
         for file in file_summary.new_files:
-            directory = self._file_system_helper.file_directory(file.rel_path)
-            directory_rel_path = self._file_system_helper.relative_file_path(directory, self._root_dir)
+            file_name = file.file_name
+            directory_rel_path = file.rel_path[: -len(file_name)]
+            
+            self._logger.debug(f"dir_rel_path = {directory_rel_path}")
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
             else:
@@ -53,8 +55,9 @@ class InternalDataService:
                 dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
 
         for file in file_summary.updated_files:
-            directory = self._file_system_helper.file_directory(file.rel_path)
-            directory_rel_path = self._file_system_helper.relative_file_path(directory, self._root_dir)
+            file_name = file.file_name
+            directory_rel_path = file.rel_path[: -len(file_name)]
+            
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)
             else:
