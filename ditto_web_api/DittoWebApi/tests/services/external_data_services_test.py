@@ -29,9 +29,9 @@ class TestExternalDataServices:
         self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         self.test_service = ExternalDataService(
             mock_configuration,
+            self.mock_file_system_helper,
             self.mock_logger,
-            self.mock_s3_client,
-            self.mock_file_system_helper
+            self.mock_s3_client
         )
 
     @staticmethod

@@ -18,7 +18,8 @@ class SampleConfigurationCreator:
                              s3_secret_key,
                              s3_use_secure,
                              root_dir,
-                             bucket_standard):
+                             bucket_standard,
+                             archive_file_name):
         template = "[Settings]\n"
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "LogFolderLocation",
@@ -50,6 +51,9 @@ class SampleConfigurationCreator:
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "BucketStandardisation",
                                                                        bucket_standard)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "ArchiveFileName",
+                                                                       archive_file_name)
         return SampleConfigurationCreator.write_sample_configuration_file(template)
 
     @staticmethod
@@ -92,7 +96,8 @@ def test_configuration_can_be_read_when_s3_secure():
                                                                          "secret",
                                                                          "true",
                                                                          current,
-                                                                         "test")
+                                                                         "test",
+                                                                         "test2")
 
     # Act
     configuration = Configuration(configuration_path)
@@ -106,6 +111,7 @@ def test_configuration_can_be_read_when_s3_secure():
     assert configuration.s3_use_secure is True
     assert configuration.root_dir == current
     assert configuration.bucket_standard == "test"
+    assert configuration.archive_file_name == "test2"
 
     # Clean up
     SampleConfigurationCreator.remove_file(configuration_path)
@@ -123,7 +129,8 @@ def test_configuration_can_be_read_when_s3_not_secure():
                                                                          "secret",
                                                                          "false",
                                                                          current,
-                                                                         "test")
+                                                                         "test",
+                                                                         "test2")
 
     # Act
     configuration = Configuration(configuration_path)
@@ -137,6 +144,7 @@ def test_configuration_can_be_read_when_s3_not_secure():
     assert configuration.s3_use_secure is False
     assert configuration.root_dir == current
     assert configuration.bucket_standard == "test"
+    assert configuration.archive_file_name == "test2"
 
     # Clean up
     SampleConfigurationCreator.remove_file(configuration_path)
