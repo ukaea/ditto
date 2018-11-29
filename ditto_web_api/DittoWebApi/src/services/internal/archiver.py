@@ -6,10 +6,10 @@ class Archiver:
         self._logger = logger
         self._file_system_helper = file_system_helper
 
-    def write_archive(self, file_path, file_summary):
+    def write_archive(self, archive_file_path, file_summary):
         time_of_transfer = current_time_in_utc()
         try:
-            new_archive_file = self._file_system_helper.open_file(file_path)
+            new_archive_file = self._file_system_helper.open_file(archive_file_path)
             for file in file_summary.new_files:
                 new_content = self._archive_new_file(file, time_of_transfer)
                 self._file_system_helper.write_to_file(new_archive_file, new_content)
@@ -21,13 +21,13 @@ class Archiver:
             raise
         finally:
             self._file_system_helper.close_file(new_archive_file)
-        self._logger.debug(f"Archive file created: {file_path}")
+        self._logger.debug(f"Archive file created: {archive_file_path}")
 
 
-    def update_archive(self, file_path, file_summary):
+    def update_archive(self, archive_file_path, file_summary):
         content = "test test"
         try:
-            archived_file = self._file_system_helper.open_file(file_path)
+            archived_file = self._file_system_helper.open_file(archive_file_path)
 
 
         except Exception as exception:
@@ -35,7 +35,7 @@ class Archiver:
             raise
         finally:
             self._file_system_helper.close_file(archived_file)
-        self._logger.debug(f"Archive file updated: {file_path}")
+        self._logger.debug(f"Archive file updated: {archive_file_path}")
 
     def _archive_new_file(self, file, time_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
@@ -60,17 +60,3 @@ class Archiver:
         content[file.rel_path]["latest update"] = time_of_transfer
         content[file.rel_path]["type of transfer"] = "update"
         content[file.rel_path]["size"] = size
-
-    def _archive_file_deletion(self, content, file, time_of_transfer):
-        content[file.rel_path]["latest update"] = time_of_transfer
-        content[file.rel_path]["type of transfer"] = "delete"
-        content[file.rel_path]["size"] = 0
-        
-    def archive_transfer(self, file_summary, old_content):
-        content = {} if old_content is None else old_content
-        time_of_transfer = current_time()
-        for file in file_summary.new_files:
-            self._archive_new_file(content, file, time_of_transfer)
-        for file in file_summary.updated_files:
-            self._update_archive(content, file, time_of_transfer)
-        return content
