@@ -123,14 +123,13 @@ class WhenSteps:
 
     def _make_unauthorised_request(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
+        authentication = HTTPBasicAuth('unknown_user', 'password')
         method = "DELETE" if handler == "deletefile" else "POST"
-        response = requests.request(method, url, json=body, timeout=TIMEOUT)
+        response = requests.request(method, url, json=body, auth=authentication, timeout=TIMEOUT)
         self._context.http_client_response = response
 
     def _make_request_with_no_authorisation_credentials(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
-        if handler == "deletefile":
-            response = requests.delete(url, json=body)
-        else:
-            response = requests.post(url, json=body)
+        method = "DELETE" if handler == "deletefile" else "POST"
+        response = requests.request(method, url, json=body)
         self._context.http_client_response = response
