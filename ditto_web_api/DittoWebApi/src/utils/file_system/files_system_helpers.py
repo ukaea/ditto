@@ -47,3 +47,6 @@ class FileSystemHelper:
         json.dump(content, open_file)
         open_file.write("\n")
 
+    def file_directory(self, file_rel_path):
+        return os.path.dirname(file_rel_path)
+

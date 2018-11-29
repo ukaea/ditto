@@ -12,10 +12,10 @@ class Archiver:
             new_archive_file = self._file_system_helper.open_file(file_path)
             for file in file_summary.new_files:
                 new_content = self._archive_new_file(file, time_of_transfer)
-                self._file_system_helper.write_to_file(file_path, new_content)
+                self._file_system_helper.write_to_file(new_archive_file, new_content)
             for file in file_summary.updated_files:
                 new_content = self._archive_file_update(file, time_of_transfer)
-                self._file_system_helper.write_to_file(file_path, new_content)
+                self._file_system_helper.write_to_file(new_archive_file, new_content)
         except Exception as exception:
             self._logger.error(f"Exception found: {exception}")
             raise
@@ -28,7 +28,7 @@ class Archiver:
         content = "test test"
         try:
             archived_file = self._file_system_helper.open_file(file_path)
-            archived_file.write(content)
+
 
         except Exception as exception:
             self._logger.error(f"Exception found: {exception}")
