@@ -29,15 +29,15 @@ class FileSystemHelper:
     def file_size(self, abs_file_path):
         return os.stat(abs_file_path).st_size
 
-    def create_file(self, file_path, content):
-        with open(file_path, "w") as file:
-            file.write(content)
+    def create_file(self, file_path):
+        return open(file_path, "w")
+
 
     def does_file_exist(self, file_path):
         return os.path.exists(file_path)
 
     def open_file(self, file_path):
-        return open(file_path, 'w')
+        return open(file_path, 'r+')
 
     def close_file(self, open_file):
         if not open_file.closed:
@@ -50,3 +50,9 @@ class FileSystemHelper:
     def file_directory(self, file_rel_path):
         return os.path.dirname(file_rel_path)
 
+    def load_json(self, open_file):
+        pass
+
+    def read_line_as_json(self, open_file):
+        line = open_file.readline()
+        return json.loads(line)
