@@ -1,9 +1,10 @@
 import os
+import pytest
+import requests
 import shutil
 import signal
+import time
 import unittest
-import pytest
-import json
 
 from testScenarios.given.given_steps import GivenSteps
 from testScenarios.when.when_steps import WhenSteps
@@ -12,7 +13,9 @@ from testScenarios.tools.process_logger import ProcessLogger
 
 
 class SystemTestContext:
-    def __init__(self):
+    def __init__(self, request):
+        self._test_group = request.node.parent.name.strip(".py")
+        self._test_name = request.node.name
         self._execution_folder_path = '/home/vagrant/systemTests/execution_space'
         self.ditto_api_process = None
         self.console_logger = ProcessLogger('console', self.log_folder_path)
@@ -31,14 +34,40 @@ class SystemTestContext:
         if self.ditto_api_process is not None:
             self.ditto_api_process = None
 
+        timeout_counter = 0
+        timeout_step = 0.5
+        timeout_limit = 20
+        while (self.is_ditto_running()) and timeout_counter < timeout_limit:
+            timeout_counter += 1
+            time.sleep(timeout_step)
+        if timeout_counter >= timeout_limit:
+            print(f'Reached timeout of {timeout_step * timeout_limit} seconds waiting for DITTO to shut down')
+        else:
+            print(f'DITTO took {timeout_counter * timeout_step} seconds to shut down')
+
+    def is_ditto_running(self):
+        url = f'http://{self.host_address}:{self.app_port}'
+        try:
+            response = requests.get(url)
+            return response.json()['status'] == 'success'
+        except Exception:
+            return False
+
+    @property
+    def test_group(self):
+        return self._test_group
+
+    @property
+    def test_name(self):
+        return self._test_name
+
     @property
     def ditto_web_api_folder_path(self):
         return os.path.join(self._execution_folder_path, 'ditto_web_api')
-        # return '/home/vagrant/ditto_web_api'
 
     @property
     def log_folder_path(self):
-        return os.path.join(self._execution_folder_path, 'logs')
+        return os.path.join(self._execution_folder_path, 'logs', self.test_group, self.test_name)
 
     @property
     def log_level(self):
@@ -84,14 +113,23 @@ class SystemTestContext:
     def s3_data_folder_path(self):
         return '/opt/minio/data'
 
-    def _response_body_as_json(self):
-        return json.loads(self.http_client_response.text)
+    @property
+    def authentication_username(self):
+        return 'Tom'
+
+    @property
+    def authentication_password(self):
+        return 'potato'
+
+    @property
+    def authentication_groups(self):
+        return 'group1'
 
     def response_status(self):
-        return self._response_body_as_json()["status"]
+        return self.http_client_response.json()["status"]
 
     def response_data(self):
-        return self._response_body_as_json()["data"]
+        return self.http_client_response.json()["data"]
 
     def object_names_from_list_present_response_body(self):
         objects = self.response_data()["objects"]
@@ -109,11 +147,12 @@ class SystemTestContext:
     def simple_file_name(self):
         return "testA.txt"
 
+
 class BaseSystemTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self, request):
         print("setting up test")
-        self.context = SystemTestContext()
+        self.context = SystemTestContext(request)
         self._clean_up_working_folders()
         self._clear_up_s3_data()
         self._set_up_loggers()
@@ -127,7 +166,8 @@ class BaseSystemTest(unittest.TestCase):
 
     def _clean_up_working_folders(self):
         # Clear out the logs
-        shutil.rmtree(self.context.log_folder_path)
+        if os.path.isdir(self.context.log_folder_path):
+            shutil.rmtree(self.context.log_folder_path)
         os.makedirs(self.context.log_folder_path)
 
         # Clear out the local data

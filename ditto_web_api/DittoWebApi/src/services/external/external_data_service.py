@@ -6,7 +6,7 @@ from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 
 
 class ExternalDataService:
-    def __init__(self, configuration, logger, s3_adapter, file_system_helper):
+    def __init__(self, configuration, file_system_helper, logger, s3_adapter):
         self._logger = logger
         self._bucket_standard = configuration.bucket_standard
         self._s3_client = s3_adapter

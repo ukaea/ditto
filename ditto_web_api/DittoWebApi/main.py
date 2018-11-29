@@ -2,7 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import tornado
-from DittoWebApi.src.handlers.ditto_handler import DittoHandler
+from DittoWebApi.src.handlers.heartbeat import HeartbeatHandler
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
 from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
@@ -14,7 +14,8 @@ from DittoWebApi.src.services.data_replication.data_replication_service import D
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
-from DittoWebApi.src.services.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.archiver import Archiver
 from DittoWebApi.src.services.security.config_security_service import ConfigSecurityService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
@@ -53,8 +54,9 @@ if __name__ == "__main__":
     # Set up services
     S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
     FILE_SYSTEM_HELPER = FileSystemHelper()
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, LOGGER, S3_ADAPTER, FILE_SYSTEM_HELPER)
-    INTERNAL_DATA_SERVICE = InternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
+    ARCHIVER = Archiver(FILE_SYSTEM_HELPER, LOGGER)
+    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
+    INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
     STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
     DATA_REPLICATION_SERVICE = DataReplicationService(EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
@@ -76,7 +78,7 @@ if __name__ == "__main__":
         security_service=SECURITY_SERVICE
     )
     APP = tornado.web.Application([
-        (format_route_specification("help"), DittoHandler, CONTAINER),
+        ("(|/)", HeartbeatHandler),
         (format_route_specification("listpresent"), ListPresentHandler, CONTAINER),
         (format_route_specification("copydir"), CopyDirHandler, CONTAINER),
         (format_route_specification("createbucket"), CreateBucketHandler, CONTAINER),
