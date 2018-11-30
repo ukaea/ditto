@@ -26,6 +26,19 @@ class BaseWhenStep:
 
     def _make_unauthorised_request(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
+        authentication = HTTPBasicAuth('OtherUser', 'password')
+        method = "DELETE" if handler == "deletefile" else "POST"
+        self._context.http_client_response = None
+        try:
+            response = requests.request(method, url, json=body, auth=authentication, timeout=TIMEOUT)
+            self._context.http_client_response = response
+        except Exception as exception:
+            print_port_state(self._context.host_address, self._context.app_port)
+            print(f'Tried to connect to "{url}"')
+            print(exception)
+
+    def _make_unauthenticated_request(self, handler, body):
+        url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
         authentication = HTTPBasicAuth('unknown_user', 'password')
         method = "DELETE" if handler == "deletefile" else "POST"
         self._context.http_client_response = None

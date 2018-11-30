@@ -12,6 +12,11 @@ class CopyDirWhenSteps(BaseWhenStep):
         body = {'bucket': self._context.standard_bucket_name}
         self._make_unauthorised_request(handler, body)
 
+    def unauthenticated_copy_dir_called_for_whole_directory(self):
+        handler = 'copydir'
+        body = {'bucket': self._context.standard_bucket_name}
+        self._make_unauthenticated_request(handler, body)
+
     def copy_dir_called_with_no_authorisation_credentials(self):
         handler = 'copydir'
         body = {'bucket': self._context.standard_bucket_name}

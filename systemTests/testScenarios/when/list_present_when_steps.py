@@ -17,3 +17,7 @@ class ListPresentWhenSteps(BaseWhenStep):
         body = {'bucket': self._context.standard_bucket_name}
         self._make_request_with_no_authorisation_credentials(handler, body)
 
+    def unauthenticated_list_present_called_for_simple_bucket_whole_directory_structure(self):
+        handler = 'listpresent'
+        body = {'bucket': self._context.standard_bucket_name}
+        self._make_unauthenticated_request(handler, body)

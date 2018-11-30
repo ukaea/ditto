@@ -45,7 +45,11 @@ class DittoApiServer:
         file_contents = \
             f'[{self._context.authentication_username}]\n' \
             f'password = {self._context.authentication_password}\n' \
-            f'groups = {self._context.authentication_groups}\n'
+            f'groups = {self._context.authentication_groups}\n' \
+            '\n' \
+            '[OtherUser]\n' \
+            'password = password\n' \
+            'groups = othergroup'
 
         security_file_path = os.path.join(
             self._context.ditto_web_api_folder_path,
