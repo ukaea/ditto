@@ -1,5 +1,6 @@
 import os
 import time
+import json
 
 from testScenarios.given.ditto_api_server import DittoApiServer
 
@@ -66,9 +67,22 @@ class GivenSteps:
 
     def archive_file_already_exists_in_local_root(self):
         file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
-        content = "test"
+        content = '{}'
         with open(file_path, 'w') as file:
             file.write(content)
+        self._context.archive_creation_time = time.time()
+
+    def old_transfer_in_archive_file(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        content = {"testB.txt":
+                       {"file": "testB.txt",
+                        "size": 22,
+                        "latest update": "1543590765.7174373",
+                        "type of transfer": "new upload"}
+                   }
+        with open(file_path, 'w') as file:
+            json.dump(content, file)
+        self._context.archive_creation_time = time.time()
 
 
     @staticmethod

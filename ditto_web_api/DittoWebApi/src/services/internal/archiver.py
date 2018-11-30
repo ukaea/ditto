@@ -61,7 +61,7 @@ class Archiver:
         return {file.file_name: {"file": file.file_name,
                                  "size": size,
                                  "latest update": time_of_transfer,
-                                 "type of transfer": "file_update"}
+                                 "type of transfer": "file update"}
                 }
 
     def _convert_old_content_to_json(self, open_file):

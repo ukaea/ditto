@@ -42,7 +42,7 @@ class TestArchive(unittest.TestCase):
                                       'file': self.mock_file_2.file_name,
                                       'size': 50,
                                       'latest update': '12345',
-                                      'type of transfer': 'file_update'}}
+                                      'type of transfer': 'file update'}}
         )
 
     @mock.patch('DittoWebApi.src.utils.system_helper.time.time', return_value=12345)
@@ -53,7 +53,7 @@ class TestArchive(unittest.TestCase):
                 'file': self.mock_file_2.file_name,
                 'size': 50,
                 'latest update': '12345',
-                'type of transfer': 'file_update'}
+                'type of transfer': 'file update'}
         }
         # Act
         self.test_archiver.update_archive("some_file_path", self.mock_file_summary)
@@ -65,7 +65,7 @@ class TestArchive(unittest.TestCase):
                     'file': self.mock_file_2.file_name,
                     'size': 50,
                     'latest update': '12345',
-                    'type of transfer': 'file_update'},
+                    'type of transfer': 'file update'},
                 self.mock_file_1.file_name: {
                     'file': self.mock_file_1.file_name,
                     'size': 100,

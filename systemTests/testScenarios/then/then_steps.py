@@ -125,6 +125,11 @@ class ThenSteps:
         file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
         assert os.path.exists(file_path)
 
+    def archive_file_has_been_updated(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        last_modified = os.path.getmtime(file_path)
+        assert last_modified > self._context.archive_creation_time
+
     def archive_file_exists_in_sub_dir(self):
         file_path = os.path.join(self._context.local_data_folder_path, "sub_dir_A", ".ditto_archived")
         assert os.path.exists(file_path)
@@ -146,4 +151,60 @@ class ThenSteps:
         with open(file_path, 'rt') as file:
             content = file.read()
         assert content == expected_content
+
+    def simple_file_is_in_root_archive_file_as_new_upload(self):
+        file_name = self._context.simple_file_name
+        assert self._file_in_archive_file_at_folder_with_specified_type(file_name, None, 'new upload') is True
+
+    def simple_file_is_in_root_archive_file_as_updated_file(self):
+        file_name = self._context.simple_file_name
+        assert self._file_in_archive_file_at_folder_with_specified_type(file_name, None, 'file update') is True
+
+    def file_in_sub_dir_is_in_archive_in_sub_dir_as_new_upload(self):
+        file_name = self._context.file_in_sub_dir_name
+        directory = self._context.simple_sub_dir
+        assert self._file_in_archive_file_at_folder_with_specified_type(file_name, directory, 'new upload') is True
+
+    def file_in_sub_dir_is_in_archive_in_sub_dir_as_file_update(self):
+        file_name = self._context.file_in_sub_dir_name
+        directory = self._context.simple_sub_dir
+        assert self._file_in_archive_file_at_folder_with_specified_type(file_name, directory, 'file update') is True
+
+    def _file_in_archive_file_at_folder_with_specified_type(self, file_name, directory, type_of_transfer):
+        root_to_directory = os.path.join(self._context.local_data_folder_path, directory) \
+            if directory \
+            else self._context.local_data_folder_path
+        file_path = os.path.join(root_to_directory, ".ditto_archived")
+        print(file_path)
+        with open(file_path, 'r') as file:
+            content = json.load(file)
+        try:
+            content[file_name]
+        except KeyError:
+            return False
+        return content[file_name]['type of transfer'] == type_of_transfer
+
+    def old_content_in_archive_file_is_untouched(self):
+        file_name = self._context.file_in_sub_dir_name
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        print(file_path)
+        with open(file_path, 'r') as file:
+            content = json.load(file)
+        try:
+            content[file_name]
+        except KeyError:
+            return False
+        return content[file_name] is {
+            "testB.txt":
+                {"file": "testB.txt",
+                 "size": 22,
+                 "latest update": "1543590765.7174373",
+                 "type of transfer": "new upload"}
+                                      }
+
+
+
+
+
+
 
