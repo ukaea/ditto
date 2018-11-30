@@ -29,7 +29,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         # Copy whole directory to s3 bucket
         self.when.authorised_copy_dir_called_for_whole_directory()
@@ -43,8 +43,8 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_sub_dir_with_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_sub_dir_with_test_file_exists_locally()
 
         # Copy sub-dir with copy-dir using directory argument
         self.when.authorised_copy_dir_called_for_sub_directory()
@@ -58,8 +58,8 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_test_file_is_setup_in_s3()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_test_file_exists_in_s3()
 
         self.when.authorised_copy_dir_called_for_whole_directory()
 
@@ -72,7 +72,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.unauthorised_copy_dir_called_for_whole_directory()
 
@@ -82,7 +82,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.copy_dir_called_with_no_authorisation_credentials()
 
@@ -92,7 +92,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.authorised_copy_dir_called_for_whole_directory()
 
@@ -105,8 +105,8 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_sub_dir_with_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_sub_dir_with_test_file_exists_locally()
 
         self.when.authorised_copy_dir_called_for_sub_directory()
 
@@ -118,7 +118,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
         self.given.archive_file_already_exists_in_local_root()
 
         self.when.authorised_copy_dir_called_for_whole_directory()

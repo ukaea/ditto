@@ -27,7 +27,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
@@ -39,8 +39,8 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_test_file_is_setup_in_s3()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_test_file_exists_in_s3()
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
@@ -52,11 +52,11 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_test_file_is_setup_in_s3()
-        self.given.simple_sub_dir_with_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_test_file_exists_in_s3()
+        self.given.simple_sub_dir_with_test_file_exists_locally()
         time.sleep(1)
-        self.given.update_simple_file()
+        self.given.simple_file_is_updated()
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
@@ -88,7 +88,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
@@ -101,7 +101,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
         self.given.archive_file_already_exists_in_local_root()
 
         self.when.authorised_copy_update_called_for_whole_directory()

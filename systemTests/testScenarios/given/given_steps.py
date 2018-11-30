@@ -16,65 +16,57 @@ class GivenSteps:
 
     # Private methods
 
-    def _create_file_in_s3(self, bucket, file_name, content):
-        file_path = os.path.join(self._context.s3_data_folder_path, bucket, file_name)
+    def _make_dir_for_s3(self, bucket, sub_dir_path=None):
+        dir_path = os.path.join(self._context.s3_data_folder_path, bucket)
+        dir_path = dir_path if sub_dir_path is None else os.path.join(dir_path, sub_dir_path)
+        os.system(f"mkdir {dir_path}")
+        os.system(f"sudo chown 'minio':'minio' {dir_path}/")
+        os.system(f"sudo chmod 0777 {dir_path}/")
+
+    def _write_file_in_s3(self, bucket_name, file_rel_path, content):
+        file_path = os.path.join(self._context.s3_data_folder_path, bucket_name, file_rel_path)
         os.system(f"sudo echo {content} > {file_path}")
         os.system(f"sudo chown -R 'minio':'minio' {file_path}")
 
-    def _make_s3_bucket(self, bucket):
-        bucket_path = os.path.join(self._context.s3_data_folder_path, bucket)
-        os.system(f"mkdir {bucket_path}")
-        os.system(f"sudo chown 'minio':'minio' {bucket_path}/")
-        os.system(f"sudo chmod 0777 {bucket_path}/")
-
-    def _make_s3_sub_dir(self, bucket, sub_dir_name):
-        sub_dir_path = os.path.join(self._context.s3_data_folder_path, bucket, sub_dir_name)
-        os.system(f"mkdir {sub_dir_path}")
-        os.system(f"sudo chown 'minio':'minio' {sub_dir_path}/")
-        os.system(f"sudo chmod 0777 {sub_dir_path}/")
-
-    def _write_test_file(self, file_name, content):
-        with open(os.path.join(self._context.local_data_folder_path, file_name), 'w') as file:
-            file.write(content)
-
-    def _write_test_file_locally_in_sub_dir(self, file_name, content):
-        filename = os.path.join(self._context.local_data_folder_path, file_name)
-        os.makedirs(os.path.dirname(filename))
-        with open(filename, 'w') as file:
+    def _write_file_locally(self, file_rel_path, content):
+        file_path = os.path.join(self._context.local_data_folder_path, file_rel_path)
+        dir_path = os.path.dirname(file_path)
+        if not os.path.isdir(dir_path):
+            os.makedirs(dir_path)
+        with open(file_path, 'w') as file:
             file.write(content)
 
     # Public methods
 
     def archive_file_already_exists_in_local_root(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
-        content = "test"
-        with open(file_path, 'w') as file:
-            file.write(content)
+        self._write_file_locally(".ditto_archived", "test")
 
     @staticmethod
     def s3_interface_is_running():
         os.system("sudo systemctl start minio")
 
-    def simple_sub_dir_with_test_file_is_setup_in_s3(self):
-        self._make_s3_sub_dir(self._context.standard_bucket_name, 'sub_dir_A')
-        self._create_file_in_s3(self._context.standard_bucket_name,
-                                os.path.join('sub_dir_A', 'testB.txt'),
-                                'example test content B')
-
-    def simple_sub_dir_with_test_file_is_setup_locally(self):
-        self._write_test_file_locally_in_sub_dir(os.path.join('sub_dir_A', 'testB.txt'), 'example test content B')
-
-    def simple_test_file_is_setup_in_s3(self):
-        self._create_file_in_s3(self._context.standard_bucket_name, 'testA.txt', 'example test content A')
-
-    def simple_test_file_is_setup_locally(self):
-        self._write_test_file('testA.txt', 'example test content A')
-
-    def standard_bucket_exists_in_s3(self):
-        self._make_s3_bucket(self._context.standard_bucket_name)
-
-    def update_simple_file(self):
+    def simple_file_is_updated(self):
         file_path = os.path.join(self._context.local_data_folder_path, 'testA.txt')
         new_content = ". A new bit of text"
         with open(file_path, 'a') as file:
             file.write(new_content)
+
+    def simple_sub_dir_with_test_file_exists_in_s3(self):
+        file_rel_path = os.path.join('sub_dir_A', 'testB.txt')
+        content = 'example test content B'
+        self._make_dir_for_s3(self._context.standard_bucket_name, sub_dir_path='sub_dir_A')
+        self._write_file_in_s3(self._context.standard_bucket_name, file_rel_path, content)
+
+    def simple_sub_dir_with_test_file_exists_locally(self):
+        file_rel_path = os.path.join('sub_dir_A', 'testB.txt')
+        content = 'example test content B'
+        self._write_file_locally(file_rel_path, content)
+
+    def simple_test_file_exists_in_s3(self):
+        self._write_file_in_s3(self._context.standard_bucket_name, 'testA.txt', 'example test content A')
+
+    def simple_test_file_exists_locally(self):
+        self._write_file_locally('testA.txt', 'example test content A')
+
+    def standard_bucket_exists_in_s3(self):
+        self._make_dir_for_s3(self._context.standard_bucket_name)

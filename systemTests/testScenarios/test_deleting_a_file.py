@@ -16,7 +16,7 @@ class TestDeleteFile(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_in_s3()
+        self.given.simple_test_file_exists_in_s3()
 
         self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
