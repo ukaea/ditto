@@ -29,7 +29,7 @@ class Archiver:
         time_of_transfer = str(current_time())
         try:
             archived_file = self._file_system_helper.open_file(archive_file_path)
-            content = self.convert_old_content_to_json(archived_file)
+            content = self._convert_old_content_to_json(archived_file)
             self._logger.debug(f"Old archive file content {content}")
             self._file_system_helper.clear_file(archived_file)
 
@@ -64,5 +64,5 @@ class Archiver:
                                 "type of transfer": "file_update"}
                 }
 
-    def convert_old_content_to_json(self, open_file):
+    def _convert_old_content_to_json(self, open_file):
         return self._file_system_helper.read_file_as_json(open_file)
