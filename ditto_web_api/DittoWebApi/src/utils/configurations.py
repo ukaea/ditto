@@ -27,9 +27,6 @@ class Configuration:
         self._s3_secret_key = None
         self._s3_use_secure = False
 
-        # Local data
-        self._root_dir = None
-
         self._parse(self._path_to_configuration_file)
 
     @property

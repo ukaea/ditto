@@ -17,7 +17,6 @@ class SampleConfigurationCreator:
                              s3_access_key,
                              s3_secret_key,
                              s3_use_secure,
-                             root_dir,
                              bucket_standard,
                              archive_file_name):
         template = "[Settings]\n"
@@ -45,9 +44,6 @@ class SampleConfigurationCreator:
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "S3Secure",
                                                                        s3_use_secure)
-        template = SampleConfigurationCreator.add_element_to_temp_file(template,
-                                                                       "RootDirectory",
-                                                                       root_dir)
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "BucketStandardisation",
                                                                        bucket_standard)
@@ -95,7 +91,6 @@ def test_configuration_can_be_read_when_s3_secure():
                                                                          "access",
                                                                          "secret",
                                                                          "true",
-                                                                         current,
                                                                          "test",
                                                                          "test2")
 
@@ -109,7 +104,6 @@ def test_configuration_can_be_read_when_s3_secure():
     assert configuration.s3_access_key == "access"
     assert configuration.s3_secret_key == "secret"
     assert configuration.s3_use_secure is True
-    assert configuration.root_dir == current
     assert configuration.bucket_standard == "test"
     assert configuration.archive_file_name == "test2"
 
@@ -128,7 +122,6 @@ def test_configuration_can_be_read_when_s3_not_secure():
                                                                          "access",
                                                                          "secret",
                                                                          "false",
-                                                                         current,
                                                                          "test",
                                                                          "test2")
 
@@ -142,7 +135,6 @@ def test_configuration_can_be_read_when_s3_not_secure():
     assert configuration.s3_access_key == "access"
     assert configuration.s3_secret_key == "secret"
     assert configuration.s3_use_secure is False
-    assert configuration.root_dir == current
     assert configuration.bucket_standard == "test"
     assert configuration.archive_file_name == "test2"
 
