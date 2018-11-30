@@ -93,7 +93,6 @@ class Configuration:
         self._s3_use_secure = str2bool(settings['S3Secure'])
 
         # Local data
-        self._root_dir = os.path.abspath(settings['RootDirectory'])
         self._bucket_standard = settings['BucketStandardisation']
         self._archive_file_name = settings['ArchiveFileName']
 
