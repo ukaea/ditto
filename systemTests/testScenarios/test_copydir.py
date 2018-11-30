@@ -36,7 +36,7 @@ class TestCopyDir(BaseSystemTest):
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.new_simple_file_exists_in_s3_bucket()
+        self.then.simple_file_exists_in_s3_bucket()
 
     def test_copy_dir_copies_just_a_sub_dir_when_specified_as_argument(self):
         # Create a file in a sub-directory
@@ -51,7 +51,7 @@ class TestCopyDir(BaseSystemTest):
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.new_file_exists_in_sub_dir_of_s3_bucket()
+        self.then.file_exists_in_sub_dir_of_s3_bucket()
         self.then.simple_file_does_not_exist_in_s3_bucket()
 
     def test_copy_dir_does_not_update_if_directory_already_exists_in_s3_bucket(self):
@@ -128,5 +128,5 @@ class TestCopyDir(BaseSystemTest):
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_does_not_exist_in_s3_bucket()
         self.then.updated_archive_file_content_is_as_expected()
-        self.then.new_simple_file_exists_in_s3_bucket()
+        self.then.simple_file_exists_in_s3_bucket()
 

@@ -9,7 +9,7 @@ class CreateBucket(BaseSystemTest):
         self.when.authorised_create_bucket_called_for_simple_bucket()
 
         self.then.response_shows_request_was_completed_successfully()
-        self.then.simple_bucket_exists_in_s3()
+        self.then.standard_s3_bucket_exists()
 
     def test_trying_to_create_a_bucket_with_invalid_name(self):
         self.given.s3_interface_is_running()

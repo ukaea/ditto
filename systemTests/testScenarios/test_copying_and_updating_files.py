@@ -33,7 +33,7 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_request_was_completed_successfully()
-        self.then.new_simple_file_exists_in_s3_bucket()
+        self.then.simple_file_exists_in_s3_bucket()
 
     def test_copy_update_transfers_no_data_when_all_files_are_present_and_up_to_date_in_s3(self):
         self.given.s3_interface_is_running()
@@ -111,4 +111,4 @@ class TestCopyUpdate(BaseSystemTest):
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_does_not_exist_in_s3_bucket()
         self.then.updated_archive_file_content_is_as_expected()
-        self.then.new_simple_file_exists_in_s3_bucket()
+        self.then.simple_file_exists_in_s3_bucket()
