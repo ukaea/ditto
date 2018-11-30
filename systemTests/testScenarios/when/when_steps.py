@@ -13,8 +13,5 @@ class WhenSteps(CopyDirWhenSteps,
                 DeleteFileWhenSteps,
                 ListPresentWhenSteps):
 
-    def __init__(self, context):
-        self._context = context
-
     def environment_is_stopped(self):
         self._context.shut_down_ditto_api()
