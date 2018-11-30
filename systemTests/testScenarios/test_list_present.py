@@ -39,7 +39,7 @@ class TestListPresent(BaseSystemTest):
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
 
-        self.when.unauthorised_list_present_called_for_simple_bucket_whole_directory_structure()
+        self.when.unauthenticated_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_fails_with_reason_authentication_required()
 

@@ -74,7 +74,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.standard_bucket_exists_in_s3()
         self.given.simple_test_file_exists_locally()
 
-        self.when.unauthorised_copy_dir_called_for_whole_directory()
+        self.when.unauthenticated_copy_dir_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
 

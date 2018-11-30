@@ -39,7 +39,7 @@ class TestDeleteFile(BaseSystemTest):
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
 
-        self.when.unauthorised_delete_file_is_called_for_simple_file_in_s3()
+        self.when.unauthenticated_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.response_fails_with_reason_authentication_required()
 

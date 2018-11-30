@@ -71,7 +71,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
 
-        self.when.unauthorised_copy_update_called_for_whole_directory()
+        self.when.unauthenticated_copy_update_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
 
