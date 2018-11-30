@@ -30,11 +30,13 @@ class InternalDataService:
 
     def archive_file_transfer(self, file_summary):
         sub_directory_file_summaries = self.split_file_summary_by_sub_dir(file_summary)
+
         for sub_dir in sub_directory_file_summaries:
             full_sub_dir_path = \
                 self._file_system_helper.join_paths(self._root_dir, sub_dir) if sub_dir else self._root_dir
             archive_file_path = self._file_system_helper.join_paths(full_sub_dir_path, self._archive_file_name)
             sub_dir_file_summary = sub_directory_file_summaries[sub_dir]
+
             if self._file_system_helper.does_file_exist(archive_file_path):
                 self._archiver.update_archive(archive_file_path, sub_dir_file_summary)
             else:
@@ -47,7 +49,6 @@ class InternalDataService:
             file_name = file.file_name
             directory_rel_path = file.rel_path[: -len(file_name)]
 
-            self._logger.debug(f"dir_rel_path = {directory_rel_path}")
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
             else:

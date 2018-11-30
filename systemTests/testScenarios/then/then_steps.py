@@ -1,5 +1,6 @@
 import os
 import json
+import time
 
 from .log_file_steps import LogFileSteps
 
@@ -128,7 +129,8 @@ class ThenSteps:
     def archive_file_has_been_updated(self):
         file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
         last_modified = os.path.getmtime(file_path)
-        assert last_modified > self._context.archive_creation_time
+        assert time.strptime(last_modified, '%Y-%m-%d %H:%M:%S') > \
+               time.strtime(self._context.archive_creation_time, '%Y-%m-%d %H:%M:%S')
 
     def archive_file_exists_in_sub_dir(self):
         file_path = os.path.join(self._context.local_data_folder_path, "sub_dir_A", ".ditto_archived")
@@ -198,7 +200,7 @@ class ThenSteps:
             "testB.txt":
                 {"file": "testB.txt",
                  "size": 22,
-                 "latest update": "1543590765.7174373",
+                 "latest update": "1970-01-01 03:25:45",
                  "type of transfer": "new upload"}
                                       }
 

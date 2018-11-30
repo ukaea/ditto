@@ -77,7 +77,7 @@ class GivenSteps:
         content = {"testB.txt":
                        {"file": "testB.txt",
                         "size": 22,
-                        "latest update": "1543590765.7174373",
+                        "latest update": "1970-01-01 03:25:45",
                         "type of transfer": "new upload"}
                    }
         with open(file_path, 'w') as file:

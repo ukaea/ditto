@@ -36,12 +36,12 @@ class TestArchive(unittest.TestCase):
             self.mock_open_file, {self.mock_file_1.file_name: {
                 'file': self.mock_file_1.file_name,
                 'size': 100,
-                'latest update': '12345',
+                'latest update': '1970-01-01 03:25:45',
                 'type of transfer': 'new upload'},
                                   self.mock_file_2.file_name: {
                                       'file': self.mock_file_2.file_name,
                                       'size': 50,
-                                      'latest update': '12345',
+                                      'latest update': '1970-01-01 03:25:45',
                                       'type of transfer': 'file update'}}
         )
 
@@ -52,7 +52,7 @@ class TestArchive(unittest.TestCase):
             self.mock_file_2.file_name: {
                 'file': self.mock_file_2.file_name,
                 'size': 50,
-                'latest update': '12345',
+                'latest update': '1970-01-01 03:25:45',
                 'type of transfer': 'file update'}
         }
         # Act
@@ -64,11 +64,11 @@ class TestArchive(unittest.TestCase):
                 self.mock_file_2.file_name: {
                     'file': self.mock_file_2.file_name,
                     'size': 50,
-                    'latest update': '12345',
+                    'latest update': '1970-01-01 03:25:45',
                     'type of transfer': 'file update'},
                 self.mock_file_1.file_name: {
                     'file': self.mock_file_1.file_name,
                     'size': 100,
-                    'latest update': '12345',
+                    'latest update': '1970-01-01 03:25:45',
                     'type of transfer': 'new upload'}
             })

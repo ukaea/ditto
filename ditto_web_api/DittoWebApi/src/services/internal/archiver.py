@@ -1,4 +1,4 @@
-from DittoWebApi.src.utils.system_helper import current_time
+from DittoWebApi.src.utils.system_helper import current_time_in_utc
 
 
 class Archiver:
@@ -7,7 +7,7 @@ class Archiver:
         self._file_system_helper = file_system_helper
 
     def write_archive(self, archive_file_path, file_summary):
-        time_of_transfer = str(current_time())
+        time_of_transfer = str(current_time_in_utc())
         try:
             content = {}
             new_archive_file = self._file_system_helper.create_file(archive_file_path)
@@ -26,7 +26,7 @@ class Archiver:
         self._logger.debug(f"Archive file created: {archive_file_path}")
 
     def update_archive(self, archive_file_path, file_summary):
-        time_of_transfer = str(current_time())
+        time_of_transfer = str(current_time_in_utc())
         try:
             archived_file = self._file_system_helper.open_file(archive_file_path)
             content = self._convert_old_content_to_json(archived_file)
