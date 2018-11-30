@@ -66,7 +66,7 @@ if __name__ == "__main__":
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
     INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
     STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
-    DATA_REPLICATION_SERVICE = DataReplicationService(BUCKET_SETTINGS_PATH,
+    DATA_REPLICATION_SERVICE = DataReplicationService(BUCKET_SETTINGS_SERVICE,
                                                       EXTERNAL_DATA_SERVICE,
                                                       INTERNAL_DATA_SERVICE,
                                                       LOGGER,
