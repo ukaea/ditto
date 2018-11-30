@@ -46,7 +46,7 @@ class InternalDataService:
         for file in file_summary.new_files:
             file_name = file.file_name
             directory_rel_path = file.rel_path[: -len(file_name)]
-            
+
             self._logger.debug(f"dir_rel_path = {directory_rel_path}")
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
@@ -57,14 +57,10 @@ class InternalDataService:
         for file in file_summary.updated_files:
             file_name = file.file_name
             directory_rel_path = file.rel_path[: -len(file_name)]
-            
+
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)
             else:
                 dict_of_sub_dir_summaries[directory_rel_path] = FilesStorageSummary(None)
                 dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)
         return dict_of_sub_dir_summaries
-
-
-
-

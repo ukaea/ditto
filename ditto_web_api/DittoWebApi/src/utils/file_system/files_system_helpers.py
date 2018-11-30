@@ -32,7 +32,6 @@ class FileSystemHelper:
     def create_file(self, file_path):
         return open(file_path, "w")
 
-
     def does_file_exist(self, file_path):
         return os.path.exists(file_path)
 
@@ -46,7 +45,6 @@ class FileSystemHelper:
     def write_to_file(self, open_file, content):
         json.dump(content, open_file)
 
-
     def file_directory(self, file_rel_path):
         return os.path.dirname(file_rel_path)
 
@@ -55,7 +53,6 @@ class FileSystemHelper:
 
     def read_file_as_json(self, open_file):
         return json.load(open_file)
-
 
     def clear_file(self, open_file):
         open_file.seek(0)

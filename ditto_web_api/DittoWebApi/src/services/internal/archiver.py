@@ -51,17 +51,17 @@ class Archiver:
     def _archive_new_file(self, file, time_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
         return {file.file_name: {"file": file.file_name,
-                                "size": size,
-                                "latest update": time_of_transfer,
-                                "type of transfer": "new upload"}
+                                 "size": size,
+                                 "latest update": time_of_transfer,
+                                 "type of transfer": "new upload"}
                 }
 
     def _archive_file_update(self, file, time_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
         return {file.file_name: {"file": file.file_name,
-                                "size": size,
-                                "latest update": time_of_transfer,
-                                "type of transfer": "file_update"}
+                                 "size": size,
+                                 "latest update": time_of_transfer,
+                                 "type of transfer": "file_update"}
                 }
 
     def _convert_old_content_to_json(self, open_file):

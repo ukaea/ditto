@@ -1,7 +1,9 @@
-import pytest
-import mock
+# pylint: disable=W0201
 import logging
 import unittest
+import pytest
+import mock
+
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.models.file_information import FileInformation
@@ -32,15 +34,16 @@ class TestArchive(unittest.TestCase):
         self._logger.debug.assert_called_with("Archive file created: some_file_path")
         self._file_system_helper.write_to_file.assert_called_once_with(
             self.mock_open_file, {self.mock_file_1.file_name: {
-                                      'file': self.mock_file_1.file_name,
-                                      'size': 100,
-                                      'latest update': '12345',
-                                      'type of transfer': 'new upload'},
+                'file': self.mock_file_1.file_name,
+                'size': 100,
+                'latest update': '12345',
+                'type of transfer': 'new upload'},
                                   self.mock_file_2.file_name: {
                                       'file': self.mock_file_2.file_name,
                                       'size': 50,
                                       'latest update': '12345',
-                                      'type of transfer': 'file_update'}})
+                                      'type of transfer': 'file_update'}}
+        )
 
     @mock.patch('DittoWebApi.src.utils.system_helper.time.time', return_value=12345)
     def test_update_archive_updates_an_archive_file(self, time):
