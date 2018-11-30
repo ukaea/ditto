@@ -147,3 +147,7 @@ class ThenSteps:
         assert json.loads(self._context.http_client_response.text)["reason"] == "Authentication required"
         assert self._context.http_client_response.status_code == 401
 
+    def response_shows_failed_as_unauthorised(self):
+        assert self._context.http_client_response.json()['reason'] == 'Not authorised for this bucket'
+        assert self._context.http_client_response.status_code == 403
+

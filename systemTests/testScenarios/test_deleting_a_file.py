@@ -34,6 +34,19 @@ class TestDeleteFile(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_reports_simple_file_does_not_exist()
 
+    def test_delete_file_fails_when_user_not_authorised_for_bucket(self):
+        # Start the api
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_exists_in_s3()
+
+        # Try to copy the bucket
+        self.when.unauthorised_delete_file_called_for_whole_directory()
+
+        self.then.response_shows_failed_as_unauthorised()
+        self.then.simple_file_exists_in_s3_bucket()
+
     def test_delete_file_is_rejected_when_authentication_is_invalid(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
