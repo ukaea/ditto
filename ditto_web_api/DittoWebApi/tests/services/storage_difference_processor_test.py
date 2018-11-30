@@ -9,7 +9,7 @@ from DittoWebApi.src.services.data_replication.storage_difference_processor impo
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 
 
-class TestSorageDifferenceProcessor:
+class TestStorageDifferenceProcessor:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
