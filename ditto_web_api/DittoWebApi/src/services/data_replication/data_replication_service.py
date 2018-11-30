@@ -98,7 +98,6 @@ class DataReplicationService:
         self._external_data_service.delete_file(bucket_name, file_rel_path)
         msg = messages.file_deleted(file_rel_path, bucket_name)
         action_summary = return_delete_file_helper(message=msg, file_rel_path=file_rel_path, bucket_name=bucket_name)
-        self._internal_data_service.archive_file_deletion(file_rel_path)
         return action_summary
 
     def copy_new(self, bucket_name, dir_path):
