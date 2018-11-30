@@ -29,7 +29,6 @@ class DittoApiServer:
             f'S3AccessKey = {self._context.s3access}\n' \
             f'S3SecretKey = {self._context.s3secret}\n' \
             f'S3Secure = {self._context.s3secure}\n' \
-            f'RootDirectory = {self._context.local_data_folder_path}\n' \
             f'BucketStandardisation = {self._context.bucket_standardisation}\n' \
             f'ArchiveFileName = .ditto_archived\n'
 
