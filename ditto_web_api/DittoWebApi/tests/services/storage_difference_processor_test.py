@@ -12,10 +12,9 @@ from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHel
 class TestStorageDifferenceProcessor:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
-        self.processor = StorageDifferenceProcessor(self.mock_logger)
-        mock_file_system_helper = mock.create_autospec(FileSystemHelper)
-        self.processor._file_system_helper = mock_file_system_helper
+        self.mock_logger = mock.create_autospec(logging.Logger)
+        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
+        self.processor = StorageDifferenceProcessor(self.mock_file_system_helper, self.mock_logger)
         # Mock file information objects
         self.file_1 = mock.create_autospec(FileInformation)
         self.file_2 = mock.create_autospec(FileInformation)
