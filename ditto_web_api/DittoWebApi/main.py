@@ -10,7 +10,7 @@ from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
-from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
+from DittoWebApi.src.services.data_replication.data_replication_service import build_standard_data_replication_service
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
@@ -65,12 +65,10 @@ if __name__ == "__main__":
     ARCHIVER = Archiver(FILE_SYSTEM_HELPER, LOGGER)
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
     INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
-    STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)
-    DATA_REPLICATION_SERVICE = DataReplicationService(BUCKET_SETTINGS_SERVICE,
-                                                      EXTERNAL_DATA_SERVICE,
-                                                      INTERNAL_DATA_SERVICE,
-                                                      LOGGER,
-                                                      STORAGE_DIFFERENCE_PROCESSOR)
+    DATA_REPLICATION_SERVICE = build_standard_data_replication_service(BUCKET_SETTINGS_SERVICE,
+                                                                       EXTERNAL_DATA_SERVICE,
+                                                                       INTERNAL_DATA_SERVICE,
+                                                                       LOGGER)
 
     # Launch app
     CONTAINER = dict(
