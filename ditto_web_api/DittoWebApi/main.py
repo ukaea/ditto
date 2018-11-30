@@ -11,7 +11,6 @@ from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.data_replication.data_replication_service import build_standard_data_replication_service
-from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService

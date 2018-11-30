@@ -1,8 +1,9 @@
 import logging
-import mock
 import os
-import pytest
 import tempfile
+
+import mock
+import pytest
 
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 
@@ -43,9 +44,10 @@ def test_settings_raises_when_path_is_not_correct():
     with pytest.raises(RuntimeError) as exception_info:
         BucketSettingsService(path, mock_logger)
     # Assert
-    assert('The bucket settings file "dummy_path" does not seem to exist.' in str(exception_info.value))
+    assert 'The bucket settings file "dummy_path" does not seem to exist.' in str(exception_info.value)
 
 
+# pylint: disable=protected-access
 def test_settings_loads_empty_file():
     # Arrange
     bucket_settings_path = SampleSettingsCreator.create_settings([])
@@ -57,6 +59,7 @@ def test_settings_loads_empty_file():
     assert not test_service._settings
 
 
+# pylint: disable=protected-access
 def test_settings_loads_single_bucket_settings_with_single_group():
     # Arrange
     bucket_settings_path = SampleSettingsCreator.create_settings([('test-bucket', 'group', '/usr/tmp/ditto')])
@@ -70,6 +73,7 @@ def test_settings_loads_single_bucket_settings_with_single_group():
     assert test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
 
 
+# pylint: disable=protected-access
 def test_settings_loads_single_bucket_settings_with_multiple_groups():
     # Arrange
     bucket_settings_path = SampleSettingsCreator.create_settings([('test-bucket', 'group1,group2', '/usr/tmp/ditto')])
@@ -83,6 +87,7 @@ def test_settings_loads_single_bucket_settings_with_multiple_groups():
     assert test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
 
 
+# pylint: disable=protected-access
 def test_settings_loads_multiple_bucket_settings():
     # Arrange
     bucket_settings_path = SampleSettingsCreator.create_settings([

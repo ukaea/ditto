@@ -14,7 +14,6 @@ from DittoWebApi.src.services.data_replication.storage_difference_processor impo
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
-from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
 
 
@@ -39,7 +38,6 @@ class DataReplicationServiceTest(unittest.TestCase):
 
         # By default we assume the bucket exists (this is overwritten in the relevant tests)
         self.mock_bucket_validator.check_bucket.return_value = None
-
 
         # Mock_objects
         self.mock_object_1 = mock.create_autospec(S3ObjectInformation)

@@ -2,6 +2,7 @@ from DittoWebApi.src.utils import messages
 from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
 
 
+# pylint: disable=too-few-public-methods
 class BucketValidator:
     def __init__(self, external_data_service, logger):
         self._external_data_service = external_data_service
