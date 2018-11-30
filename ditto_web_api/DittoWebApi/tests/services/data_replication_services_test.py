@@ -190,7 +190,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
-        self.mock_internal_data_service.find_files.assert_called_once_with('testdir/testsubdir/')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_not_called()
         self.mock_logger.warning.assert_called_with("No files found in directory or directory"
@@ -213,7 +213,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
-        self.mock_internal_data_service.find_files.assert_called_once_with('testdir/testsubdir/')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_external_data_service.upload_file.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_not_called()
         self.mock_logger.warning.assert_called_with("Directory testdir/testsubdir/ "
@@ -237,7 +237,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
-        self.mock_internal_data_service.find_files.assert_called_once_with('testdir/testsubdir/')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
             [file_1]
@@ -264,7 +264,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
-        self.mock_internal_data_service.find_files.assert_called_once_with('testdir/testsubdir/')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
             [file_1, file_2]
@@ -340,7 +340,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new("bucket", None)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with(None)
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1],
@@ -363,7 +363,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new("bucket", None)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with(None)
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_logger.warning.assert_called_with('No files found in directory or directory does not exist (root)')
         assert response == {'message': 'No files found in directory or directory does not exist (root)',
@@ -394,7 +394,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new("bucket", None)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with(None)
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
             [self.mock_file_information_2, self.mock_file_information_3],
@@ -430,7 +430,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new("bucket", "some_dir")
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with("some_dir")
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", "some_dir")
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1],
             [self.mock_file_information_1, self.mock_file_information_2, self.mock_file_information_3],
@@ -472,7 +472,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with(None)
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1],
@@ -496,7 +496,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with(None)
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_logger.warning.assert_called_with('No files found in directory or directory does not exist (root)')
         assert response == {'message': 'No files found in directory or directory does not exist (root)',
@@ -530,7 +530,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new_and_update("bucket", "some_dir")
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with("some_dir")
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", "some_dir")
         self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1, self.mock_object_3],
@@ -564,7 +564,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
         self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
-        self.mock_internal_data_service.find_files.assert_called_once_with(None)
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
