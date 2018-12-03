@@ -46,21 +46,19 @@ class InternalDataService:
     def _split_file_summary_by_sub_dir(self, file_summary):
         dict_of_sub_dir_summaries = {}
 
-        for file in file_summary.new_files:
+        self._add_file_to_sub_dir_file_summary(
+            file_summary.new_files, dict_of_sub_dir_summaries, lambda path: dict_of_sub_dir_summaries[path].new_files)
 
-            self._add_file_to_sub_dir_file_summary(file, dict_of_sub_dir_summaries, "new")
-
-        for file in file_summary.updated_files:
-
-            self._add_file_to_sub_dir_file_summary(file, dict_of_sub_dir_summaries, "update")
+        self._add_file_to_sub_dir_file_summary(
+            file_summary.updated_files,
+            dict_of_sub_dir_summaries,
+            lambda path: dict_of_sub_dir_summaries[path].updated_files)
 
         return dict_of_sub_dir_summaries
 
-    def _add_file_to_sub_dir_file_summary(self, file, dict_of_sub_dir_summaries, type_of_file_change):
-        directory_rel_path = self._file_system_helper.file_directory(file.rel_path)
-        if directory_rel_path not in dict_of_sub_dir_summaries:
-            dict_of_sub_dir_summaries[directory_rel_path] = FilesStorageSummary(None)
-        if type_of_file_change == "new":
-            dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
-        elif type_of_file_change == "update":
-            dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)
+    def _add_file_to_sub_dir_file_summary(self, files, dict_of_sub_dir_summaries, summary_selector):
+        for file in files:
+            directory_rel_path = self._file_system_helper.file_directory(file.rel_path)
+            if directory_rel_path not in dict_of_sub_dir_summaries:
+                dict_of_sub_dir_summaries[directory_rel_path] = FilesStorageSummary(None)
+            summary_selector(directory_rel_path).append(file)
