@@ -34,6 +34,8 @@ class DataReplicationService:
             return {"message": bucket_warning, "objects": []}
         objects = self._external_data_service.get_objects(bucket_name, dir_path)
         object_dicts = [obj.to_dict() for obj in objects]
+        if not object_dicts:
+            return {"message": f"no objects in directory {dir_path} in bucket {bucket_name}"}
         return {"message": "objects returned successfully", "objects": object_dicts}
 
     def copy_dir(self, bucket_name, dir_path):

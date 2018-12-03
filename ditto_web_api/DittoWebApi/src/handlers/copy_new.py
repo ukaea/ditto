@@ -3,6 +3,7 @@ from tornado_json import schema, exceptions
 from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_transfer_output_schema
+from DittoWebApi.src.utils.messages import positive_responses
 
 
 class CopyNewHandler(DittoHandler):
@@ -25,7 +26,7 @@ class CopyNewHandler(DittoHandler):
         bucket_name = self.get_body_attribute("bucket", required=True)
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_new(bucket_name, dir_path)
-        exceptions.api_assert(result["message"] == "Transfer successful",
+        exceptions.api_assert(result["message"] in positive_responses(dir_path),
                               400,
                               result["message"])
         return result

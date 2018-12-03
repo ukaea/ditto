@@ -24,6 +24,6 @@ class ListPresentHandler(DittoHandler):
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.retrieve_object_dicts(bucket_name, dir_path)
         exceptions.api_assert(result["message"] == "objects returned successfully",
-                              400,
+                              404,
                               result["message"])
         return result
