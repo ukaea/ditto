@@ -1,5 +1,5 @@
 # pylint: disable=W0221,W0223
-from tornado_json import schema
+from tornado_json import schema, exceptions
 from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 
@@ -23,4 +23,7 @@ class DeleteFileHandler(DittoHandler):
         bucket_name = self.get_body_attribute("bucket", required=True)
         file_rel_path = self.get_body_attribute("file", required=True)
         result = self._data_replication_service.try_delete_file(bucket_name, file_rel_path)
+        exceptions.api_assert("successfully deleted from bucket" in result["message"],
+                              404,
+                              result["message"])
         return result
