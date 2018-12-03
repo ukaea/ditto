@@ -3,8 +3,10 @@ import logging
 import unittest
 import mock
 import pytest
-from DittoWebApi.src.services.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
+from DittoWebApi.src.services.internal.archiver import Archiver
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
+from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 
 
 class TestInternalDataServices(unittest.TestCase):
@@ -13,7 +15,9 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         mock_configuration = mock.Mock()
         self.mock_logger = mock.create_autospec(logging.RootLogger, spec_set=False)
+        self.mock_archiver = mock.create_autospec(Archiver)
         mock_configuration.root_dir = "test_root_dir"
+        mock_configuration.archive_file_name = ".ditto_archived"
         self.mock_file_system_helper.join_paths.return_value = "test_root_dir/file_1"
         self.mock_file_system_helper.find_all_files_in_folder.return_value = ["test_root_dir/file_1.txt",
                                                                               "test_root_dir/file_2.txt"]
@@ -23,7 +27,8 @@ class TestInternalDataServices(unittest.TestCase):
                                                                        "test_root_dir/file_2.txt"]
         self.mock_file_system_helper.file_name.side_effect = ["file_1.txt",
                                                               "file_2.txt"]
-        self.internal_data_services = InternalDataService(mock_configuration,
+        self.internal_data_services = InternalDataService(self.mock_archiver,
+                                                          mock_configuration,
                                                           self.mock_file_system_helper,
                                                           self.mock_logger)
 
@@ -71,3 +76,24 @@ class TestInternalDataServices(unittest.TestCase):
         assert self.mock_logger.debug.call_count == 2
         self.mock_logger.debug.assert_any_call("Finding files in directory test_root_dir/file_1")
         self.mock_logger.debug.assert_any_call("Found 2 files, converting to file information objects")
+
+    def test_create_archive_file_calls_archiver_with_given_content_when_archive_file_does_not_exist(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.return_value = False
+        self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
+        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        # Act
+        self.internal_data_services.archive_file_transfer(None, mock_file_summary)
+        # Assert
+        self.mock_archiver.write_archive.assert_called_once_with("root/.ditto_archived", mock_file_summary)
+
+    def test_create_archive_file_calls_archiver_with_updated_content_when_archive_filet_exist(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.return_value = True
+        self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
+        self.mock_archiver.update_archive.return_value = "Some old content test_content"
+        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        # Act
+        self.internal_data_services.archive_file_transfer(None, mock_file_summary)
+        # Assert
+        self.mock_archiver.update_archive.assert_called_once_with("root/.ditto_archived", mock_file_summary)
