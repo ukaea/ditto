@@ -24,6 +24,6 @@ class DeleteFileHandler(DittoHandler):
         file_rel_path = self.get_body_attribute("file", required=True)
         result = self._data_replication_service.try_delete_file(bucket_name, file_rel_path)
         exceptions.api_assert("successfully deleted from bucket" in result["message"],
-                              404,
+                              400,
                               result["message"])
         return result
