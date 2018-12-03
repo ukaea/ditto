@@ -1,5 +1,5 @@
 # pylint: disable=W0221,W0223
-from tornado_json import schema
+from tornado_json import schema, exceptions
 from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_transfer_output_schema
@@ -25,4 +25,7 @@ class CopyDirHandler(DittoHandler):
         bucket_name = self.get_body_attribute("bucket", required=True)
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_dir(bucket_name, dir_path)
+        exceptions.api_assert(result["message"] == "Transfer successful",
+                              400,
+                              result["message"])
         return result
