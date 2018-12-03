@@ -18,6 +18,7 @@ from DittoWebApi.src.services.internal.archiver import Archiver
 from DittoWebApi.src.services.security.config_security_service import ConfigSecurityService
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
+from DittoWebApi.src.utils.file_read_write_helper import FileReadWriteHelper
 from DittoWebApi.src.utils.route_helper import format_route_specification
 
 
@@ -52,8 +53,9 @@ if __name__ == "__main__":
 
     # Set up services
     S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
+    FILE_READ_WRITE_HELPER = FileReadWriteHelper()
     FILE_SYSTEM_HELPER = FileSystemHelper()
-    ARCHIVER = Archiver(FILE_SYSTEM_HELPER, LOGGER)
+    ARCHIVER = Archiver(FILE_READ_WRITE_HELPER, FILE_SYSTEM_HELPER, LOGGER)
     EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
     INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
     STORAGE_DIFFERENCE_PROCESSOR = StorageDifferenceProcessor(LOGGER)

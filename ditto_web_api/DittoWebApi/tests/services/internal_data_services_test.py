@@ -95,7 +95,7 @@ class TestInternalDataServices(unittest.TestCase):
         # Act
         self.internal_data_services.archive_file_transfer(self.mock_file_summary)
         # Assert
-        assert self.mock_archiver.write_archive.call_count == 2
+        assert self.mock_archiver.write_archive.call_count == 1
         assert self.mock_archiver.update_archive.call_count == 0
 
     def test_create_archive_file_calls_archiver_with_updated_content_when_archive_file_exist(self):
@@ -109,12 +109,13 @@ class TestInternalDataServices(unittest.TestCase):
         self.internal_data_services.archive_file_transfer(self.mock_file_summary)
         # Assert
         assert self.mock_archiver.write_archive.call_count == 0
-        assert self.mock_archiver.update_archive.call_count == 2
+        assert self.mock_archiver.update_archive.call_count == 1
 
     def test_create_archive_file_updates_archive_when_exists_and_creates_new_when_not(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.side_effect = [True, False]
+        self.mock_file_system_helper.does_file_exist.side_effect = [False, True]
         self.mock_file_system_helper.join_paths.return_value = "root/.ditto_archived"
+        self.mock_file_system_helper.file_directory.side_effect = ["path_1", "path_2"]
         self.mock_archiver.update_archive.return_value = "Some old content test_content"
         self.mock_file_summary.new_files = [self.mock_file_2]
         self.mock_file_summary.updated_files = [self.mock_file_1]
@@ -135,7 +136,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.internal_data_services.archive_file_transfer(self.mock_file_summary)
         # Assert
         assert self.mock_archiver.write_archive.call_count == 0
-        assert self.mock_archiver.update_archive.call_count == 2
+        assert self.mock_archiver.update_archive.call_count == 1
 
     def test_create_archive_file_creates_archive_that_do_not_exist_even_when_all_files_are_updating_files_on_s3(self):
         # Arrange
@@ -147,5 +148,5 @@ class TestInternalDataServices(unittest.TestCase):
         # Act
         self.internal_data_services.archive_file_transfer(self.mock_file_summary)
         # Assert
-        assert self.mock_archiver.write_archive.call_count == 2
+        assert self.mock_archiver.write_archive.call_count == 1
         assert self.mock_archiver.update_archive.call_count == 0
