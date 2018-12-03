@@ -14,12 +14,13 @@ class Archiver:
         try:
             content = {}
             new_archive_file = self._file_system_helper.create_and_open_file_for_writing(archive_file_path)
+
             for file in file_summary.new_files:
-                new_content = self._archive_new_file(file, time_of_transfer)
-                content.update(new_content)
+                content[file.file_name] = self._archive_file(file, time_of_transfer, "new upload")
+
             for file in file_summary.updated_files:
-                new_content = self._archive_file_update(file, time_of_transfer)
-                content.update(new_content)
+                content[file.file_name] = self._archive_file(file, time_of_transfer, "file update")
+
             write_json_to_file(new_archive_file, content)
         except Exception as exception:
             self._logger.error(f"Exception found here: {exception}")
@@ -33,14 +34,13 @@ class Archiver:
         try:
             archived_file = self._file_system_helper.open_file_for_reading_and_writing(archive_file_path)
             content = read_file_as_json(archived_file)
-            self._logger.debug(f"Old archive file content {content}")
             clear_file(archived_file)
 
             for file in file_summary.new_files:
-                content[file.file_name] = self._archive_new_file(file, time_of_transfer)[file.file_name]
+                content[file.file_name] = self._archive_file(file, time_of_transfer, "new upload")[file.file_name]
 
             for file in file_summary.updated_files:
-                content[file.file_name] = self._archive_file_update(file, time_of_transfer)[file.file_name]
+                content[file.file_name] = self._archive_update(file, time_of_transfer, "file update")[file.file_name]
 
             write_json_to_file(archived_file, content)
 
@@ -51,19 +51,10 @@ class Archiver:
             self._file_system_helper.close_file(archived_file)
         self._logger.debug(f"Archive file updated: {archive_file_path}")
 
-    def _archive_new_file(self, file, time_of_transfer):
+    def _archive_file(self, file, time_of_transfer, type_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
         return {file.file_name: {"file": file.file_name,
                                  "size": size,
                                  "latest update": time_of_transfer,
-                                 "type of transfer": "new upload"}
+                                 "type of transfer": type_of_transfer}
                 }
-
-    def _archive_file_update(self, file, time_of_transfer):
-        size = self._file_system_helper.file_size(file.abs_path)
-        return {file.file_name: {"file": file.file_name,
-                                 "size": size,
-                                 "latest update": time_of_transfer,
-                                 "type of transfer": "file update"}
-                }
-
