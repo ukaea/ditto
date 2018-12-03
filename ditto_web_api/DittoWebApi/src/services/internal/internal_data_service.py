@@ -34,6 +34,7 @@ class InternalDataService:
         for sub_dir in sub_directory_file_summaries:
             full_sub_dir_path = \
                 self._file_system_helper.join_paths(self._root_dir, sub_dir) if sub_dir else self._root_dir
+            self._logger.debug(f"Writing archive file in {full_sub_dir_path}")
             archive_file_path = self._file_system_helper.join_paths(full_sub_dir_path, self._archive_file_name)
             sub_dir_file_summary = sub_directory_file_summaries[sub_dir]
 
@@ -46,6 +47,7 @@ class InternalDataService:
         dict_of_sub_dir_summaries = {}
 
         for file in (file_summary.new_files + file_summary.updated_files):
+
             self._add_file_to_sub_dir_file_summary(file, file_summary, dict_of_sub_dir_summaries)
 
         return dict_of_sub_dir_summaries
@@ -54,7 +56,7 @@ class InternalDataService:
         directory_rel_path = self._file_system_helper.file_directory(file.rel_path)
         if directory_rel_path not in dict_of_sub_dir_summaries:
             dict_of_sub_dir_summaries[directory_rel_path] = FilesStorageSummary(None)
-        else:
-            dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file) if \
-                file in file_summary.new_files \
-                else dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)
+
+        dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file) if \
+            file in file_summary.new_files \
+            else dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)

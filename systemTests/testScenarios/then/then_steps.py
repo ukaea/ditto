@@ -178,6 +178,7 @@ class ThenSteps:
         print(file_path)
         with open(file_path, 'r') as file:
             content = json.load(file)
+            print(content)
         try:
             content[file_name]
         except KeyError:

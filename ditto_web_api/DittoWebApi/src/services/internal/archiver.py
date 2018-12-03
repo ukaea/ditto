@@ -14,9 +14,11 @@ class Archiver:
             new_archive_file = self._file_system_helper.create_and_open_file_for_writing(archive_file_path)
 
             for file in file_summary.new_files:
+                self._logger.debug(f"new file found: {file.file_name}")
                 content[file.file_name] = self._archive_file(file, time_of_transfer, "new upload")
 
             for file in file_summary.updated_files:
+                self._logger.debug(f"updated file found: {file.file_name}")
                 content[file.file_name] = self._archive_file(file, time_of_transfer, "file update")
 
             self._file_read_write_helper.write_json_to_file(new_archive_file, content)
