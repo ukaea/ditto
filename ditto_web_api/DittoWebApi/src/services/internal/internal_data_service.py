@@ -29,7 +29,7 @@ class InternalDataService:
         return FileInformation(abs_path_to_file, rel_path_to_file, file_name)
 
     def archive_file_transfer(self, file_summary):
-        sub_directory_file_summaries = self.split_file_summary_by_sub_dir(file_summary)
+        sub_directory_file_summaries = self._split_file_summary_by_sub_dir(file_summary)
 
         for sub_dir in sub_directory_file_summaries:
             full_sub_dir_path = \
@@ -42,12 +42,11 @@ class InternalDataService:
             else:
                 self._archiver.write_archive(archive_file_path, sub_dir_file_summary)
 
-    def split_file_summary_by_sub_dir(self, file_summary):
+    def _split_file_summary_by_sub_dir(self, file_summary):
         dict_of_sub_dir_summaries = {}
 
         for file in file_summary.new_files:
-            file_name = file.file_name
-            directory_rel_path = file.rel_path[: -len(file_name)]
+            directory_rel_path = self._file_system_helper.file_directory(file.rel_path)
 
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
@@ -56,8 +55,7 @@ class InternalDataService:
                 dict_of_sub_dir_summaries[directory_rel_path].new_files.append(file)
 
         for file in file_summary.updated_files:
-            file_name = file.file_name
-            directory_rel_path = file.rel_path[: -len(file_name)]
+            directory_rel_path = self._file_system_helper.file_directory(file.rel_path)
 
             if directory_rel_path in dict_of_sub_dir_summaries:
                 dict_of_sub_dir_summaries[directory_rel_path].updated_files.append(file)
