@@ -53,7 +53,6 @@ class TestArchive(unittest.TestCase):
                                       'type of transfer': 'file update'}}
         )
 
-
     @mock.patch('DittoWebApi.src.utils.system_helper.time.time', return_value=12345)
     def test_update_archive_updates_an_archive_file(self, time):
         self.mock_file_summary.new_files = [self.mock_file_1]
@@ -114,4 +113,3 @@ class TestArchive(unittest.TestCase):
                     'type of transfer': 'file update'}
 
             })
-

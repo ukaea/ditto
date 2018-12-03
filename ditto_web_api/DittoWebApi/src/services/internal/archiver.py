@@ -54,6 +54,6 @@ class Archiver:
     def _archive_file(self, file, time_of_transfer, type_of_transfer):
         size = self._file_system_helper.file_size(file.abs_path)
         return {"file": file.file_name,
-                            "size": size,
-                            "latest update": time_of_transfer,
-                            "type of transfer": type_of_transfer}
+                "size": size,
+                "latest update": time_of_transfer,
+                "type of transfer": type_of_transfer}

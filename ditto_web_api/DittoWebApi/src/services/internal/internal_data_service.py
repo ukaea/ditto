@@ -46,7 +46,7 @@ class InternalDataService:
     def _split_file_summary_by_sub_dir(self, file_summary):
         dict_of_sub_dir_summaries = {}
 
-        for file in (file_summary.new_files + file_summary.updated_files):
+        for file in file_summary.new_files + file_summary.updated_files:
 
             self._add_file_to_sub_dir_file_summary(file, file_summary, dict_of_sub_dir_summaries)
 
