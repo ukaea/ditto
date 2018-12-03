@@ -1,5 +1,5 @@
 # pylint: disable=W0221,W0223
-from tornado_json import schema
+from tornado_json import schema, exceptions
 from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 
@@ -23,4 +23,7 @@ class CreateBucketHandler(DittoHandler):
     def post(self, *args, **kwargs):
         bucket_name = self.get_body_attribute("bucket", required=True)
         result = self._data_replication_service.create_bucket(bucket_name)
+        exceptions.api_assert("Bucket Created" in result["message"],
+                              400,
+                              result["message"])
         return result
