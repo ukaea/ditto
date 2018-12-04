@@ -19,7 +19,6 @@ from DittoWebApi.tests.helpers_for_tests import build_mock_file_summary
 from DittoWebApi.tests.helpers_for_tests import build_transfer_return
 
 
-
 class DataReplicationServiceTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -236,7 +235,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         file_2 = FileInformation("/home/test/sub_1/test2.txt", "sub_1/test2.txt", "test2.txt")
         self.mock_external_data_service.does_dir_exist.return_value = False
         self._set_up_system(True, [], [file_1, file_2])
-        self.mock_external_data_service.perform_transfer.return_value = build_transfer_return(2,0,0,32)
+        self.mock_external_data_service.perform_transfer.return_value = build_transfer_return(2, 0, 0, 32)
         # Act
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
