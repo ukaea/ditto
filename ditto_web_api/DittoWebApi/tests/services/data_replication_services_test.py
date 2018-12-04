@@ -14,6 +14,7 @@ from DittoWebApi.src.services.data_replication.storage_difference_processor impo
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
+from DittoWebApi.tests.helpers_for_tests import build_mock_file_summary
 
 
 class DataReplicationServiceTest(unittest.TestCase):
@@ -314,10 +315,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary = build_mock_file_summary()
         mock_file_summary.files_in_directory = [self.mock_file_information_1]
-        mock_file_summary.new_files = []
-        mock_file_summary.updated_files = []
         mock_file_summary.files_to_be_skipped = [self.mock_file_information_1]
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         # Act
@@ -357,11 +356,10 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_objects.return_value = []
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_2,
                                                                    self.mock_file_information_3]
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary = build_mock_file_summary()
         mock_file_summary.files_in_directory = [self.mock_file_information_2,
                                                 self.mock_file_information_3]
         mock_file_summary.new_files = [self.mock_file_information_2, self.mock_file_information_3]
-        mock_file_summary.updated_files = []
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         self.mock_external_data_service.perform_transfer.return_value = {"message": "Transfer successful",
                                                                          "new_files_uploaded": 2,
@@ -389,12 +387,11 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2,
                                                                    self.mock_file_information_3]
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary = build_mock_file_summary()
         mock_file_summary.files_in_directory = [self.mock_file_information_1,
                                                 self.mock_file_information_2,
                                                 self.mock_file_information_3]
         mock_file_summary.new_files = [self.mock_file_information_2, self.mock_file_information_3]
-        mock_file_summary.updated_files = []
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         self.mock_external_data_service.perform_transfer.return_value = {"message": "Transfer successful",
                                                                          "new_files_uploaded": 2,
@@ -434,10 +431,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary = build_mock_file_summary()
         mock_file_summary.files_in_directory = [self.mock_file_information_1]
-        mock_file_summary.new_files = []
-        mock_file_summary.updated_files = []
         mock_file_summary.files_to_be_skipped.return_value = [self.mock_file_information_1]
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         # Act
@@ -479,7 +474,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2,
                                                                    self.mock_file_information_3]
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary = build_mock_file_summary()
         mock_file_summary.files_in_directory = [self.mock_file_information_1,
                                                 self.mock_file_information_2,
                                                 self.mock_file_information_3]
@@ -513,10 +508,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_objects.return_value = []
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2]
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        mock_file_summary = build_mock_file_summary()
         mock_file_summary.new_files = [self.mock_file_information_1, self.mock_file_information_2]
-        mock_file_summary.updated_files = []
-        mock_file_summary.files_to_be_skipped = []
         self.mock_storage_difference_processor.return_difference_comparison.return_value = mock_file_summary
         self.mock_external_data_service.perform_transfer.return_value = {'message': 'Transfer successful',
                                                                          'new_files_uploaded': 2,
