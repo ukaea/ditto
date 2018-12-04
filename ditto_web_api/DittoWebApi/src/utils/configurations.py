@@ -62,10 +62,6 @@ class Configuration:
         return self._s3_use_secure
 
     @property
-    def root_dir(self):
-        return self._root_dir
-
-    @property
     def bucket_standard(self):
         return self._bucket_standard
 
