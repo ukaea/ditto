@@ -13,5 +13,6 @@ Vagrant VM up and running. In GitBash:
 
 In Postman:
 * POST request to `http://172.28.129.160:8888/listpresent/` is refused
-* Authorization tab > Basic Auth in drop-down menu > enter Username and Password
+* Authentication tab > Basic Auth in drop-down menu > enter Username and Password
   - Correct credentials; one or other incorrect
+  - Show both authentication and authorisation
