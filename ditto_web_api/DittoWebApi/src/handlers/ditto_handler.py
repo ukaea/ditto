@@ -1,6 +1,7 @@
 from base64 import b64decode
 
 from tornado_json.requesthandlers import APIHandler
+from tornado_json import exceptions
 
 
 class DittoHandler(APIHandler):
@@ -38,5 +39,4 @@ class DittoHandler(APIHandler):
             self._authentication_failed()
 
     def _authentication_failed(self):
-        self.set_status(401)
-        self.finish({'reason': 'Authentication required'})
+        raise exceptions.APIError(401, 'Authentication required')

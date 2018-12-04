@@ -23,7 +23,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         with pytest.raises(tornado.httpclient.HTTPClientError) as error:
             yield self.send_DELETE_request(body)
         # Assert
-        self.mock_security_service.check_credentials.assert_not_called
+        self.mock_security_service.check_credentials.assert_not_called()
         assert error.value.response.code == 401
 
     @gen_test
