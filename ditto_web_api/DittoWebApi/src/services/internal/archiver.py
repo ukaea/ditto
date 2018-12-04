@@ -8,18 +8,11 @@ class Archiver:
         self._file_read_write_helper = file_read_write_helper
 
     def write_archive(self, archive_file_path, file_summary):
-        time_of_transfer = str(current_time_in_utc())
         try:
             content = {}
             new_archive_file = self._file_system_helper.create_and_open_file_for_writing(archive_file_path)
 
-            for file in file_summary.new_files:
-                self._logger.debug(f"new file found: {file.file_name}")
-                content[file.file_name] = self._archive_file(file, time_of_transfer, "new upload")
-
-            for file in file_summary.updated_files:
-                self._logger.debug(f"updated file found: {file.file_name}")
-                content[file.file_name] = self._archive_file(file, time_of_transfer, "file update")
+            self._archive_file_summary(file_summary, content)
 
             self._file_read_write_helper.write_json_to_file(new_archive_file, content)
         except Exception as exception:
@@ -30,17 +23,12 @@ class Archiver:
         self._logger.debug(f"Archive file created: {archive_file_path}")
 
     def update_archive(self, archive_file_path, file_summary):
-        time_of_transfer = str(current_time_in_utc())
         try:
             archived_file = self._file_system_helper.open_file_for_reading_and_writing(archive_file_path)
             content = self._file_read_write_helper.read_file_as_json(archived_file)
             self._file_read_write_helper.clear_file(archived_file)
 
-            for file in file_summary.new_files:
-                content[file.file_name] = self._archive_file(file, time_of_transfer, "new upload")
-
-            for file in file_summary.updated_files:
-                content[file.file_name] = self._archive_file(file, time_of_transfer, "file update")
+            self._archive_file_summary(file_summary, content)
 
             self._file_read_write_helper.write_json_to_file(archived_file, content)
 
@@ -57,3 +45,11 @@ class Archiver:
                 "size": size,
                 "latest update": time_of_transfer,
                 "type of transfer": type_of_transfer}
+
+    def _archive_file_summary(self, file_summary, content):
+        time_of_transfer = str(current_time_in_utc())
+        for file in file_summary.new_files:
+            content[file.file_name] = self._archive_file(file, time_of_transfer, "new upload")
+
+        for file in file_summary.updated_files:
+            content[file.file_name] = self._archive_file(file, time_of_transfer, "file update")
