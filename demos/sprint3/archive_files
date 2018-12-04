@@ -62,8 +62,7 @@ demonstrated in security demo)
   body = {"bucket": "ditto-testbucket1"} to copy across new file and update old in sub directory
 
 Browser
-29. http://172.28.129.160:9000/ to show what files exist if
- anything present delete all files and buckets to start from empty
+29. http://172.28.129.160:9000/ to show files exist, should be all new files and no archive files
 
 Bash
 30. `ls -A` show archive file still there
