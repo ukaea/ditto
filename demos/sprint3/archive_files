@@ -31,41 +31,41 @@ Bash (new window)
 15. `cd ..` Get back to root dir for data
 
 Browser
-15. http://172.28.129.160:9000/ to show what files exist if
+16. http://172.28.129.160:9000/ to show what files exist if
  anything present delete all files and buckets to start from empty
 
 Postman
-15. http://172.28.129.160:8888/copydir/ (post, ensure authentication is as
+17. http://172.28.129.160:8888/copydir/ (post, ensure authentication is as
 demonstrated in security demo)
   body = {"bucket": "ditto-testbucket1"} to copy across all files from local
 
 Browser
-16. http://172.28.129.160:9000/ Show the files copied across but no archive file
+18. http://172.28.129.160:9000/ Show the files copied across but no archive file
 
 
 Bash
-17. `ls -A` now see archive file
-18. `cat .ditto_archived` show content of archive file
-19. `cd some_files`
-20. `ls -A` now see archive file
-21. `cat .ditto_archived` show content of archive file
+19. `ls -A` now see archive file
+20. `cat .ditto_archived` show content of archive file
+21. `cd some_files`
+22. `ls -A` now see archive file
+23. `cat .ditto_archived` show content of archive file
 ### Update this file and add a new file to the root data dir but keep the old as it is
-22. `echo "updating this file \n" >> another_test_file.txt`
-23. `cd ..`
-24. `echo "A new file to test" >> test_file_2.txt`
+24. `echo "updating this file \n" >> another_test_file.txt`
+25. `cd ..`
+26. `echo "A new file to test" >> test_file_2.txt`
 
 Postman
-25. http://172.28.129.160:8888/copyupdate/ (post, ensure authentication is as
+27. http://172.28.129.160:8888/copyupdate/ (post, ensure authentication is as
 demonstrated in security demo)
   body = {"bucket": "ditto-testbucket1"} to copy across new file and update old in sub directory
 
 Browser
-26. http://172.28.129.160:9000/ to show what files exist if
+28. http://172.28.129.160:9000/ to show what files exist if
  anything present delete all files and buckets to start from empty
 
 Bash
-27. `ls -A` show archive file still there
-28. `cat .ditto_archived` show new file there, old entry untouched
-29. `cd some_files`
-30. `ls -A`
-31. `cat .ditto_archived` Show file updated
+29. `ls -A` show archive file still there
+30. `cat .ditto_archived` show new file there, old entry untouched
+31. `cd some_files`
+32. `ls -A`
+33. `cat .ditto_archived` Show file updated
