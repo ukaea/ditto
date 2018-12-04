@@ -20,6 +20,7 @@ class SystemTestContext:
         self.ditto_api_process = None
         self.console_logger = ProcessLogger('console', self.log_folder_path)
         self.http_client_response = None
+        self.archive_creation_time = None
 
     def clean_up(self):
         print('cleaning up test')
@@ -146,6 +147,15 @@ class SystemTestContext:
     @property
     def simple_file_name(self):
         return "testA.txt"
+
+    @property
+    def simple_sub_dir(self):
+        return "sub_dir_A"
+
+    @property
+    def file_in_sub_dir_name(self):
+        return "testB.txt"
+
 
 
 class BaseSystemTest(unittest.TestCase):

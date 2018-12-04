@@ -8,6 +8,7 @@ from DittoWebApi.src.services.internal.archiver import Archiver
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils.configurations import Configuration
+from DittoWebApi.src.models.file_information import FileInformation
 
 
 class TestInternalDataServices(unittest.TestCase):
@@ -24,6 +25,13 @@ class TestInternalDataServices(unittest.TestCase):
                                                           mock_configuration,
                                                           self.mock_file_system_helper,
                                                           self.mock_logger)
+        self.mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        self.mock_file_1 = mock.create_autospec(FileInformation)
+        self.mock_file_1.rel_path = 'root/test.txt'
+        self.mock_file_1.file_name = 'test.txt'
+        self.mock_file_2 = mock.create_autospec(FileInformation)
+        self.mock_file_2.rel_path = 'root/sub_dir_1/test_1.txt'
+        self.mock_file_2.file_name = 'test_1.txt'
 
     def test_find_files_finds_files_in_the_root_directory(self):
         # Arrange
@@ -197,22 +205,79 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_logger.debug.assert_any_call("Finding files in directory /usr/tmp/data/test_dir")
         self.mock_logger.debug.assert_any_call("Found 2 files, converting to file information objects")
 
-    def test_create_archive_file_calls_archiver_with_given_content_when_archive_file_does_not_exist(self):
+    def test_create_archive_file_called_for_each_subdir_for_files_transferred_when_archive_file_does_not_exist(self):
         # Arrange
         self.mock_file_system_helper.does_file_exist.return_value = False
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        self.mock_file_summary.new_files = [self.mock_file_1, self.mock_file_2]
+        self.mock_file_summary.updated_files = []
         # Act
-        self.internal_data_services.archive_file_transfer("/usr/tmp/data", None, mock_file_summary)
+        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
         # Assert
-        self.mock_archiver.write_archive.assert_called_once_with("/usr/tmp/data/.ditto_archived", mock_file_summary)
+        assert self.mock_archiver.write_archive.call_count == 1
+        assert self.mock_archiver.update_archive.call_count == 0
 
     def test_create_archive_file_calls_archiver_with_updated_content_when_archive_file_exists(self):
         # Arrange
         self.mock_file_system_helper.does_file_exist.return_value = True
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
-        mock_file_summary = mock.create_autospec(FilesStorageSummary)
+        self.mock_file_summary.new_files = []
+        self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
         # Act
-        self.internal_data_services.archive_file_transfer("/usr/tmp/data", None, mock_file_summary)
+        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
         # Assert
-        self.mock_archiver.update_archive.assert_called_once_with("/usr/tmp/data/.ditto_archived", mock_file_summary)
+        assert self.mock_archiver.write_archive.call_count == 0
+        assert self.mock_archiver.update_archive.call_count == 1
+
+    def test_create_archive_file_calls_archiver_with_updated_content_when_archive_file_exist(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.return_value = True
+        self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
+        self.mock_archiver.update_archive.return_value = "Some old content test_content"
+        self.mock_file_summary.new_files = []
+        self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
+        # Act
+        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        # Assert
+        assert self.mock_archiver.write_archive.call_count == 0
+        assert self.mock_archiver.update_archive.call_count == 1
+
+    def test_create_archive_file_updates_archive_when_exists_and_creates_new_when_not(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.side_effect = [False, True]
+        self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
+        self.mock_file_system_helper.file_directory.side_effect = ["path_1", "path_2"]
+        self.mock_archiver.update_archive.return_value = "Some old content test_content"
+        self.mock_file_summary.new_files = [self.mock_file_2]
+        self.mock_file_summary.updated_files = [self.mock_file_1]
+        # Act
+        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        # Assert
+        assert self.mock_archiver.write_archive.call_count == 1
+        assert self.mock_archiver.update_archive.call_count == 1
+
+    def test_create_archive_file_updates_archive_when_exists_even_when_all_files_are_new(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.side_effect = [True, True]
+        self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
+        self.mock_archiver.update_archive.return_value = "Some old content test_content"
+        self.mock_file_summary.new_files = [self.mock_file_1, self.mock_file_2]
+        self.mock_file_summary.updated_files = []
+        # Act
+        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        # Assert
+        assert self.mock_archiver.write_archive.call_count == 0
+        assert self.mock_archiver.update_archive.call_count == 1
+
+    def test_create_archive_file_creates_archive_that_do_not_exist_even_when_all_files_are_updating_files_on_s3(self):
+        # Arrange
+        self.mock_file_system_helper.does_file_exist.side_effect = [False, False]
+        self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
+        self.mock_archiver.update_archive.return_value = "Some old content test_content"
+        self.mock_file_summary.new_files = []
+        self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
+        # Act
+        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        # Assert
+        assert self.mock_archiver.write_archive.call_count == 1
+        assert self.mock_archiver.update_archive.call_count == 0
