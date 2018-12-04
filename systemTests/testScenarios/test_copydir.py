@@ -29,37 +29,37 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         # Copy whole directory to s3 bucket
         self.when.authorised_copy_dir_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.new_simple_file_exists_in_s3_bucket()
+        self.then.simple_file_exists_in_s3_bucket()
 
     def test_copy_dir_copies_just_a_sub_dir_when_specified_as_argument(self):
         # Create a file in a sub-directory
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_sub_dir_with_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_sub_dir_with_test_file_exists_locally()
 
         # Copy sub-dir with copy-dir using directory argument
         self.when.authorised_copy_dir_called_for_sub_directory()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.new_file_exists_in_sub_dir_of_s3_bucket()
+        self.then.file_exists_in_sub_dir_of_s3_bucket()
         self.then.simple_file_does_not_exist_in_s3_bucket()
 
     def test_copy_dir_does_not_update_if_directory_already_exists_in_s3_bucket(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_test_file_is_setup_in_s3()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_test_file_exists_in_s3()
 
         self.when.authorised_copy_dir_called_for_whole_directory()
 
@@ -68,13 +68,26 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_shows_one_file_skipped()
         self.then.response_shows_request_was_completed_successfully()
 
+    def test_copy_dir_fails_when_user_not_authorised_for_bucket(self):
+        # Start the api
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_exists_locally()
+
+        # Try to copy the bucket
+        self.when.unauthorised_copy_dir_called_for_whole_directory()
+
+        self.then.response_shows_failed_as_unauthorised()
+        self.then.simple_file_does_not_exist_in_s3_bucket()
+
     def test_copy_dir_fails_when_authentication_is_not_valid(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
-        self.when.unauthorised_copy_dir_called_for_whole_directory()
+        self.when.unauthenticated_copy_dir_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
 
@@ -82,17 +95,17 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.copy_dir_called_with_no_authorisation_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
-        
+
     def test_archive_file_is_created_when_copy_dir_called_for_whole_dir(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
 
         self.when.authorised_copy_dir_called_for_whole_directory()
 
@@ -105,8 +118,8 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
-        self.given.simple_sub_dir_with_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
+        self.given.simple_sub_dir_with_test_file_exists_locally()
 
         self.when.authorised_copy_dir_called_for_whole_directory()
 
@@ -120,7 +133,7 @@ class TestCopyDir(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_locally()
+        self.given.simple_test_file_exists_locally()
         self.given.archive_file_already_exists_in_local_root()
 
         self.when.authorised_copy_dir_called_for_whole_directory()
@@ -129,5 +142,5 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_does_not_exist_in_s3_bucket()
-        self.then.new_simple_file_exists_in_s3_bucket()
         self.then.archive_file_has_been_updated()
+        self.then.simple_file_exists_in_s3_bucket()

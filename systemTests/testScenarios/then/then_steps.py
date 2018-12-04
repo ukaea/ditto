@@ -11,42 +11,76 @@ class ThenSteps:
         self.console_error = LogFileSteps(context, 'console-stderr.log')
         self.ditto_api_log = LogFileSteps(context, 'ditto_api_server.log')
 
-    def thing_is_true(self):
-        assert isinstance(self, ThenSteps)
+    # Private properties
 
-    def thing_is_false(self):
-        assert isinstance(self, list)
+    @property
+    def _standard_s3_bucket_path(self):
+        return os.path.join(self._context.s3_data_folder_path, self._context.standard_bucket_name)
 
-    def simple_bucket_exists_in_s3(self):
-        bucket_dir_path = os.path.join(self._context.s3_data_folder_path, 'systemtest-textbucket')
-        assert os.path.isdir(bucket_dir_path)
+    @property
+    def _simple_s3_file_path(self):
+        return os.path.join(self._context.s3_data_folder_path,
+                            self._context.standard_bucket_name,
+                            self._context.simple_file_name)
 
-    def new_simple_file_exists_in_s3_bucket(self):
-        file_path = os.path.join(self._context.s3_data_folder_path,
-                                 'systemtest-textbucket',
-                                 self._context.simple_file_name)
+    # Public methods: archive
+
+    def archive_file_exists_in_root_dir(self):
+        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
         assert os.path.exists(file_path)
 
-    def new_file_exists_in_sub_dir_of_s3_bucket(self):
-        file_path = os.path.join(self._context.s3_data_folder_path,
-                                 'systemtest-textbucket',
-                                 'sub_dir_A', 'testB.txt')
+    def archive_file_does_not_exist_in_s3_bucket(self):
+        file_path = os.path.join(self._context.s3_data_folder_path, ".ditto_archived")
+        assert os.path.exists(file_path) is False
+
+    def archive_file_exists_in_sub_dir(self):
+        file_path = os.path.join(self._context.local_data_folder_path, "sub_dir_A", ".ditto_archived")
         assert os.path.exists(file_path)
+
+    # Public methods: directories and files
+
+    def standard_s3_bucket_exists(self):
+        assert os.path.isdir(self._standard_s3_bucket_path)
+
+    def standard_s3_bucket_does_not_exist(self):
+        assert not os.path.isdir(self._standard_s3_bucket_path)
+
+    def simple_file_exists_in_s3_bucket(self):
+        assert os.path.isfile(self._simple_s3_file_path)
+
+    def simple_file_does_not_exist_in_s3_bucket(self):
+        assert not os.path.exists(self._simple_s3_file_path)
+
+    def simple_file_content_is_updated_on_s3(self):
+        with open(self._simple_s3_file_path, 'r') as file:
+            content = file.read()
+        assert content == 'example test content A. A new bit of text'
+
+    def file_exists_in_sub_dir_of_s3_bucket(self):
+        file_path = os.path.join(self._context.s3_data_folder_path,
+                                 self._context.standard_bucket_name,
+                                 'sub_dir_A',
+                                 'testB.txt')
+        assert os.path.isfile(file_path)
+
+    # Public methods: HTTP responses
+
+    def response_shows_no_objects_in_bucket(self):
+        assert self._context.object_names_from_list_present_response_body() == []
 
     def response_body_shows_simple_file_in_s3(self):
         assert self._context.response_data()["message"] == "objects returned successfully"
-        assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt')
-
-    def response_body_shows_file_in_sub_dir_in_s3(self):
-        sub_dir_file = os.path.join('sub_dir_A', 'testB.txt')
-        assert self._context.response_data()["message"] == "objects returned successfully"
-        assert self._context.file_name_in_objects_returned_in_list_present_body(sub_dir_file)
+        assert 'testA.txt' in self._context.object_names_from_list_present_response_body()
 
     def response_body_shows_simple_file_not_in_s3(self):
-        assert self._context.file_name_in_objects_returned_in_list_present_body('testA.txt') is False
+        assert 'testA.txt' not in self._context.object_names_from_list_present_response_body()
+
+    def response_body_shows_file_in_sub_dir_in_s3(self):
+        assert self._context.response_data()["message"] == "objects returned successfully"
+        sub_dir_file = os.path.join('sub_dir_A', 'testB.txt')
+        assert sub_dir_file in self._context.object_names_from_list_present_response_body()
 
     def response_shows_request_was_completed_successfully(self):
-        print(self._context.http_client_response.status_code)
         assert self._context.http_client_response.status_code == 200
         assert self._context.response_status() == "success"
 
@@ -75,17 +109,6 @@ class ThenSteps:
         assert self._context.response_data()["message"] == 'File testA.txt successfully deleted ' \
                                                                    'from bucket systemtest-textbucket'
 
-    def simple_file_does_not_exist_in_s3_bucket(self):
-        file_path = os.path.join(self._context.s3_data_folder_path,
-                                 'systemtest-textbucket',
-                                 self._context.simple_file_name)
-        assert os.path.exists(file_path) is False
-
-    def standard_s3_bucket_does_not_exist(self):
-        file_path = os.path.join(self._context.s3_data_folder_path,
-                                 'systemtest-textbucket')
-        assert os.path.exists(file_path) is False
-
     def response_shows_one_file_skipped(self):
         assert self._context.response_data()["files skipped"] == 1
 
@@ -98,14 +121,6 @@ class ThenSteps:
     def response_message_body_indicates_one_file_updated(self):
         assert self._context.response_data()["files updated"] == 1
 
-    def simple_file_content_is_updated_on_s3(self):
-        file_path = os.path.join(self._context.s3_data_folder_path,
-                                 'systemtest-textbucket',
-                                 self._context.simple_file_name)
-        with open(file_path, 'r') as file:
-            content = file.read()
-        assert content == 'example test content A. A new bit of text'
-
     def response_message_reports_simple_file_does_not_exist(self):
         assert self._context.response_data()["message"] == "File testA.txt does not exist" \
                                                                    " in bucket systemtest-textbucket"
@@ -114,13 +129,13 @@ class ThenSteps:
         assert self._context.response_data()["message"] == "No files found in directory" \
                                                                    " or directory does not exist (root)"
 
-    def response_shows_no_objects_in_bucket(self):
-        assert self._context.object_names_from_list_present_response_body() == []
-
     def response_fails_with_reason_authentication_required(self):
         assert json.loads(self._context.http_client_response.text)["reason"] == "Authentication required"
         assert self._context.http_client_response.status_code == 401
 
+    def response_shows_failed_as_unauthorised(self):
+        assert self._context.http_client_response.json()['reason'] == 'Not authorised for this bucket'
+        assert self._context.http_client_response.status_code == 403
     def archive_file_exists_in_root_dir(self):
         file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
         assert os.path.exists(file_path)
@@ -202,10 +217,3 @@ class ThenSteps:
                  "latest update": "1970-01-01 03:25:45",
                  "type of transfer": "new upload"}
                                       }
-
-
-
-
-
-
-

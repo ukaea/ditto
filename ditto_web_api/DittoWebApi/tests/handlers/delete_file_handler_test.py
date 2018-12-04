@@ -12,6 +12,10 @@ class DeleteFileHandlerTest(BaseHandlerTest):
     def handler(self):
         return DeleteFileHandler
 
+    @property
+    def standard_body(self):
+        return {'bucket': "test-bucket", 'file': 'test.txt'}
+
     # Security
 
     @gen_test
@@ -19,11 +23,10 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         # Arrange
         self.mock_security_service.check_credentials.return_value = False
         # Act
-        body = {'bucket': "test-bucket", 'file': 'test.txt'}
         with pytest.raises(tornado.httpclient.HTTPClientError) as error:
-            yield self.send_DELETE_request(body)
+            yield self.send_DELETE_request(self.standard_body)
         # Assert
-        self.mock_security_service.check_credentials.assert_not_called
+        self.mock_security_service.check_credentials.assert_not_called()
         assert error.value.response.code == 401
 
     @gen_test
@@ -31,21 +34,50 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         # Arrange
         self.mock_security_service.check_credentials.return_value = False
         # Act
-        body = {'bucket': "test-bucket", 'file': 'test.txt'}
         with pytest.raises(tornado.httpclient.HTTPClientError) as error:
-            yield self.send_authorised_DELETE_request(body)
+            yield self.send_authorised_DELETE_request(self.standard_body)
         # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
         assert error.value.response.code == 401
+
+    @gen_test
+    def test_delete_returns_403_when_user_is_unauthorised(self):
+        # Arrange
+        self.mock_security_service.check_credentials.return_value = True
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = True
+        self.mock_bucket_settings_service.bucket_permitted_groups.return_value = ['other']
+        self.mock_security_service.is_in_group.return_value = False
+        # Act
+        with pytest.raises(tornado.httpclient.HTTPClientError) as error:
+            yield self.send_authorised_DELETE_request(self.standard_body)
+        # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_security_service.is_in_group.assert_called_once_with(self._auth_username, 'other')
+        assert error.value.response.code == 403
+
+    @gen_test
+    def test_delete_returns_404_when_bucket_not_recognised(self):
+        # Arrange
+        self.mock_security_service.check_credentials.return_value = True
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = False
+        # Act
+        with pytest.raises(tornado.httpclient.HTTPClientError) as error:
+            yield self.send_authorised_DELETE_request(self.standard_body)
+        # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_bucket_settings_service.is_bucket_recognised.assert_called_once_with('test-bucket')
+        assert error.value.response.code == 404
 
     @gen_test
     def test_delete_returns_200_when_credentials_accepted(self):
         # Arrange
         self.mock_data_replication_service.try_delete_file.return_value = {}
-        self.mock_security_service.check_credentials.return_value = True
+        self._set_authentication_authorisation_ok()
         # Act
-        body = {'bucket': "test-bucket", 'file': 'test.txt'}
-        response_body, response_code = yield self.send_authorised_DELETE_request(body)
+        response_body, response_code = yield self.send_authorised_DELETE_request(self.standard_body)
         # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_security_service.is_in_group.assert_called_once_with(self._auth_username, self._user_group)
         assert response_code == 200
         assert response_body['status'] == 'success'
 
@@ -60,7 +92,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
             "bucket": "test-bucket"
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
-        self.mock_security_service.check_credentials.return_value = True
+        self._set_authentication_authorisation_ok()
         # Act
         body = {'bucket': "test-bucket", 'file': "test.txt"}
         response_body, response_code = yield self.send_authorised_DELETE_request(body)
@@ -75,7 +107,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         # Arrange
         action_summary = return_delete_file_helper("File successfully deleted", "test.txt", "test-bucket")
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
-        self.mock_security_service.check_credentials.return_value = True
+        self._set_authentication_authorisation_ok()
         # Act
         body = {'bucket': "test-bucket", 'file': "test.txt"}
         response_body, response_code = yield self.send_authorised_DELETE_request(body)
@@ -93,7 +125,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
             "bucket": "test-bucket"
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
-        self.mock_security_service.check_credentials.return_value = True
+        self._set_authentication_authorisation_ok()
         # Act
         body = {'bucket': "test-bucket", 'file': "test.txt"}
         response_body, response_code = yield self.send_authorised_DELETE_request(body)
@@ -112,7 +144,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
             "test-bucket"
         )
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
-        self.mock_security_service.check_credentials.return_value = True
+        self._set_authentication_authorisation_ok()
         # Act
         body = {'bucket': "test-bucket", 'file': "test.txt"}
         response_body, response_code = yield self.send_authorised_DELETE_request(body)

@@ -5,20 +5,23 @@ import unittest
 import mock
 import pytest
 
+from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
-from DittoWebApi.src.models.file_information import FileInformation
-from DittoWebApi.src.services.external.external_data_service import ExternalDataService
+from DittoWebApi.src.services.data_replication.bucket_validator import BucketValidator
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
+from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
+from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
-from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 
 
 class DataReplicationServiceTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def setup(self):
+        self.mock_bucket_settings_service = mock.create_autospec(BucketSettingsService)
+        self.mock_bucket_validator = mock.create_autospec(BucketValidator)
         self.mock_external_data_service = mock.create_autospec(ExternalDataService)
         self.mock_internal_data_service = mock.create_autospec(InternalDataService)
         self.mock_storage_difference_processor = mock.create_autospec(StorageDifferenceProcessor)
@@ -26,10 +29,16 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_storage_difference_processor.return_difference_comparison.return_value = \
             self.mock_s3_object_file_comparison
         self.mock_logger = mock.create_autospec(logging.Logger)
-        self.test_service = DataReplicationService(self.mock_external_data_service,
+        self.test_service = DataReplicationService(self.mock_bucket_settings_service,
+                                                   self.mock_bucket_validator,
+                                                   self.mock_external_data_service,
                                                    self.mock_internal_data_service,
-                                                   self.mock_storage_difference_processor,
-                                                   self.mock_logger)
+                                                   self.mock_logger,
+                                                   self.mock_storage_difference_processor)
+
+        # By default we assume the bucket exists (this is overwritten in the relevant tests)
+        self.mock_bucket_validator.check_bucket.return_value = None
+
         # Mock_objects
         self.mock_object_1 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_1.to_dict.return_value = {"object_name": "test",
@@ -60,23 +69,40 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_file_information_3 = mock.create_autospec(FileInformation)
         self.mock_file_information_3.rel_path = "test_dir/test"
 
-    def test_retrieve_objects_dicts_returns_warning_when_bucket_does_not_exist(self):
+    def assert_bucket_validator_warning_used_correctly(self, output):
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-bucket')
+        self.mock_external_data_service.get_objects.assert_not_called()
+        self.mock_internal_data_service.archive_file_transfer.assert_not_called()
+        assert output['message'] == 'Warning message'
+        assert not any([output[key] for key in [x for x in output if not x == 'message']])
+
+    # retrieve_objects
+
+    def test_retrieve_objects_dicts_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
+        # Act
+        output = self.test_service.retrieve_object_dicts('test-bucket', None)
+        # Assert
+        self.assert_bucket_validator_warning_used_correctly(output)
+
+    def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
+        # Arrange
+        self.mock_external_data_service.get_objects.return_value = []
         # Act
         output = self.test_service.retrieve_object_dicts("test-bucket", None)
         # Assert
-        self.mock_external_data_service.get_objects.assert_not_called()
-        self.mock_logger.warning.assert_called_with("Warning, bucket does not exist (test-bucket)")
-        assert output == {"message": "Warning, bucket does not exist (test-bucket)", "objects": []}
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-bucket')
+        self.mock_external_data_service.get_objects.assert_called_once_with("test-bucket", None)
+        assert output["objects"] == []
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1, self.mock_object_2]
         # Act
         output = self.test_service.retrieve_object_dicts("test-bucket", None)
         # Assert
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-bucket')
         self.mock_external_data_service.get_objects.assert_called_once_with("test-bucket", None)
         assert output["objects"][0] == {"object_name": "test",
                                         "bucket_name": "test_bucket",
@@ -90,15 +116,6 @@ class DataReplicationServiceTest(unittest.TestCase):
                                         "etag": "test_etag_2",
                                         "last_modified": 1124557444.128364}
         assert len(output["objects"]) == 2
-
-    def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
-        self.mock_external_data_service.does_bucket_exist.return_value = True
-        self.mock_external_data_service.get_objects.return_value = []
-        # Act
-        output = self.test_service.retrieve_object_dicts("test-bucket", None)
-        # Assert
-        self.mock_external_data_service.get_objects.assert_called_once_with("test-bucket", None)
-        assert output["objects"] == []
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects_from_sub_dir(self):
         self.mock_external_data_service.does_bucket_exist.return_value = True
@@ -115,6 +132,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                                         "etag": "test_etag",
                                         "last_modified": 4132242586.159111}
         assert len(output["objects"]) == 1
+
+    # create_bucket
 
     def test_create_bucket_message_correct_when_bucket_name_invalid(self):
         # Arrange
@@ -161,31 +180,28 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.assertEqual(response, {"message": "Bucket Created (test-12345)",
                                     "bucket": "test-12345"})
 
-    def test_copy_dir_returns_warning_if_bucket_does_not_exist(self):
+    # copy_dir
+
+    def test_copy_dir_passes_warning_from_bucket_validator(self):
         # Arrange
-        bucket_name = 'test-12345'
-        dir_path = 'testdir/testsubdir/'
-        self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
         # Act
-        response = self.test_service.copy_dir(bucket_name, dir_path)
+        output = self.test_service.copy_dir('test-bucket', 'testdir/testsubdir/')
         # Assert
-        self.mock_logger.warning.assert_called_with("Warning, bucket does not exist (test-12345)")
-        self.mock_external_data_service.perform_transfer.assert_not_called()
-        self.mock_storage_difference_processor.return_difference_comparison.assert_not_called()
-        assert response == return_transfer_summary(
-            message='Warning, bucket does not exist (test-12345)'
-        )
-        self.mock_internal_data_service.archive_file_transfer.assert_not_called()
+        self.assert_bucket_validator_warning_used_correctly(output)
 
     def test_copy_dir_does_not_upload_if_no_local_files_found(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
         self.mock_internal_data_service.find_files.return_value = []
         # Act
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-12345')
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_not_called()
         self.mock_logger.warning.assert_called_with("No files found in directory or directory"
@@ -197,7 +213,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_dir_does_not_upload_if_s3_dir_already_exists(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
         self.mock_internal_data_service.find_files.return_value = [
@@ -207,6 +223,9 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-12345')
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_external_data_service.upload_file.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_not_called()
         self.mock_logger.warning.assert_called_with("Directory testdir/testsubdir/ "
@@ -215,7 +234,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_dir_uploads_single_file_in_new_dir(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
         file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
@@ -229,6 +248,9 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-12345')
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
             [file_1]
@@ -239,7 +261,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_dir_uploads_files_from_sub_dir_in_new_dir(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
         file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
@@ -254,6 +276,9 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
+        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-12345')
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('test-12345')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", 'testdir/testsubdir/')
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
             [file_1, file_2]
@@ -262,20 +287,15 @@ class DataReplicationServiceTest(unittest.TestCase):
         assert response["new files uploaded"] == 2
         assert response["data transferred (bytes)"] == 32
 
+    # try_delete_file
+
     def test_try_delete_file_returns_warning_message_when_bucket_doesnt_exist(self):
         # Arrange
-        bucket_name = "test-bucket"
-        file_rel_path = "test.txt"
-        self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
         # Act
-        response = self.test_service.try_delete_file(bucket_name, file_rel_path)
+        output = self.test_service.try_delete_file('test-bucket', 'test.txt')
         # Assert
-        self.mock_logger.warning.assert_called_with("Warning, bucket does not exist (test-bucket)")
-        assert response == return_delete_file_helper(
-            bucket_name=bucket_name,
-            file_rel_path=file_rel_path,
-            message='Warning, bucket does not exist (test-bucket)'
-        )
+        assert output == {'bucket': 'test-bucket', 'file': 'test.txt', 'message': 'Warning message'}
 
     def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):
         # Arrange
@@ -300,23 +320,19 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'file': 'known_file',
                             'message': 'File known_file successfully deleted from bucket some-bucket'}
 
-    def test_copy_new_return_warning_when_bucket_not_found(self):
+    # copy_new
+
+    def test_copy_new_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
         # Act
-        response = self.test_service.copy_new("bucket", None)
+        output = self.test_service.copy_new('test-bucket', 'testdir/testsubdir/')
         # Assert
-        self.mock_external_data_service.perform_transfer.assert_not_called()
-        self.mock_logger.warning.assert_called_with('Warning, bucket does not exist (bucket)')
-        self.mock_internal_data_service.archive_file_transfer.assert_not_called()
-        assert response == {'message': 'Warning, bucket does not exist (bucket)',
-                            'new files uploaded': 0,
-                            'files updated': 0,
-                            'files skipped': 0,
-                            'data transferred (bytes)': 0}
+        self.assert_bucket_validator_warning_used_correctly(output)
 
     def test_copy_new_return_message_when_no_new_files_to_transfer(self):
         # Arrange
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
@@ -329,6 +345,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1],
@@ -344,12 +362,15 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_return_message_directory_does_not_exist(self):
         # Arrange
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = []
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_internal_data_service.archive_file_transfer.assert_not_called()
         self.mock_logger.warning.assert_called_with('No files found in directory or directory does not exist (root)')
@@ -361,6 +382,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_transfers_all_files_when_no_objects_in_s3(self):
         # Arrange
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = []
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_2,
@@ -379,6 +401,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
             [self.mock_file_information_2, self.mock_file_information_3],
@@ -393,7 +417,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_return_message_when_new_files_transferred(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
                                                                    self.mock_file_information_2,
@@ -413,6 +437,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new("bucket", "some_dir")
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", "some_dir")
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1],
             [self.mock_file_information_1, self.mock_file_information_2, self.mock_file_information_3],
@@ -425,24 +451,19 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'files skipped': 1,
                             'data transferred (bytes)': 46}
 
-    def test_copy_new_and_update_return_warning_when_bucket_not_found(self):
+    # copy_new_and_update
+
+    def test_copy_new_and_update_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
         # Act
-        response = self.test_service.copy_new_and_update("bucket", None)
+        output = self.test_service.copy_new_and_update('test-bucket', 'testdir/testsubdir/')
         # Assert
-        self.mock_external_data_service.perform_transfer.assert_not_called()
-        self.mock_internal_data_service.archive_file_transfer.assert_not_called()
-        self.mock_logger.warning.assert_called_with('Warning, bucket does not exist (bucket)')
-        assert response == {'message': 'Warning, bucket does not exist (bucket)',
-                            'new files uploaded': 0,
-                            'files updated': 0,
-                            'files skipped': 0,
-                            'data transferred (bytes)': 0}
+        self.assert_bucket_validator_warning_used_correctly(output)
 
     def test_copy_new_and_update_return_message_when_no_new_files_to_transfer_or_update(self):
         # Arrange
-        self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1]
         mock_file_summary = mock.create_autospec(FilesStorageSummary)
@@ -454,6 +475,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1],
@@ -470,14 +493,17 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_return_message_directory_does_not_exist(self):
         # Arrange
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1]
         self.mock_internal_data_service.find_files.return_value = []
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
-        self.mock_internal_data_service.archive_file_transfer.assert_not_called()
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_not_called()
+        self.mock_internal_data_service.archive_file_transfer.assert_not_called()
         self.mock_logger.warning.assert_called_with('No files found in directory or directory does not exist (root)')
         assert response == {'message': 'No files found in directory or directory does not exist (root)',
                             'new files uploaded': 0,
@@ -487,6 +513,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_return_message_when_new_files_transferred_and_files_updated(self):
         # Arrange
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = [self.mock_object_1, self.mock_object_3]
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
@@ -508,6 +535,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", "some_dir")
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", "some_dir")
         self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [self.mock_object_1, self.mock_object_3],
@@ -523,6 +552,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_transfers_all_files_when_no_objects_already_in_bucket(self):
         # Arrange
+        self.mock_bucket_settings_service.bucket_root_directory.return_value = "/usr/tmp/data"
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_external_data_service.get_objects.return_value = []
         self.mock_internal_data_service.find_files.return_value = [self.mock_file_information_1,
@@ -540,6 +570,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
+        self.mock_bucket_settings_service.bucket_root_directory.assert_called_once_with('bucket')
+        self.mock_internal_data_service.find_files.assert_called_once_with("/usr/tmp/data", None)
         self.mock_external_data_service.perform_transfer.assert_called_once_with("bucket", mock_file_summary)
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
@@ -553,40 +585,3 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'files updated': 0,
                             'files skipped': 0,
                             'data transferred (bytes)': 46}
-
-    def test_check_bucket_warning_returns_waning_when_bucket_name_is_not_valid(self):
-        # Act
-        response = self.test_service._check_bucket_warning("bu")
-        # Assert
-        self.mock_logger.warning.assert_called_with("Bucket name breaks S3 naming convention (bu)")
-        assert response == "Bucket name breaks S3 naming convention (bu)"
-
-    def test_check_bucket_warning_returns_waning_when_bucket_does_not_match_configuration(self):
-        # Arrange
-        self.mock_external_data_service.does_bucket_match_standard.return_value = False
-        # Act
-        response = self.test_service._check_bucket_warning("bucket")
-        # Assert
-        self.mock_logger.warning.assert_called_with("Bucket breaks local naming standard (bucket)")
-        assert response == "Bucket breaks local naming standard (bucket)"
-
-    def test_check_bucket_warning_returns_waning_when_bucket_does_not_exist(self):
-        # Arrange
-        self.mock_external_data_service.does_bucket_match_standard.return_value = True
-        self.mock_external_data_service.does_bucket_exist.return_value = False
-        # Act
-        response = self.test_service._check_bucket_warning("bucket")
-        # Assert
-        self.mock_logger.warning.assert_called_with("Warning, bucket does not exist (bucket)")
-        assert response == "Warning, bucket does not exist (bucket)"
-
-    def test_check_bucket_warning_returns_none_when_no_warnings(self):
-        # Arrange
-        self.mock_external_data_service.does_bucket_match_standard.return_value = True
-        self.mock_external_data_service.does_bucket_exist.return_value = True
-        # Act
-        response = self.test_service._check_bucket_warning("bucket")
-        # Assert
-        self.mock_logger.debug.assert_called_with("No bucket related warnings found")
-        self.mock_logger.warning.assert_not_called()
-        assert response is None

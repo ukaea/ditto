@@ -27,9 +27,6 @@ class Configuration:
         self._s3_secret_key = None
         self._s3_use_secure = False
 
-        # Local data
-        self._root_dir = None
-
         self._parse(self._path_to_configuration_file)
 
     @property
@@ -65,10 +62,6 @@ class Configuration:
         return self._s3_use_secure
 
     @property
-    def root_dir(self):
-        return self._root_dir
-
-    @property
     def bucket_standard(self):
         return self._bucket_standard
 
@@ -96,7 +89,6 @@ class Configuration:
         self._s3_use_secure = str2bool(settings['S3Secure'])
 
         # Local data
-        self._root_dir = os.path.abspath(settings['RootDirectory'])
         self._bucket_standard = settings['BucketStandardisation']
         self._archive_file_name = settings['ArchiveFileName']
 
