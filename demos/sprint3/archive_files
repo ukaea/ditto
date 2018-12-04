@@ -8,6 +8,11 @@
 ## Stories covered
 #7 #8
 
+Setup
+* Ensure bucket_settings.ini file in code
+* Ensure data directory is set to /home/vagrant/ditto_web_api/data for bucket in bucket settings
+* Clear out data directory locally and on s3 end 
+
 Bash (Set up - perform pre demo)
 1. `vagrant up`
 2. `vagrant ssh`
