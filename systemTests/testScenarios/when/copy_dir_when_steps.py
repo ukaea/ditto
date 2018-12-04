@@ -20,7 +20,7 @@ class CopyDirWhenSteps(BaseWhenStep):
     def copy_dir_called_with_no_authorisation_credentials(self):
         handler = 'copydir'
         body = {'bucket': self._context.standard_bucket_name}
-        self._make_request_with_no_authorisation_credentials(handler, body)
+        self._make_request_with_no_user_credentials(handler, body)
 
     def authorised_copy_dir_called_for_sub_directory(self):
         handler = 'copydir'

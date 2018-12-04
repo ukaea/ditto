@@ -20,4 +20,4 @@ class DeleteFileWhenSteps(BaseWhenStep):
     def delete_file_called_with_no_authorisation_credentials(self):
         handler = 'deletefile'
         body = {'bucket': self._context.standard_bucket_name, 'file': 'testA.txt'}
-        self._make_request_with_no_authorisation_credentials(handler, body)
+        self._make_request_with_no_user_credentials(handler, body)

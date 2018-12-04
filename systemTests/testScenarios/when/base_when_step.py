@@ -50,7 +50,7 @@ class BaseWhenStep:
             print(f'Tried to connect to "{url}"')
             print(exception)
 
-    def _make_request_with_no_authorisation_credentials(self, handler, body):
+    def _make_request_with_no_user_credentials(self, handler, body):
         url = f'http://{self._context.host_address}:{self._context.app_port}/{handler}/'
         method = "DELETE" if handler == "deletefile" else "POST"
         self._context.http_client_response = None

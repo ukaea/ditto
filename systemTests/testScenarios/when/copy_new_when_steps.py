@@ -20,4 +20,4 @@ class CopyNewWhenSteps(BaseWhenStep):
     def copy_new_called_with_no_authorisation_credentials(self):
         handler = 'copynew'
         body = {'bucket': self._context.standard_bucket_name}
-        self._make_request_with_no_authorisation_credentials(handler, body)
+        self._make_request_with_no_user_credentials(handler, body)
