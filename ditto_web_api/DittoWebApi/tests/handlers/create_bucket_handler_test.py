@@ -10,19 +10,23 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     def handler(self):
         return CreateBucketHandler
 
+    @property
+    def standard_body(self):
+        return {'bucket': "test-bucket"}
+
     # Security
 
     @gen_test
     def test_post_returns_401_when_no_credentials_given(self):
-        self.assert_post_returns_401_when_no_credentials_given()
+        self.assert_post_returns_401_when_no_credentials_given(self.standard_body)
 
     @gen_test
     def test_post_returns_401_when_invalid_credentials_given(self):
-        self.assert_post_returns_401_when_invalid_credentials_given()
+        self.assert_post_returns_401_when_invalid_credentials_given(self.standard_body)
 
     @gen_test
     def test_post_returns_200_when_credentials_accepted(self):
-        self.assert_post_returns_200_when_credentials_accepted()
+        self.assert_post_returns_200_when_credentials_accepted(self.standard_body)
 
     # Coupling with Data Replication Service
 
@@ -32,9 +36,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         action_summary = {"message": "Bucket created", "bucket": "some-bucket"}
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
+        self.mock_security_service.is_in_group.return_value = True
         # Act
-        body = {'bucket': "test-bucket"}
-        response_body, response_code = yield self.send_authorised_POST_request(body)
+        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
         # Assert
         self.mock_data_replication_service.create_bucket.assert_called_once_with("test-bucket")
         assert response_code == 200
@@ -47,9 +51,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         action_summary = return_bucket_message("Bucket created", "some-bucket")
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
+        self.mock_security_service.is_in_group.return_value = True
         # Act
-        body = {'bucket': "test-bucket", 'directory': "some_directory"}
-        response_body, response_code = yield self.send_authorised_POST_request(body)
+        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
         # Assert
         assert response_code == 200
         assert response_body['status'] == 'success'
@@ -61,9 +65,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         action_summary = {"message": "Bucket already exists", "bucket": "some-bucket"}
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
+        self.mock_security_service.is_in_group.return_value = True
         # Act
-        body = {'bucket': "test-bucket"}
-        response_body, response_code = yield self.send_authorised_POST_request(body)
+        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
         # Assert
         self.mock_data_replication_service.create_bucket.assert_called_once_with("test-bucket")
         assert response_code == 200
@@ -76,9 +80,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         action_summary = return_bucket_message("Bucket already exists", "some-bucket")
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
+        self.mock_security_service.is_in_group.return_value = True
         # Act
-        body = {'bucket': "test-bucket"}
-        response_body, response_code = yield self.send_authorised_POST_request(body)
+        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
         # Assert
         assert response_code == 200
         assert response_body['status'] == 'success'

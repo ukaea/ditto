@@ -15,8 +15,8 @@ class TestListPresent(BaseSystemTest):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
-        self.given.simple_test_file_is_setup_in_s3()
-        self.given.simple_sub_dir_with_test_file_is_setup_in_s3()
+        self.given.simple_test_file_exists_in_s3()
+        self.given.simple_sub_dir_with_test_file_exists_in_s3()
 
         self.when.authorised_list_present_called_for_simple_bucket_whole_directory_structure()
 
@@ -34,12 +34,24 @@ class TestListPresent(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_shows_no_objects_in_bucket()
 
+    def test_list_present_fails_when_user_not_authorised_for_bucket(self):
+        # Start the api
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.simple_test_file_exists_in_s3()
+
+        # Try to copy the bucket
+        self.when.unauthorised_list_present_called_for_simple_bucket_whole_directory_structure()
+
+        self.then.response_shows_failed_as_unauthorised()
+
     def test_list_present_rejected_when_authentication_is_invalid(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
         self.given.standard_bucket_exists_in_s3()
 
-        self.when.unauthorised_list_present_called_for_simple_bucket_whole_directory_structure()
+        self.when.unauthenticated_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_fails_with_reason_authentication_required()
 

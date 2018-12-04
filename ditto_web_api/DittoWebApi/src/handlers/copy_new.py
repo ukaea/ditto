@@ -24,6 +24,7 @@ class CopyNewHandler(DittoHandler):
     )
     def post(self, *args, **kwargs):
         bucket_name = self.get_body_attribute("bucket", required=True)
+        self.check_current_user_authorised_for_bucket(bucket_name)
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_new(bucket_name, dir_path)
         exceptions.api_assert(result["message"] in positive_responses(dir_path),

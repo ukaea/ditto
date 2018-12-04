@@ -1,12 +1,10 @@
-# pylint: disable=R0201
-from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 
 
 class StorageDifferenceProcessor:
-    def __init__(self, logger):
-        self._file_system_helper = FileSystemHelper()
+    def __init__(self, file_system_helper, logger):
+        self._file_system_helper = file_system_helper
         self._logger = logger
 
     def return_difference_comparison(self, objects_in_bucket, files_in_directory, check_for_updates=False):
