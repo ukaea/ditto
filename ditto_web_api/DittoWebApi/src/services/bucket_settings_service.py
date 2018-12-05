@@ -19,10 +19,11 @@ class BucketSetting:
 
 
 class BucketSettingsService:
-    def __init__(self, bucket_settings_path, logger):
+    def __init__(self, bucket_settings_path, configuration, logger):
         self._bucket_settings_path = bucket_settings_path
         if not os.path.exists(self._bucket_settings_path):
             raise RuntimeError(f'The bucket settings file "{self._bucket_settings_path}" does not seem to exist.')
+        self._admin_groups = configuration.admin_groups
         self._logger = logger
         self._settings = {}
         self._parse(self._bucket_settings_path)
