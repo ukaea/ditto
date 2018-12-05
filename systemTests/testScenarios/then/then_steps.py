@@ -101,9 +101,9 @@ class ThenSteps:
 
     def response_shows_error_that_bad_bucket_name_given(self):
         assert "Bucket name breaks S3 naming convention" in \
-               self._context.response_data()["message"] or \
+               self._context.response_data() or \
                "Bucket breaks local naming standard" in\
-               self._context.response_data()["message"]
+               self._context.response_data()
 
     def response_confirms_simple_file_deleted(self):
         assert self._context.response_data()["message"] == 'File testA.txt successfully deleted ' \
@@ -122,11 +122,11 @@ class ThenSteps:
         assert self._context.response_data()["files updated"] == 1
 
     def response_data_reports_simple_file_does_not_exist(self):
-        assert self._context.response_data()["data"] == "File testA.txt does not exist" \
+        assert self._context.response_data() == "File testA.txt does not exist" \
                                                                    " in bucket systemtest-textbucket"
 
     def response_data_reports_directory_does_not_exist(self):
-        assert self._context.response_data()["data"] == "No files found in directory" \
+        assert self._context.response_data() == "No files found in directory" \
                                                                    " or directory does not exist (root)"
 
     def response_fails_with_reason_authentication_required(self):
