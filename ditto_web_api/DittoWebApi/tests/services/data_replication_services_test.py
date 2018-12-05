@@ -5,19 +5,15 @@ import unittest
 import mock
 import pytest
 
-from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.services.data_replication.bucket_validator import BucketValidator
-from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
-from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
-from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.tests.helpers_for_tests import build_mock_file_information
 from DittoWebApi.tests.helpers_for_tests import build_mock_file_summary
 from DittoWebApi.tests.helpers_for_tests import build_transfer_return
@@ -82,7 +78,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_exist.return_value = does_bucket_exist
         self.mock_external_data_service.get_objects.return_value = objects_in_bucket if objects_in_bucket else []
         self.mock_internal_data_service.find_files.return_value = files_in_system if files_in_system else []
-        
+
     def assert_bucket_validator_warning_used_correctly(self, output):
         self.mock_bucket_validator.check_bucket.assert_called_once_with('test-bucket')
         self.mock_external_data_service.get_objects.assert_not_called()
@@ -97,16 +93,6 @@ class DataReplicationServiceTest(unittest.TestCase):
         output = self.test_service.retrieve_object_dicts('test-bucket', None)
         # Assert
         self.assert_bucket_validator_warning_used_correctly(output)
-
-    def test_retrieve_objects_dicts_empty_array_when_no_objects_present(self):
-        # Arrange
-        self.mock_external_data_service.get_objects.return_value = []
-        # Act
-        output = self.test_service.retrieve_object_dicts("test-bucket", None)
-        # Assert
-        self.mock_bucket_validator.check_bucket.assert_called_once_with('test-bucket')
-        self.mock_external_data_service.get_objects.assert_called_once_with("test-bucket", None)
-        assert output["objects"] == []
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects(self):
         # Arrange
