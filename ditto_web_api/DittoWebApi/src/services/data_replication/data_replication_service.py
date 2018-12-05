@@ -1,35 +1,31 @@
-from DittoWebApi.src.utils.return_helper import return_transfer_summary
+from DittoWebApi.src.services.data_replication.bucket_validator import BucketValidator
+from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
+from DittoWebApi.src.utils import messages
+from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
-from DittoWebApi.src.utils.bucket_helper import is_valid_bucket
-from DittoWebApi.src.utils import messages
+from DittoWebApi.src.utils.return_helper import return_transfer_summary
 
 
 class DataReplicationService:
-    def __init__(self, external_data_service, internal_data_service, storage_difference_processor, logger):
+    def __init__(self,
+                 bucket_settings_service,
+                 bucket_validator,
+                 external_data_service,
+                 internal_data_service,
+                 logger,
+                 storage_difference_processor):
+        self._bucket_settings_service = bucket_settings_service
+        self._bucket_validator = bucket_validator
         self._external_data_service = external_data_service
         self._internal_data_service = internal_data_service
         self._storage_difference_processor = storage_difference_processor
         self._logger = logger
 
-    def _check_bucket_warning(self, bucket_name):
-        self._logger.debug(f"About to check for warning to do with bucket name {bucket_name}")
-        bucket_warning = None
-        if not is_valid_bucket(bucket_name):
-            bucket_warning = messages.bucket_breaks_s3_convention(bucket_name)
-        elif not self._external_data_service.does_bucket_match_standard(bucket_name):
-            bucket_warning = messages.bucket_breaks_config(bucket_name)
-        elif not self._external_data_service.does_bucket_exist(bucket_name):
-            bucket_warning = messages.bucket_not_exists(bucket_name)
-        if bucket_warning is not None:
-            self._logger.warning(bucket_warning)
-            return bucket_warning
-        self._logger.debug("No bucket related warnings found")
-        return bucket_warning
-
     def retrieve_object_dicts(self, bucket_name, dir_path):
         self._logger.debug("Called list-present handler")
-        bucket_warning = self._check_bucket_warning(bucket_name)
+        bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
             return {"message": bucket_warning, "objects": []}
         objects = self._external_data_service.get_objects(bucket_name, dir_path)
@@ -38,11 +34,15 @@ class DataReplicationService:
 
     def copy_dir(self, bucket_name, dir_path):
         self._logger.debug("Called copy-dir handler")
-        bucket_warning = self._check_bucket_warning(bucket_name)
-        directory = dir_path if dir_path else "root"
+
+        bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
-        files_in_directory = self._internal_data_service.find_files(dir_path)
+
+        root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
+
+        directory = dir_path if dir_path else "root"
 
         if not files_in_directory:
             warning = messages.no_files_found(directory)
@@ -56,7 +56,7 @@ class DataReplicationService:
 
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary)
-        self._internal_data_service.archive_file_transfer(dir_path, file_summary=file_summary)
+        self._internal_data_service.archive_file_transfer(file_summary, root_dir)
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name):
@@ -83,7 +83,7 @@ class DataReplicationService:
 
     def try_delete_file(self, bucket_name, file_rel_path):
         self._logger.debug("Called delete-file handler")
-        bucket_warning = self._check_bucket_warning(bucket_name)
+        bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
             return return_delete_file_helper(message=bucket_warning,
                                              file_rel_path=file_rel_path,
@@ -102,11 +102,12 @@ class DataReplicationService:
 
     def copy_new(self, bucket_name, dir_path):
         self._logger.debug("Called copy new handler")
-        bucket_warning = self._check_bucket_warning(bucket_name)
+        bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
         directory = dir_path if dir_path else "root"
-        files_in_directory = self._internal_data_service.find_files(dir_path)
+        root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
 
         if not files_in_directory:
             warning = messages.no_files_found(directory)
@@ -123,17 +124,18 @@ class DataReplicationService:
             return return_transfer_summary(message=message,
                                            files_skipped=len(files_in_directory))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
-        self._internal_data_service.archive_file_transfer(dir_path, file_summary=files_summary)
+        self._internal_data_service.archive_file_transfer(files_summary, root_dir)
         return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
         self._logger.debug("Called copy-update handler")
-        bucket_warning = self._check_bucket_warning(bucket_name)
+        bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning)
 
         directory = dir_path if dir_path else "root"
-        files_in_directory = self._internal_data_service.find_files(dir_path)
+        root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
 
         if not files_in_directory:
             warning = messages.no_files_found(directory)
@@ -151,5 +153,20 @@ class DataReplicationService:
             return return_transfer_summary(message=message,
                                            files_skipped=len(files_summary.files_to_be_skipped()))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
-        self._internal_data_service.archive_file_transfer(dir_path, file_summary=files_summary)
+        self._internal_data_service.archive_file_transfer(files_summary, root_dir)
         return return_transfer_summary(**transfer_summary)
+
+
+def build_standard_data_replication_service(bucket_settings_service,
+                                            external_data_service,
+                                            internal_data_service,
+                                            logger):
+    bucket_validator = BucketValidator(external_data_service, logger)
+    storage_difference_processor = StorageDifferenceProcessor(FileSystemHelper(), logger)
+    data_replication_service = DataReplicationService(bucket_settings_service,
+                                                      bucket_validator,
+                                                      external_data_service,
+                                                      internal_data_service,
+                                                      logger,
+                                                      storage_difference_processor)
+    return data_replication_service

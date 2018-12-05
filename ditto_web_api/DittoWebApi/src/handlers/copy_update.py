@@ -24,6 +24,7 @@ class CopyUpdateHandler(DittoHandler):
     )
     def post(self, *args, **kwargs):
         bucket_name = self.get_body_attribute("bucket", required=True)
+        self.check_current_user_authorised_for_bucket(bucket_name)
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_new_and_update(bucket_name, dir_path)
         return result
