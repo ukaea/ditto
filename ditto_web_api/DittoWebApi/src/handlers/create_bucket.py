@@ -23,7 +23,6 @@ class CreateBucketHandler(DittoHandler):
     def post(self, *args, **kwargs):
         bucket_name = self.get_body_attribute("bucket", required=True)
         result = self._data_replication_service.create_bucket(bucket_name)
-        exceptions.api_assert("Bucket Created" in result["message"],
-                              400,
-                              result["message"])
+        self.check_request_was_completed_successfully(result)
+        del result['status']
         return result

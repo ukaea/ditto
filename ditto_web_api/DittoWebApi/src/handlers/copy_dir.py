@@ -3,7 +3,6 @@ from tornado_json import schema, exceptions
 from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_transfer_output_schema
-from DittoWebApi.src.utils.messages import positive_responses
 
 
 class CopyDirHandler(DittoHandler):
