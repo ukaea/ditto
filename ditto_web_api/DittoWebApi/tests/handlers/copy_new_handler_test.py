@@ -2,8 +2,8 @@ from tornado.testing import gen_test
 
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
-from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 from DittoWebApi.src.utils.return_status import StatusCodes
+from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
 class CopyNewHandlerTest(BaseHandlerTest):

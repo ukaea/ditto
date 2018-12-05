@@ -4,8 +4,8 @@ from tornado.testing import gen_test
 
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.utils.return_helper import return_bucket_message
-from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 from DittoWebApi.src.utils.return_status import StatusCodes
+from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
 class CreateBucketHandlerTest(BaseHandlerTest):

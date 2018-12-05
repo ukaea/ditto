@@ -5,8 +5,8 @@ import tornado.web
 
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
-from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 from DittoWebApi.src.utils.return_status import StatusCodes
+from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
 class DeleteFileHandlerTest(BaseHandlerTest):

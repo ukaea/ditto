@@ -1,11 +1,8 @@
-import pytest
-
 from tornado.testing import gen_test
-from tornado.httpclient import HTTPClientError
 
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
-from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 from DittoWebApi.src.utils.return_status import StatusCodes
+from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
 class ListPresentHandlerTest(BaseHandlerTest):
