@@ -339,7 +339,8 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_transfers_all_files_when_no_objects_in_s3(self):
         # Arrange
-        self._set_up_system(does_bucket_exist=True, files_in_system=[self.mock_file_information_2, self.mock_file_information_3])
+        self._set_up_system(does_bucket_exist=True, files_in_system=[self.mock_file_information_2,
+                                                                     self.mock_file_information_3])
         mock_file_summary = build_mock_file_summary(files_in_dir=[self.mock_file_information_2,
                                                                   self.mock_file_information_3],
                                                     new_files=[self.mock_file_information_2,
