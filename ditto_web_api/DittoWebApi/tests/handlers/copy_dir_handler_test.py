@@ -3,6 +3,7 @@ from tornado.testing import gen_test
 from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
+from DittoWebApi.src.utils.return_status import StatusCodes
 
 
 class CopyDirHandlerTest(BaseHandlerTest):
@@ -46,7 +47,8 @@ class CopyDirHandlerTest(BaseHandlerTest):
             "new files uploaded": 1,
             "files updated": 0,
             "files skipped": 0,
-            "data transferred (bytes)": 100
+            "data transferred (bytes)": 100,
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -66,7 +68,8 @@ class CopyDirHandlerTest(BaseHandlerTest):
             new_files_uploaded=1,
             files_updated=0,
             files_skipped=0,
-            data_transferred=100
+            data_transferred=100,
+            status=StatusCodes.Okay
         )
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -85,7 +88,8 @@ class CopyDirHandlerTest(BaseHandlerTest):
             "new files uploaded": 0,
             "files updated": 0,
             "files skipped": 5,
-            "data transferred (bytes)": 0
+            "data transferred (bytes)": 0,
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -105,27 +109,14 @@ class CopyDirHandlerTest(BaseHandlerTest):
             new_files_uploaded=0,
             files_updated=0,
             files_skipped=5,
-            data_transferred=0
+            data_transferred=0,
+            status=StatusCodes.Okay
         )
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
         # Act
         response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
         # Assert
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == transfer_summary
-
-    @gen_test
-    def test_post_returns_warning_when_nonexistent_bucket_name_provided(self):
-        # Arrange
-        transfer_summary = {"message": "test-bucket does not exist in S3", "objects": []}
-        self.mock_data_replication_service.copy_dir.return_value = transfer_summary
-        self._set_authentication_authorisation_ok()
-        # Act
-        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
-        # Assert
-        self.mock_data_replication_service.copy_dir.assert_called_once_with("test-bucket", "test_dir/test_sub_dir")
         assert response_code == 200
         assert response_body['status'] == 'success'
         assert response_body['data'] == transfer_summary

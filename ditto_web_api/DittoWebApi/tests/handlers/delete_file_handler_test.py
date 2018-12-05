@@ -1,10 +1,12 @@
 import pytest
 from tornado.testing import gen_test
+from tornado.httpclient import HTTPClientError
 import tornado.web
 
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
+from DittoWebApi.src.utils.return_status import StatusCodes
 
 
 class DeleteFileHandlerTest(BaseHandlerTest):
@@ -71,7 +73,8 @@ class DeleteFileHandlerTest(BaseHandlerTest):
     @gen_test
     def test_delete_returns_200_when_credentials_accepted(self):
         # Arrange
-        self.mock_data_replication_service.try_delete_file.return_value = {}
+        self.mock_data_replication_service.try_delete_file.return_value = {'message': 'File successfully deleted',
+                                                                           'status': StatusCodes.Okay}
         self._set_authentication_authorisation_ok()
         # Act
         response_body, response_code = yield self.send_authorised_DELETE_request(self.standard_body)
@@ -89,7 +92,8 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         action_summary = {
             "message": "File successfully deleted",
             "file": "test.txt",
-            "bucket": "test-bucket"
+            "bucket": "test-bucket",
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self._set_authentication_authorisation_ok()
@@ -105,7 +109,8 @@ class DeleteFileHandlerTest(BaseHandlerTest):
     @gen_test
     def test_delete_file_successful_return_helper_coupled_with_method_schema(self):
         # Arrange
-        action_summary = return_delete_file_helper("File successfully deleted", "test.txt", "test-bucket")
+        action_summary = return_delete_file_helper(
+            "File successfully deleted", "test.txt", "test-bucket", StatusCodes.Okay)
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self._set_authentication_authorisation_ok()
         # Act
@@ -117,38 +122,19 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         assert response_body['data'] == action_summary
 
     @gen_test
-    def test_delete_file_reports_warning_as_json(self):
+    def test_delete_file_reports_404_when_file_is_missing(self):
         # Arrange
         action_summary = {
             "message": "File does not exist in the bucket",
             "file": "test.txt",
-            "bucket": "test-bucket"
+            "bucket": "test-bucket",
+            "status": StatusCodes.Not_found
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self._set_authentication_authorisation_ok()
         # Act
         body = {'bucket': "test-bucket", 'file': "test.txt"}
-        response_body, response_code = yield self.send_authorised_DELETE_request(body)
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_DELETE_request(body)
         # Assert
-        self.mock_data_replication_service.try_delete_file.assert_called_once_with("test-bucket", "test.txt")
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == action_summary
-
-    @gen_test
-    def test_delete_file_reports_warning_coupled_with_method_schema(self):
-        # Arrange
-        action_summary = return_delete_file_helper(
-            "File does not exist in the bucket",
-            "test.txt",
-            "test-bucket"
-        )
-        self.mock_data_replication_service.try_delete_file.return_value = action_summary
-        self._set_authentication_authorisation_ok()
-        # Act
-        body = {'bucket': "test-bucket", 'file': "test.txt"}
-        response_body, response_code = yield self.send_authorised_DELETE_request(body)
-        # Assert
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == action_summary
+        error.value.response.code == 404

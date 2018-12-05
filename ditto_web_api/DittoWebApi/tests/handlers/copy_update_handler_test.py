@@ -1,8 +1,10 @@
+import pytest
 from tornado.testing import gen_test
-
+from tornado.httpclient import HTTPClientError
 from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
+from DittoWebApi.src.utils.return_status import StatusCodes
 
 
 class CopyUpdateHandlerTest(BaseHandlerTest):
@@ -46,7 +48,8 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
             'new files uploaded': 2,
             'files updated': 1,
             'files skipped': 3,
-            'data transferred (bytes)': 100
+            'data transferred (bytes)': 100,
+            'status': StatusCodes.Okay
         }
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -66,7 +69,8 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
             new_files_uploaded=2,
             files_updated=1,
             files_skipped=3,
-            data_transferred=100
+            data_transferred=100,
+            status=StatusCodes.Okay
         )
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -85,7 +89,8 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
             'new files transferred': 0,
             'files updated': 0,
             'files skipped': 5,
-            'data transferred (bytes)': 0
+            'data transferred (bytes)': 0,
+            'status': StatusCodes.Okay
         }
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -105,7 +110,8 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
             new_files_uploaded=0,
             files_updated=0,
             files_skipped=5,
-            data_transferred=0
+            data_transferred=0,
+            status=StatusCodes.Okay
         )
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
@@ -116,31 +122,18 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         assert response_body['status'] == 'success'
         assert response_body['data'] == transfer_summary
 
-    @gen_test
-    def test_post_returns_warning_when_nonexistent_bucket_name_provided(self):
-        # Arrange
-        transfer_summary = {"message": "test-bucket does not exist in S3", "objects": []}
-        self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
-        self._set_authentication_authorisation_ok()
-        # Act
-        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
-        # Assert
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == transfer_summary
 
     @gen_test
-    def test_post_returns_warning_when_directory_empty_or_nonexistent(self):
+    def test_post_returns_400_when_directory_empty_or_nonexistent(self):
         # Arrange
         transfer_summary = {
             "message": "No files found in directory or directory does not exist (some_directory)",
-            "objects": []
+            "status": StatusCodes.Bad_request
         }
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self._set_authentication_authorisation_ok()
         # Act
-        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_POST_request(self.standard_body)
         # Assert
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == transfer_summary
+        assert error.value.response.code == 400
