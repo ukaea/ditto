@@ -13,7 +13,7 @@ def build_mock_file_summary(files_in_dir=None, new_files=None, updated_files=Non
     return mock_file_summary
 
 
-def build_mock_file_information(file_name, rel_path, abs_path):
+def build_mock_file_information(file_name=None, rel_path=None, abs_path=None):
     mock_file_information = mock.create_autospec(FileInformation)
     mock_file_information.file_name = file_name
     mock_file_information.rel_path = rel_path

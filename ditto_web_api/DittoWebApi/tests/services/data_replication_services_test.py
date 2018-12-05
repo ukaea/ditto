@@ -10,7 +10,6 @@ from DittoWebApi.src.services.external.external_data_service import ExternalData
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.data_replication.storage_difference_processor import StorageDifferenceProcessor
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
-from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
@@ -56,12 +55,18 @@ class DataReplicationServiceTest(unittest.TestCase):
                                                    "etag": "test_etag",
                                                    "last_modified": 4132242586.159111}
         # mock file information
-        self.mock_file_information_1 = build_mock_file_information("test", "test", "test")
-        self.mock_file_information_2 = build_mock_file_information("test_2", "test_2", "test_2")
-        self.mock_file_information_3 = build_mock_file_information("test", "test_dir/test", "test_dir/test")
+        self.mock_file_information_1 = build_mock_file_information(file_name="test",
+                                                                   rel_path="test",
+                                                                   abs_path="test")
+        self.mock_file_information_2 = build_mock_file_information(file_name="test_2",
+                                                                   rel_path="test_2",
+                                                                   abs_path="test_2")
+        self.mock_file_information_3 = build_mock_file_information(file_name="test",
+                                                                   rel_path="test_dir/test",
+                                                                   abs_path="test_dir/test")
 
-    def _set_up_system(self, does_bucket_exists=True, objects_in_bucket=None, files_in_system=None):
-        self.mock_external_data_service.does_bucket_exist.return_value = does_bucket_exists
+    def _set_up_system(self, does_bucket_exist=True, objects_in_bucket=None, files_in_system=None):
+        self.mock_external_data_service.does_bucket_exist.return_value = does_bucket_exist
         self.mock_external_data_service.get_objects.return_value = objects_in_bucket if objects_in_bucket else []
         self.mock_internal_data_service.find_files.return_value = files_in_system if files_in_system else []
 
@@ -77,7 +82,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True, objects_in_bucket=[self.mock_object_1, self.mock_object_2])
+        self._set_up_system(does_bucket_exist=True, objects_in_bucket=[self.mock_object_1, self.mock_object_2])
         # Act
         output = self.test_service.retrieve_object_dicts("test-bucket", None)
         # Assert
@@ -105,7 +110,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_retrieve_objects_dicts_returns_all_correct_dictionaries_of_objects_from_sub_dir(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True, objects_in_bucket=[self.mock_object_3])
+        self._set_up_system(does_bucket_exist=True, objects_in_bucket=[self.mock_object_3])
         # Act
         output = self.test_service.retrieve_object_dicts("test-bucket", "test_dir")
         # Assert
@@ -182,7 +187,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
-        self._set_up_system(does_bucket_exists=True)
+        self._set_up_system(does_bucket_exist=True)
         # Act
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
@@ -198,8 +203,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
-        file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
-        self._set_up_system(True, [], [file_1])
+        self._set_up_system(does_bucket_exist=True, files_in_system=[self.mock_file_information_1])
         self.mock_external_data_service.does_dir_exist.return_value = True
         # Act
         self.test_service.copy_dir(bucket_name, dir_path)
@@ -213,8 +217,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
-        file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
-        self._set_up_system(does_bucket_exists=True, files_in_system=[file_1])
+        self._set_up_system(does_bucket_exist=True, files_in_system=[self.mock_file_information_1])
         self.mock_external_data_service.does_dir_exist.return_value = False
         self.mock_external_data_service.perform_transfer.return_value = build_transfer_return(1, 0, 0, 42)
         # Act
@@ -222,7 +225,7 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
-            [file_1]
+            [self.mock_file_information_1]
         )
         assert response["new files uploaded"] == 1
         assert response["data transferred (bytes)"] == 42
@@ -231,17 +234,16 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         dir_path = 'testdir/testsubdir/'
-        file_1 = FileInformation("/home/test/test1.txt", "test1.txt", "test1.txt")
-        file_2 = FileInformation("/home/test/sub_1/test2.txt", "sub_1/test2.txt", "test2.txt")
         self.mock_external_data_service.does_dir_exist.return_value = False
-        self._set_up_system(does_bucket_exists=True, files_in_system=[file_1, file_2])
+        self._set_up_system(does_bucket_exist=True,
+                            files_in_system=[self.mock_file_information_1, self.mock_file_information_2])
         self.mock_external_data_service.perform_transfer.return_value = build_transfer_return(2, 0, 0, 32)
         # Act
         response = self.test_service.copy_dir(bucket_name, dir_path)
         # Assert
         self.mock_storage_difference_processor.return_difference_comparison.assert_called_with(
             [],
-            [file_1, file_2]
+            [self.mock_file_information_1, self.mock_file_information_2]
         )
         assert response["new files uploaded"] == 2
         assert response["data transferred (bytes)"] == 32
@@ -300,7 +302,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_return_message_when_no_new_files_to_transfer(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True,
+        self._set_up_system(does_bucket_exist=True,
                             objects_in_bucket=[self.mock_object_1],
                             files_in_system=[self.mock_file_information_1])
         mock_file_summary = build_mock_file_summary(files_in_dir=[self.mock_file_information_1],
@@ -323,7 +325,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_return_message_directory_does_not_exist(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True, objects_in_bucket=[self.mock_object_1])
+        self._set_up_system(does_bucket_exist=True, objects_in_bucket=[self.mock_object_1])
         # Act
         response = self.test_service.copy_new("bucket", None)
         # Assert
@@ -337,7 +339,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_transfers_all_files_when_no_objects_in_s3(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True, files_in_system=[self.mock_file_information_2, self.mock_file_information_3])
+        self._set_up_system(does_bucket_exist=True, files_in_system=[self.mock_file_information_2, self.mock_file_information_3])
         mock_file_summary = build_mock_file_summary(files_in_dir=[self.mock_file_information_2,
                                                                   self.mock_file_information_3],
                                                     new_files=[self.mock_file_information_2,
@@ -360,7 +362,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_return_message_when_new_files_transferred(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True,
+        self._set_up_system(does_bucket_exist=True,
                             objects_in_bucket=[self.mock_object_1],
                             files_in_system=[self.mock_file_information_1,
                                              self.mock_file_information_2,
@@ -402,7 +404,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_return_message_when_no_new_files_to_transfer_or_update(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True,
+        self._set_up_system(does_bucket_exist=True,
                             objects_in_bucket=[self.mock_object_1],
                             files_in_system=[self.mock_file_information_1])
         mock_file_summary = build_mock_file_summary(files_in_dir=[self.mock_file_information_1],
@@ -426,7 +428,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_return_message_directory_does_not_exist(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True, objects_in_bucket=self.mock_object_1)
+        self._set_up_system(does_bucket_exist=True, objects_in_bucket=self.mock_object_1)
         # Act
         response = self.test_service.copy_new_and_update("bucket", None)
         # Assert
@@ -440,7 +442,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_return_message_when_new_files_transferred_and_files_updated(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True,
+        self._set_up_system(does_bucket_exist=True,
                             objects_in_bucket=[self.mock_object_1, self.mock_object_3],
                             files_in_system=[self.mock_file_information_1,
                                              self.mock_file_information_2,
@@ -470,7 +472,7 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_copy_new_and_update_transfers_all_files_when_no_objects_already_in_bucket(self):
         # Arrange
-        self._set_up_system(does_bucket_exists=True,
+        self._set_up_system(does_bucket_exist=True,
                             files_in_system=[self.mock_file_information_1, self.mock_file_information_2])
         mock_file_summary = build_mock_file_summary()
         mock_file_summary.new_files = [self.mock_file_information_1, self.mock_file_information_2]
