@@ -9,7 +9,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_whole_directory()
 
         self.then.standard_s3_bucket_does_not_exist()
-        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is_404()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
     def test_copy_new_fails_when_no_dir_to_copy(self):
@@ -19,7 +19,7 @@ class TestCopyNew(BaseSystemTest):
 
         self.when.authorised_copy_new_called_for_whole_directory()
 
-        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is_404()
         self.then.response_data_reports_directory_does_not_exist()
 
     def test_copy_new_copies_whole_dir_not_on_s3_to_s3(self):

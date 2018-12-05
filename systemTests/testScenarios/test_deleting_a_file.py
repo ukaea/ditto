@@ -9,7 +9,7 @@ class TestDeleteFile(BaseSystemTest):
         self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.standard_s3_bucket_does_not_exist()
-        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is_404()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
     def test_delete_file_removes_simple_file_from_s3(self):
@@ -31,7 +31,7 @@ class TestDeleteFile(BaseSystemTest):
 
         self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
-        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is_404()
         self.then.response_data_reports_simple_file_does_not_exist()
 
     def test_delete_file_fails_when_user_not_authorised_for_bucket(self):
