@@ -1,5 +1,5 @@
 # pylint: disable=W0221,W0223
-from tornado_json import schema, exceptions
+from tornado_json import schema
 from DittoWebApi.src.handlers.ditto_handler import DittoHandler
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_object_schema_with_string_properties
 from DittoWebApi.src.handlers.schemas.schema_helpers import create_list_present_output_schema
