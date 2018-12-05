@@ -27,8 +27,8 @@ class CopyDirHandler(DittoHandler):
         self.check_current_user_authorised_for_bucket(bucket_name)
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_dir(bucket_name, dir_path)
-
-        exceptions.api_assert(result["message"] in positive_responses(dir_path),
-                              400,
-                              result["message"])
+        exceptions.api_assert(result["status"].value == 200,
+                              result["status"].value,
+                              result['message'])
+        del result['status']
         return result

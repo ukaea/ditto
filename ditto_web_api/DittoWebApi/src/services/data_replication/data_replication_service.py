@@ -40,7 +40,7 @@ class DataReplicationService:
 
         bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
-            return return_transfer_summary(message=bucket_warning, status=StatusCodes.Bad_request)
+            return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
 
         root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
         files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
@@ -50,12 +50,13 @@ class DataReplicationService:
         if not files_in_directory:
             warning = messages.no_files_found(directory)
             self._logger.warning(warning)
-            return return_transfer_summary(message=warning)
+            return return_transfer_summary(message=warning, status=StatusCodes.Not_found)
 
         if self._external_data_service.does_dir_exist(bucket_name, dir_path):
             warning = messages.directory_exists(directory, len(files_in_directory))
             self._logger.warning(warning)
-            return return_transfer_summary(message=warning, files_skipped=len(files_in_directory))
+            return return_transfer_summary(
+                message=warning, files_skipped=len(files_in_directory), status=StatusCodes.Bad_request)
 
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary)
