@@ -21,7 +21,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.authorised_copy_update_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
-        self.then.response_message_reports_directory_does_not_exist()
+        self.then.response_data_reports_directory_does_not_exist()
 
     def test_copy_update_copies_across_whole_dir_that_is_new(self):
         self.given.s3_interface_is_running()

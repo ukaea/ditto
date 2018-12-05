@@ -32,7 +32,7 @@ class TestDeleteFile(BaseSystemTest):
         self.when.authorised_delete_file_is_called_for_simple_file_in_s3()
 
         self.then.response_shows_request_was_completed_successfully()
-        self.then.response_message_reports_simple_file_does_not_exist()
+        self.then.response_data_reports_simple_file_does_not_exist()
 
     def test_delete_file_fails_when_user_not_authorised_for_bucket(self):
         # Start the api
