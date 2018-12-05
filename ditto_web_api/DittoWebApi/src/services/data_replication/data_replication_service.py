@@ -6,6 +6,7 @@ from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHel
 from DittoWebApi.src.utils.return_helper import return_bucket_message
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
+from DittoWebApi.src.utils.return_status import StatusCodes
 
 
 class DataReplicationService:
@@ -39,7 +40,7 @@ class DataReplicationService:
 
         bucket_warning = self._bucket_validator.check_bucket(bucket_name)
         if bucket_warning is not None:
-            return return_transfer_summary(message=bucket_warning)
+            return return_transfer_summary(message=bucket_warning, status=StatusCodes.Bad_request)
 
         root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
         files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)

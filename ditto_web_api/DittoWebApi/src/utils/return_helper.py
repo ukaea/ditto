@@ -1,9 +1,14 @@
-def return_transfer_summary(new_files_uploaded=0, files_updated=0, files_skipped=0, data_transferred=0, message=""):
+from DittoWebApi.src.utils.return_status import StatusCodes
+
+status_codes = StatusCodes()
+
+def return_transfer_summary(new_files_uploaded=0, files_updated=0, files_skipped=0, data_transferred=0, status=status_codes.Okay, message=""):
     return {"message": message,
             "new files uploaded": new_files_uploaded,
             "files updated": files_updated,
             "files skipped": files_skipped,
-            "data transferred (bytes)": data_transferred}
+            "data transferred (bytes)": data_transferred,
+            "status": status}
 
 
 def return_bucket_message(message, bucket_name=""):
