@@ -24,14 +24,12 @@ class DittoHandler(APIHandler):
 
     def check_current_user_authorised_for_bucket(self, bucket_name):
         if not self._bucket_settings_service.is_bucket_recognised(bucket_name):
-            self.set_status(404)
-            self.finish({'reason': 'Bucket name not recognised'})
+            raise exceptions.APIError(404, 'Not authorised for this bucket')
         permitted_groups = self._bucket_settings_service.bucket_permitted_groups(bucket_name)
         for group_name in permitted_groups:
             if self._security_service.is_in_group(self._current_user, group_name):
                 return
-        self.set_status(403)
-        self.finish({'reason': 'Not authorised for this bucket'})
+        raise exceptions.APIError(403, 'Not authorised for this bucket')
 
     def _check_credentials(self):
         auth_header = self.request.headers.get('Authorization')
