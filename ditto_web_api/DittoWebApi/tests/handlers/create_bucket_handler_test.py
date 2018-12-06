@@ -63,7 +63,6 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         assert response_body['status'] == 'fail'
         assert response_body['data'] == "Bucket already exists"
 
-
     @gen_test
     def test_post_returns_200_when_credentials_accepted(self):
         # Arrange
