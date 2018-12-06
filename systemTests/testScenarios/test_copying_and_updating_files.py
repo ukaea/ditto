@@ -10,7 +10,8 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.authorised_copy_update_called_for_whole_directory()
 
         self.then.standard_s3_bucket_does_not_exist()
-        self.then.response_status_is_404()
+        self.then.response_status_is(404)
+        self.then.response_shows_request_failed()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
     def test_copy_update_fails_when_no_file_in_directory(self):
@@ -20,7 +21,8 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
-        self.then.response_status_is_404()
+        self.then.response_status_is(404)
+        self.then.response_shows_request_failed()
         self.then.response_data_reports_directory_does_not_exist()
 
     def test_copy_update_copies_across_whole_dir_that_is_new(self):
@@ -33,6 +35,7 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.simple_file_exists_in_s3_bucket()
 
     def test_copy_update_transfers_no_data_when_all_files_are_present_and_up_to_date_in_s3(self):
@@ -45,6 +48,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.authorised_copy_update_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_shows_one_file_skipped()
         self.then.response_indicates_no_files_updated()
         self.then.response_indicates_no_new_file_uploaded()
@@ -62,6 +66,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.authorised_copy_update_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_confirms_transfer()
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_message_body_indicates_one_file_updated()
@@ -78,6 +83,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.unauthorised_copy_update_called_for_whole_directory()
 
         self.then.response_shows_failed_as_unauthorised()
+        self.then.response_status_is(403)
         self.then.simple_file_does_not_exist_in_s3_bucket()
 
     def test_copy_update_fails_when_authentication_is_invalid(self):
@@ -88,6 +94,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.unauthenticated_copy_update_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_copy_update_fails_when_authentication_credentials_are_missing(self):
         self.given.s3_interface_is_running()
@@ -97,6 +104,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.copy_update_called_with_no_authorisation_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_archive_file_is_created_when_copy_update_called_for_whole_dir(self):
         self.given.s3_interface_is_running()
@@ -107,6 +115,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.authorised_copy_update_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
 
@@ -121,6 +130,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.when.authorised_copy_update_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_has_been_updated()
@@ -139,4 +149,5 @@ class TestCopyUpdate(BaseSystemTest):
         self.then.simple_file_content_is_updated_on_s3()
         self.then.simple_file_is_in_root_archive_file_as_updated_file()
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_file_updated()

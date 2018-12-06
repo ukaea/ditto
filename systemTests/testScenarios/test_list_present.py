@@ -10,7 +10,8 @@ class TestListPresent(BaseSystemTest):
 
         self.then.standard_s3_bucket_does_not_exist()
         self.then.response_shows_warning_as_bucket_does_not_exist()
-        self.then.response_status_is_404()
+        self.then.response_status_is(404)
+        self.then.response_shows_request_failed()
 
     def test_list_present_shows_content_of_directory(self):
         self.given.s3_interface_is_running()
@@ -22,6 +23,7 @@ class TestListPresent(BaseSystemTest):
         self.when.authorised_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_body_shows_simple_file_in_s3()
         self.then.response_body_shows_file_in_sub_dir_in_s3()
 
@@ -33,6 +35,7 @@ class TestListPresent(BaseSystemTest):
         self.when.authorised_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_shows_no_objects_in_bucket()
 
     def test_list_present_fails_when_user_not_authorised_for_bucket(self):
@@ -46,6 +49,7 @@ class TestListPresent(BaseSystemTest):
         self.when.unauthorised_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_shows_failed_as_unauthorised()
+        self.then.response_status_is(403)
 
     def test_list_present_rejected_when_authentication_is_invalid(self):
         self.given.s3_interface_is_running()
@@ -55,6 +59,7 @@ class TestListPresent(BaseSystemTest):
         self.when.unauthenticated_list_present_called_for_simple_bucket_whole_directory_structure()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_list_present_rejected_when_authentication_credentials_are_not_provided(self):
         self.given.s3_interface_is_running()
@@ -64,3 +69,4 @@ class TestListPresent(BaseSystemTest):
         self.when.list_present_called_with_no_authorisation_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)

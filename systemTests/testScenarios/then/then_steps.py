@@ -81,8 +81,10 @@ class ThenSteps:
         assert sub_dir_file in self._context.object_names_from_list_present_response_body()
 
     def response_shows_request_was_completed_successfully(self):
-        assert self._context.http_client_response.status_code == 200
         assert self._context.response_status() == "success"
+
+    def response_shows_request_failed(self):
+        assert self._context.response_status() == "fail"
 
     def response_shows_copy_dir_copied_no_new_files_as_directory_already_exists(self):
         assert self._context.response_data()["new files uploaded"] == 0
@@ -131,17 +133,12 @@ class ThenSteps:
 
     def response_fails_with_reason_authentication_required(self):
         assert json.loads(self._context.http_client_response.text)["data"] == "Authentication required"
-        assert self._context.http_client_response.status_code == 401
 
     def response_shows_failed_as_unauthorised(self):
         assert self._context.http_client_response.json()['data'] == 'Not authorised for this bucket'
-        assert self._context.http_client_response.status_code == 403
 
-    def response_status_is_400(self):
-        assert self._context.http_client_response.status_code == 400
-
-    def response_status_is_404(self):
-        assert self._context.http_client_response.status_code == 404
+    def response_status_is(self, status_code):
+        assert self._context.http_client_response.status_code == status_code
 
     def archive_file_exists_in_root_dir(self):
         file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")

@@ -9,7 +9,8 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_whole_directory()
 
         self.then.standard_s3_bucket_does_not_exist()
-        self.then.response_status_is_404()
+        self.then.response_status_is(404)
+        self.then.response_shows_request_failed()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
     def test_copy_new_fails_when_no_dir_to_copy(self):
@@ -19,7 +20,8 @@ class TestCopyNew(BaseSystemTest):
 
         self.when.authorised_copy_new_called_for_whole_directory()
 
-        self.then.response_status_is_404()
+        self.then.response_status_is(404)
+        self.then.response_shows_request_failed()
         self.then.response_data_reports_directory_does_not_exist()
 
     def test_copy_new_copies_whole_dir_not_on_s3_to_s3(self):
@@ -32,6 +34,7 @@ class TestCopyNew(BaseSystemTest):
 
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.simple_file_exists_in_s3_bucket()
 
     def test_copy_new_copies_no_files_when_none_are_new(self):
@@ -44,6 +47,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_shows_one_file_skipped()
 
     def test_copy_new_copies_only_new_files_when_new_and_old_exist(self):
@@ -57,6 +61,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_confirms_transfer()
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.response_shows_one_file_skipped()
@@ -73,6 +78,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.unauthorised_copy_new_called_for_whole_directory()
 
         self.then.response_shows_failed_as_unauthorised()
+        self.then.response_status_is(403)
         self.then.simple_file_does_not_exist_in_s3_bucket()
 
     def test_copy_new_fails_when_authentication_is_invalid(self):
@@ -83,6 +89,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.unauthenticated_copy_new_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_copy_new_fails_when_authentication_credentials_are_missing(self):
         self.given.s3_interface_is_running()
@@ -92,6 +99,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.copy_new_called_with_no_authorisation_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_archive_file_is_created_at_each_sub_dir_when_copy_new_called_for_whole_dir(self):
         self.given.s3_interface_is_running()
@@ -103,6 +111,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_exists_in_sub_dir()
         self.then.file_in_sub_dir_is_in_archive_in_sub_dir_as_new_upload()
@@ -120,6 +129,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_has_been_updated()

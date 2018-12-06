@@ -9,6 +9,7 @@ class CreateBucket(BaseSystemTest):
         self.when.authenticated_create_bucket_called_for_simple_bucket()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.standard_s3_bucket_exists()
 
     def test_create_bucket_fails_when_invalid_name_given(self):
@@ -18,6 +19,8 @@ class CreateBucket(BaseSystemTest):
         self.when.authenticated_create_bucket_called_with_name('BAD')
 
         self.then.response_shows_error_that_bad_bucket_name_given()
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(400)
 
     def test_create_bucket_fails_when_invalid_authentication(self):
         self.given.s3_interface_is_running()
@@ -26,6 +29,7 @@ class CreateBucket(BaseSystemTest):
         self.when.unauthenticated_create_bucket_called_for_simple_bucket()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_create_bucket_fails_with_no_user_credentials_provided(self):
         self.given.s3_interface_is_running()
@@ -34,3 +38,4 @@ class CreateBucket(BaseSystemTest):
         self.when.create_bucket_called_for_simple_bucket_with_no_user_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
