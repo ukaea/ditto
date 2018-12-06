@@ -24,7 +24,7 @@ from DittoWebApi.src.utils.route_helper import format_route_specification
 
 def setup_logger(log_file_location, level):
     # Set  up the logger
-    logger = logging.getlogger("ditto-web-api")
+    logger = logging.getLogger("ditto-web-api")
     formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
     logger.setLevel(level)
 
@@ -73,7 +73,7 @@ def launch():
 
     # Launch app
     container = dict(
-        bucket_settingsservice=bucket_settings_service,
+        bucket_settings_service=bucket_settings_service,
         data_replication_service=data_replication_service,
         security_service=security_service
     )
