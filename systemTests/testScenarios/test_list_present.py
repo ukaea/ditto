@@ -10,6 +10,7 @@ class TestListPresent(BaseSystemTest):
 
         self.then.standard_s3_bucket_does_not_exist()
         self.then.response_shows_warning_as_bucket_does_not_exist()
+        self.then.response_status_is_404()
 
     def test_list_present_shows_content_of_directory(self):
         self.given.s3_interface_is_running()

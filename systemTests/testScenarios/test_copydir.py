@@ -22,7 +22,6 @@ class TestCopyDir(BaseSystemTest):
         # try copy dir before directory formed
         self.when.authorised_copy_dir_called_for_whole_directory()
 
-        #self.then.response_message_reports_directory_does_not_exist()
         self.then.response_status_is_404()
 
     def test_copy_dir_copies_whole_directory_into_s3_bucket(self):

@@ -44,6 +44,7 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
+        self.then.response_shows_request_was_completed_successfully()
         self.then.response_shows_one_file_skipped()
         self.then.response_indicates_no_files_updated()
         self.then.response_indicates_no_new_file_uploaded()
