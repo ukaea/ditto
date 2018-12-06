@@ -75,6 +75,7 @@ if __name__ == "__main__":
     CONTAINER = dict(
         bucket_settings_service=BUCKET_SETTINGS_SERVICE,
         data_replication_service=DATA_REPLICATION_SERVICE,
+        file_system_helper=FILE_SYSTEM_HELPER,
         security_service=SECURITY_SERVICE
     )
     APP = tornado.web.Application([

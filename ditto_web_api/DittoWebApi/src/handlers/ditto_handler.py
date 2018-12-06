@@ -3,16 +3,15 @@ from base64 import b64decode
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import exceptions
 
-from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.parse_strings import is_str_empty
 
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
-    def initialize(self, bucket_settings_service, data_replication_service, security_service):
+    def initialize(self, bucket_settings_service, data_replication_service, file_system_helper, security_service):
         self._bucket_settings_service = bucket_settings_service
         self._data_replication_service = data_replication_service
         self._security_service = security_service
-        self._file_system_helper = FileSystemHelper()
+        self._file_system_helper = file_system_helper
 
     def prepare(self):
         self._check_credentials()
