@@ -34,12 +34,10 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
     def get_app(self):
         self.mock_bucket_settings_service = mock.create_autospec(BucketSettingsService)
         self.mock_data_replication_service = mock.create_autospec(DataReplicationService)
-        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         self.mock_security_service = mock.create_autospec(ISecurityService)
         self.container = {
             'bucket_settings_service': self.mock_bucket_settings_service,
             'data_replication_service': self.mock_data_replication_service,
-            'file_system_helper': self.mock_file_system_helper,
             'security_service': self.mock_security_service
         }
         application = Application([

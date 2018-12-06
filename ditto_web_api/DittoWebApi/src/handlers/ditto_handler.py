@@ -7,11 +7,10 @@ from DittoWebApi.src.utils.parse_strings import is_str_empty
 
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
-    def initialize(self, bucket_settings_service, data_replication_service, file_system_helper, security_service):
+    def initialize(self, bucket_settings_service, data_replication_service, security_service):
         self._bucket_settings_service = bucket_settings_service
         self._data_replication_service = data_replication_service
         self._security_service = security_service
-        self._file_system_helper = file_system_helper
 
     def prepare(self):
         self._check_credentials()
@@ -72,13 +71,9 @@ class DittoHandler(APIHandler):
         # pylint: disable=no-member
         self.body[key] = default
 
-    def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path_to_data):
+    @staticmethod
+    def check_not_trying_to_access_data_outside_root(rel_path_to_data):
         if rel_path_to_data is None:
             return
-        abs_bucket_root_dir = self._file_system_helper.absolute_file_path(
-            self._bucket_settings_service.bucket_root_directory(bucket_name))
-        abs_data_path = self._file_system_helper.absolute_file_path(rel_path_to_data)
-        relative_path_bucket_to_data = self._file_system_helper.relative_file_path(abs_data_path,
-                                                                                   abs_bucket_root_dir)
-        if '..' in relative_path_bucket_to_data:
+        if '..' in rel_path_to_data:
             raise exceptions.APIError(400, 'Can not access data outside root directory!')
