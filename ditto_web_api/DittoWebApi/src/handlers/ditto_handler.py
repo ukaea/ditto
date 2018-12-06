@@ -65,7 +65,7 @@ class DittoHandler(APIHandler):
         # pylint: disable=no-member
         if is_str_empty(self.body[key]) is False:
             return
-        # When not given value, test if can be treated as None
+        # If missing see if can use as default
         if required:
             raise exceptions.APIError(400, 'Attribute provided is empty')
         self.body[key] = default
