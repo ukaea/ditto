@@ -5,6 +5,7 @@ from tornado_json import exceptions
 
 from DittoWebApi.src.utils.parse_strings import is_str_empty
 
+
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
     def initialize(self, bucket_settings_service, data_replication_service, security_service):

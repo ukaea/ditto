@@ -8,7 +8,6 @@ from tornado.web import Application
 
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
-from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.services.security.isecurity_service import ISecurityService
 from DittoWebApi.src.utils.route_helper import format_route_specification
 
