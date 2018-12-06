@@ -24,7 +24,7 @@ class DittoHandler(APIHandler):
 
     def check_current_user_authorised_for_bucket(self, bucket_name):
         if not self._bucket_settings_service.is_bucket_recognised(bucket_name):
-            raise exceptions.APIError(404, 'Bucket does not exist')
+            raise exceptions.APIError(404, 'Bucket name not recognised')
         permitted_groups = self._bucket_settings_service.bucket_permitted_groups(bucket_name)
         for group_name in permitted_groups:
             if self._security_service.is_in_group(self._current_user, group_name):
