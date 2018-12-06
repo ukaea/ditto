@@ -7,6 +7,7 @@ pytest
 pytest-cov
 pytest-mock
 pytest-tornado
+python-dateutil
 tornado
 tornado-json
 wheel

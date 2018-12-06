@@ -24,13 +24,15 @@ setup(
     # Dependent packages (distributions)
     install_requires=[
         "Tornado-JSON",
-        "requests"
+        "requests",
+        "boto",
+        "python-dateutil"
     ],
 
     # entry points
     entry_points={
         'console_scripts': [
-            'ditto_server = DittoWebApi.main'
+            'ditto_server = DittoWebApi.run_ditto:launch'
         ]
     },
 )

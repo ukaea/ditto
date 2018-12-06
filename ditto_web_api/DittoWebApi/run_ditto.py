@@ -42,7 +42,7 @@ def setup_logger(log_file_location, level):
     return logger
 
 
-if __name__ == "__main__":
+def launch():
     # Read configuration
     CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'configuration.ini'))
     CONFIGURATION = Configuration(CONFIGURATION_PATH)
@@ -89,3 +89,7 @@ if __name__ == "__main__":
     LOGGER.info(f'DITTO Web API listening on port {CONFIGURATION.app_port}')
     APP.listen(CONFIGURATION.app_port)
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    launch()
