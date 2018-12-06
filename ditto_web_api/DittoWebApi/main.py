@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     # Bucket settings
     BUCKET_SETTINGS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
-    BUCKET_SETTINGS_SERVICE = BucketSettingsService(BUCKET_SETTINGS_PATH, LOGGER)
+    BUCKET_SETTINGS_SERVICE = BucketSettingsService(BUCKET_SETTINGS_PATH, CONFIGURATION, LOGGER)
 
     # Security (PLACEHOLDER CODE)
     SECURITY_CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
