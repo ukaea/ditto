@@ -33,6 +33,10 @@ class BucketSettingsService:
         settings.read(bucket_settings_path)
         self._settings = {bucket_name: BucketSetting(settings[bucket_name]) for bucket_name in settings.sections()}
 
+    @property
+    def admin_groups(self):
+        return self._admin_groups
+
     def is_bucket_recognised(self, bucket_name):
         return bucket_name in self._settings
 

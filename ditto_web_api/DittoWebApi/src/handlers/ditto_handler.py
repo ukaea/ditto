@@ -1,5 +1,6 @@
 from base64 import b64decode
 
+from tornado_json import exceptions
 from tornado_json.requesthandlers import APIHandler
 
 
@@ -31,6 +32,12 @@ class DittoHandler(APIHandler):
                 return
         self.set_status(403)
         self.finish({'reason': 'Not authorised for this bucket'})
+
+    def check_current_user_is_admin(self):
+        for group_name in self._bucket_settings_service.admin_groups:
+            if self._security_service.is_in_group(self._current_user, group_name):
+                return
+        raise exceptions.APIError(403, 'Administrator authorisation required')
 
     def _check_credentials(self):
         auth_header = self.request.headers.get('Authorization')

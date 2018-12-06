@@ -21,6 +21,7 @@ class CreateBucketHandler(DittoHandler):
         }
     )
     def post(self, *args, **kwargs):
+        self.check_current_user_is_admin()
         bucket_name = self.get_body_attribute("bucket", required=True)
         result = self._data_replication_service.create_bucket(bucket_name)
         return result
