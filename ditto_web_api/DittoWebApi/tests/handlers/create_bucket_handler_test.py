@@ -1,3 +1,4 @@
+import json
 import pytest
 from tornado.httpclient import HTTPClientError
 from tornado.testing import gen_test
@@ -46,6 +47,24 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         assert error.value.response.code == 403
 
     @gen_test
+    def test_post_returns_400_when_bucket_already_exists(self):
+        # Arrange
+        action_summary = {"message": "Bucket already exists",
+                          "bucket": "some-bucket",
+                          "status": StatusCodes.Bad_request}
+        self.mock_data_replication_service.create_bucket.return_value = action_summary
+        self._set_admin_user()
+        # Act
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_authenticated_request(self.standard_body)
+        response_body = json.loads(error.value.response.body, encoding='utf-8')
+        # Assert
+        assert error.value.response.code == 400
+        assert response_body['status'] == 'fail'
+        assert response_body['data'] == "Bucket already exists"
+
+
+    @gen_test
     def test_post_returns_200_when_credentials_accepted(self):
         # Arrange
         action_summary = {"message": "Bucket created", "bucket": "some-bucket", 'status': StatusCodes.Okay}
@@ -89,19 +108,3 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         assert response_code == 200
         assert response_body['status'] == 'success'
         assert response_body['data'] == action_summary
-
-    @gen_test
-    def test_post_create_bucket_reports_warning_as_json(self):
-        # Arrange
-        action_summary = {"message": "Bucket already exists",
-                          "bucket": "some-bucket",
-                          "status": StatusCodes.Bad_request}
-        self.mock_data_replication_service.create_bucket.return_value = action_summary
-        self.mock_security_service.check_credentials.return_value = True
-        self.mock_security_service.is_in_group.return_value = True
-        self.mock_bucket_settings_service.admin_groups = [self.user_group]
-        # Act
-        with pytest.raises(HTTPClientError) as error:
-            yield self.send_authorised_authenticated_request(self.standard_body)
-        # Assert
-        assert error.value.response.code == 400
