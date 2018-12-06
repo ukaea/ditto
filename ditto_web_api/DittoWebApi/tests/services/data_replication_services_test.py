@@ -47,21 +47,18 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_object_1 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_1.to_dict.return_value = {"object_name": "test",
                                                    "bucket_name": "test_bucket",
-                                                   "is_dir": False,
                                                    "size": 100,
                                                    "etag": "test_etag",
                                                    "last_modified": 2132142421.123123}
         self.mock_object_2 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_2.to_dict.return_value = {"object_name": "test_2",
                                                    "bucket_name": "test_bucket",
-                                                   "is_dir": False,
                                                    "size": 100,
                                                    "etag": "test_etag_2",
                                                    "last_modified": 1124557444.128364}
         self.mock_object_3 = mock.create_autospec(S3ObjectInformation)
         self.mock_object_3.to_dict.return_value = {"object_name": "test_dir/test",
                                                    "bucket_name": "test_bucket",
-                                                   "is_dir": False,
                                                    "size": 100,
                                                    "etag": "test_etag",
                                                    "last_modified": 4132242586.159111}
@@ -107,13 +104,12 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_objects.assert_called_once_with("test-bucket", None)
         assert output["objects"][0] == {"object_name": "test",
                                         "bucket_name": "test_bucket",
-                                        "is_dir": False,
                                         "size": 100,
                                         "etag": "test_etag",
                                         "last_modified": 2132142421.123123}
         assert output["objects"][1] == {"object_name": "test_2",
                                         "bucket_name": "test_bucket",
-                                        "is_dir": False, "size": 100,
+                                        "size": 100,
                                         "etag": "test_etag_2",
                                         "last_modified": 1124557444.128364}
         assert len(output["objects"]) == 2
@@ -135,7 +131,6 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_objects.assert_called_once_with("test-bucket", "test_dir")
         assert output["objects"][0] == {"object_name": "test_dir/test",
                                         "bucket_name": "test_bucket",
-                                        "is_dir": False,
                                         "size": 100,
                                         "etag": "test_etag",
                                         "last_modified": 4132242586.159111}

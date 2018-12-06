@@ -123,7 +123,6 @@ class ExternalDataService:
         return S3ObjectInformation.create(
             boto_object.name,
             boto_object.bucket.name,
-            False,
             boto_object.size,
             boto_object.etag,
             dateutil.parser.parse(boto_object.last_modified)
