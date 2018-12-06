@@ -42,50 +42,54 @@ def setup_logger(log_file_location, level):
     return logger
 
 
-if __name__ == "__main__":
+def launch():
     # Read configuration
-    CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'configuration.ini'))
-    CONFIGURATION = Configuration(CONFIGURATION_PATH)
+    configuration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'configuration.ini'))
+    configuration = Configuration(configuration_path)
 
     # Set up logging
-    LOGGER = setup_logger(CONFIGURATION.log_folder_location, CONFIGURATION.logging_level)
-    LOGGER.info("Starting DITTO Web API")
+    logger = setup_logger(configuration.log_folder_location, configuration.logging_level)
+    logger.info("Starting DITTO Web API")
 
     # Bucket settings
-    BUCKET_SETTINGS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
-    BUCKET_SETTINGS_SERVICE = BucketSettingsService(BUCKET_SETTINGS_PATH, CONFIGURATION, LOGGER)
+    bucket_settings_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
+    bucket_settings_service = BucketSettingsService(bucket_settings_path, configuration, logger)
 
     # Security (PLACEHOLDER CODE)
-    SECURITY_CONFIGURATION_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
-    SECURITY_SERVICE = ConfigSecurityService(SECURITY_CONFIGURATION_PATH, LOGGER)
+    security_configuration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
+    security_service = ConfigSecurityService(security_configuration_path, logger)
 
     # Set up services
-    S3_ADAPTER = BotoAdapter(CONFIGURATION, LOGGER)
-    FILE_READ_WRITE_HELPER = FileReadWriteHelper()
-    FILE_SYSTEM_HELPER = FileSystemHelper()
-    ARCHIVER = Archiver(FILE_READ_WRITE_HELPER, FILE_SYSTEM_HELPER, LOGGER)
-    EXTERNAL_DATA_SERVICE = ExternalDataService(CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER, S3_ADAPTER)
-    INTERNAL_DATA_SERVICE = InternalDataService(ARCHIVER, CONFIGURATION, FILE_SYSTEM_HELPER, LOGGER)
-    DATA_REPLICATION_SERVICE = build_standard_data_replication_service(BUCKET_SETTINGS_SERVICE,
-                                                                       EXTERNAL_DATA_SERVICE,
-                                                                       INTERNAL_DATA_SERVICE,
-                                                                       LOGGER)
+    s3_adapter = BotoAdapter(configuration, logger)
+    file_read_write_helper = FileReadWriteHelper()
+    file_system_helper = FileSystemHelper()
+    archiver = Archiver(file_read_write_helper, file_system_helper, logger)
+    external_data_service = ExternalDataService(configuration, file_system_helper, logger, s3_adapter)
+    internal_data_service = InternalDataService(archiver, configuration, file_system_helper, logger)
+    data_replication_service = build_standard_data_replication_service(bucket_settings_service,
+                                                                       external_data_service,
+                                                                       internal_data_service,
+                                                                       logger)
 
     # Launch app
-    CONTAINER = dict(
-        bucket_settings_service=BUCKET_SETTINGS_SERVICE,
-        data_replication_service=DATA_REPLICATION_SERVICE,
-        security_service=SECURITY_SERVICE
+    container = dict(
+        bucket_settings_service=bucket_settings_service,
+        data_replication_service=data_replication_service,
+        security_service=security_service
     )
-    APP = tornado.web.Application([
+    app = tornado.web.Application([
         ("(|/)", HeartbeatHandler),
-        (format_route_specification("listpresent"), ListPresentHandler, CONTAINER),
-        (format_route_specification("copydir"), CopyDirHandler, CONTAINER),
-        (format_route_specification("createbucket"), CreateBucketHandler, CONTAINER),
-        (format_route_specification("deletefile"), DeleteFileHandler, CONTAINER),
-        (format_route_specification("copynew"), CopyNewHandler, CONTAINER),
-        (format_route_specification("copyupdate"), CopyUpdateHandler, CONTAINER),
+        (format_route_specification("listpresent"), ListPresentHandler, container),
+        (format_route_specification("copydir"), CopyDirHandler, container),
+        (format_route_specification("createbucket"), CreateBucketHandler, container),
+        (format_route_specification("deletefile"), DeleteFileHandler, container),
+        (format_route_specification("copynew"), CopyNewHandler, container),
+        (format_route_specification("copyupdate"), CopyUpdateHandler, container),
     ])
-    LOGGER.info(f'DITTO Web API listening on port {CONFIGURATION.app_port}')
-    APP.listen(CONFIGURATION.app_port)
+    logger.info(f'DITTO Web API listening on port {configuration.app_port}')
+    app.listen(configuration.app_port)
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    launch()
