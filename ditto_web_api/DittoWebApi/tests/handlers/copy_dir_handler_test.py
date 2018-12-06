@@ -1,3 +1,6 @@
+import pytest
+
+from tornado.httpclient import HTTPClientError
 from tornado.testing import gen_test
 
 from DittoWebApi.src.handlers.copy_dir import CopyDirHandler
@@ -120,3 +123,25 @@ class CopyDirHandlerTest(BaseHandlerTest):
         assert response_code == 200
         assert response_body['status'] == 'success'
         assert response_body['data'] == transfer_summary
+
+    @gen_test()
+    def test_copy_dir_returns_404_when_bucket_does_not_exist_in_s3(self):
+        # Arrange
+        self._set_authentication_authorisation_ok()
+        transfer_summary = return_transfer_summary(
+            message="Bucket does not exist in s3",
+            new_files_uploaded=0,
+            files_updated=0,
+            files_skipped=5,
+            data_transferred=0,
+            status=StatusCodes.Not_found
+        )
+        self.mock_data_replication_service.copy_dir.return_value = transfer_summary
+        # Act
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_POST_request(self.standard_body)
+        # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_bucket_settings_service.is_bucket_recognised.assert_called_once_with('test-bucket')
+        self.mock_security_service.is_in_group.assert_called_once_with(self._auth_username, self._user_group)
+        assert error.value.response.code == 404

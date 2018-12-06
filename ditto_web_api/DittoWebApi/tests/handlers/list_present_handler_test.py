@@ -1,4 +1,7 @@
+import pytest
+
 from tornado.testing import gen_test
+from tornado.httpclient import HTTPClientError
 
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
 from DittoWebApi.src.utils.return_status import StatusCodes
@@ -96,3 +99,20 @@ class ListPresentHandlerTest(BaseHandlerTest):
         assert response_code == 200
         assert response_body['status'] == 'success'
         assert response_body['data'] == object_dicts
+
+    @gen_test()
+    def test_list_present_returns_404_when_bucket_does_not_exist_in_s3(self):
+        # Arrange
+        self._set_authentication_authorisation_ok()
+        object_dicts = {"message": "Bucket does not exist in s3",
+                        "objects": [],
+                        "status": StatusCodes.Not_found}
+        self.mock_data_replication_service.retrieve_object_dicts.return_value = object_dicts
+        # Act
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_POST_request(self.standard_body)
+        # Assert
+        self.mock_security_service.check_credentials.assert_called_once_with(self._auth_username, self._auth_password)
+        self.mock_bucket_settings_service.is_bucket_recognised.assert_called_once_with('test-bucket')
+        self.mock_security_service.is_in_group.assert_called_once_with(self._auth_username, self._user_group)
+        assert error.value.response.code == 404
