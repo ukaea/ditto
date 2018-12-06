@@ -3,6 +3,7 @@ from base64 import b64decode
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import exceptions
 
+from DittoWebApi.src.utils.parse_strings import is_str_empty
 
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
@@ -17,6 +18,7 @@ class DittoHandler(APIHandler):
     def get_body_attribute(self, key, default=None, required=False):
         # pylint: disable=no-member
         if key in self.body:
+            self._check_attribute_is_valid(self.body[key])
             return self.body[key]
         if required:
             raise exceptions.APIError(400, 'Attribute missing')
@@ -57,3 +59,10 @@ class DittoHandler(APIHandler):
     @staticmethod
     def _authentication_failed():
         raise exceptions.APIError(401, 'Authentication required')
+
+    @staticmethod
+    def _check_attribute_is_valid(attribute):
+        if is_str_empty(attribute) is True:
+            raise exceptions.APIError(400, 'Attribute provided is empty')
+        if '..' in attribute:
+            raise exceptions.APIError(400, 'Can not access data outside root directory')
