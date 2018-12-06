@@ -26,4 +26,6 @@ class CopyNewHandler(DittoHandler):
         self.check_current_user_authorised_for_bucket(bucket_name)
         dir_path = self.get_body_attribute("directory", default=None)
         result = self._data_replication_service.copy_new(bucket_name, dir_path)
+        self.check_request_was_completed_successfully(result)
+        del result['status']
         return result

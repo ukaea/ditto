@@ -11,6 +11,7 @@ class SampleConfigurationCreator:
     @staticmethod
     def create_configuration(log_folder_loc,
                              logging_level,
+                             admin_groups,
                              app_port,
                              s3_host,
                              s3_port,
@@ -26,6 +27,9 @@ class SampleConfigurationCreator:
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "LoggingLevel",
                                                                        logging_level)
+        template = SampleConfigurationCreator.add_element_to_temp_file(template,
+                                                                       "AdminGroups",
+                                                                       admin_groups)
         template = SampleConfigurationCreator.add_element_to_temp_file(template,
                                                                        "ApplicationPort",
                                                                        app_port)
@@ -85,6 +89,7 @@ def test_configuration_can_be_read_when_s3_secure():
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
                                                                          "INFO",
+                                                                         "dittoadmin",
                                                                          "8888",
                                                                          "0.0.0.0",
                                                                          "9000",
@@ -99,6 +104,8 @@ def test_configuration_can_be_read_when_s3_secure():
 
     # Assert
     assert configuration.log_folder_location == current
+    assert configuration.admin_groups == ["dittoadmin"]
+    assert configuration.app_port == 8888
     assert configuration.s3_host == "0.0.0.0"
     assert configuration.s3_port == 9000
     assert configuration.s3_access_key == "access"
@@ -116,6 +123,7 @@ def test_configuration_can_be_read_when_s3_not_secure():
     current = os.getcwd()
     configuration_path = SampleConfigurationCreator.create_configuration(current,
                                                                          "INFO",
+                                                                         "dittoadmin",
                                                                          "8888",
                                                                          "0.0.0.0",
                                                                          "9000",
@@ -130,6 +138,8 @@ def test_configuration_can_be_read_when_s3_not_secure():
 
     # Assert
     assert configuration.log_folder_location == current
+    assert configuration.admin_groups == ["dittoadmin"]
+    assert configuration.app_port == 8888
     assert configuration.s3_host == "0.0.0.0"
     assert configuration.s3_port == 9000
     assert configuration.s3_access_key == "access"

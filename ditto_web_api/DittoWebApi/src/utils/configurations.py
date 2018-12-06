@@ -1,8 +1,9 @@
 import os
 import configparser
 
-from .parse_strings import str2bool
-from .parse_strings import str2non_negative_int
+from DittoWebApi.src.utils.parse_strings import str2bool
+from DittoWebApi.src.utils.parse_strings import str2non_negative_int
+from DittoWebApi.src.utils.parse_strings import str2list
 
 
 class Configuration:
@@ -19,6 +20,7 @@ class Configuration:
 
         # Application
         self._app_port = None
+        self._admin_groups = None
 
         # S3 client
         self._s3_host = None
@@ -40,6 +42,10 @@ class Configuration:
     @property
     def app_port(self):
         return self._app_port
+
+    @property
+    def admin_groups(self):
+        return self._admin_groups
 
     @property
     def s3_host(self):
@@ -80,6 +86,7 @@ class Configuration:
 
         # Application
         self._app_port = str2non_negative_int(settings['ApplicationPort'])
+        self._admin_groups = str2list(settings['AdminGroups'])
 
         # S3 client
         self._s3_host = settings['S3Host']

@@ -23,6 +23,7 @@ class DittoApiServer:
             '[Settings]\n' \
             f'LogFolderLocation = {self._context.log_folder_path}\n' \
             f'LoggingLevel = {self._context.log_level}\n' \
+            f'AdminGroups = dittoadmin\n' \
             f'ApplicationPort = {self._context.app_port}\n' \
             f'S3Host = {self._context.host_address}\n' \
             f'S3Port = {self._context.s3port}\n' \
@@ -49,7 +50,11 @@ class DittoApiServer:
             '\n' \
             '[OtherUser]\n' \
             'password = password\n' \
-            'groups = othergroup'
+            'groups = othergroup\n' \
+            '\n' \
+            '[AdminUser]\n' \
+            'password = IamAdmin\n' \
+            'groups = dittoadmin'
 
         security_file_path = os.path.join(
             self._context.ditto_web_api_folder_path,

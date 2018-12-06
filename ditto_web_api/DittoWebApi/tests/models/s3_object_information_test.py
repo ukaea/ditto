@@ -10,7 +10,6 @@ class TestS3ObjectInformation(unittest.TestCase):
         test_object = S3ObjectInformation.create(
             "test_1.txt",
             "bucket_1_test",
-            False,
             100,
             "test_etag",
             datetime.datetime(2018, 11, 15)
@@ -20,7 +19,6 @@ class TestS3ObjectInformation(unittest.TestCase):
         # Assert
         assert output == {'object_name': 'test_1.txt',
                           'bucket_name': 'bucket_1_test',
-                          'is_dir': False,
                           'size': 100,
                           'etag': 'test_etag',
                           'last modified': 1542240000.0}

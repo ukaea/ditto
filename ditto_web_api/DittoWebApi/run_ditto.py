@@ -53,7 +53,7 @@ def launch():
 
     # Bucket settings
     bucket_settings_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
-    bucket_settings_service = BucketSettingsService(bucket_settings_path, logger)
+    bucket_settings_service = BucketSettingsService(bucket_settings_path, configuration, logger)
 
     # Security (PLACEHOLDER CODE)
     security_configuration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
