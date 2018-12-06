@@ -1,7 +1,10 @@
+import pytest
 from tornado.testing import gen_test
+from tornado.httpclient import HTTPClientError
 
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.utils.return_helper import return_delete_file_helper
+from DittoWebApi.src.utils.return_status import StatusCodes
 from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
@@ -25,21 +28,21 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         yield self.assert_request_returns_401_when_no_credentials_given(self.standard_body)
 
     @gen_test
-    def test_post_returns_401_when_invalid_credentials_given(self):
+    def test_delete_returns_401_when_invalid_credentials_given(self):
         yield self.assert_request_returns_401_when_invalid_credentials_given(self.standard_body)
 
     @gen_test
-    def test_post_returns_403_when_user_is_unauthorised(self):
+    def test_delete_returns_403_when_user_is_unauthorised(self):
         yield self.assert_request_returns_403_when_unauthorised_user(self.standard_body)
 
     @gen_test
-    def test_post_returns_404_when_bucket_nonexistent(self):
+    def test_delete_returns_404_when_bucket_nonexistent(self):
         yield self.assert_request_returns_404_when_unrecognised_bucket_named(self.standard_body)
 
     @gen_test
-    def test_post_returns_200_when_credentials_accepted(self):
-        self.mock_data_replication_service.try_delete_file.return_value = \
-            return_delete_file_helper('success', 'test.txt', 'test.txr')
+    def test_delete_returns_200_when_credentials_accepted(self):
+        self.mock_data_replication_service.try_delete_file.return_value = {'message': 'File successfully deleted',
+                                                                           'status': StatusCodes.Okay}
         yield self.assert_request_returns_200_when_credentials_accepted(self.standard_body)
 
     # Coupling with Data Replication Service
@@ -50,7 +53,8 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         action_summary = {
             "message": "File successfully deleted",
             "file": "test.txt",
-            "bucket": "test-bucket"
+            "bucket": "test-bucket",
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
@@ -65,7 +69,8 @@ class DeleteFileHandlerTest(BaseHandlerTest):
     @gen_test
     def test_delete_file_successful_return_helper_coupled_with_method_schema(self):
         # Arrange
-        action_summary = return_delete_file_helper("File successfully deleted", "test.txt", "test-bucket")
+        action_summary = return_delete_file_helper(
+            "File successfully deleted", "test.txt", "test-bucket", StatusCodes.Okay)
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
         # Act
@@ -76,36 +81,35 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         assert response_body['data'] == action_summary
 
     @gen_test
-    def test_delete_file_reports_warning_as_json(self):
+    def test_delete_file_reports_404_when_file_is_missing(self):
         # Arrange
         action_summary = {
             "message": "File does not exist in the bucket",
             "file": "test.txt",
-            "bucket": "test-bucket"
+            "bucket": "test-bucket",
+            "status": StatusCodes.Not_found
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
         # Act
-        response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
-        self.mock_data_replication_service.try_delete_file.assert_called_once_with("test-bucket", "test.txt")
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == action_summary
+        assert error.value.response.code == 404
 
-    @gen_test
-    def test_delete_file_reports_warning_coupled_with_method_schema(self):
+    @gen_test()
+    def test_delete_file_returns_404_when_bucket_does_not_exist_in_s3(self):
         # Arrange
-        action_summary = return_delete_file_helper(
-            "File does not exist in the bucket",
-            "test.txt",
-            "test-bucket"
-        )
-        self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
+        transfer_summary = return_delete_file_helper(
+            message="Bucket does not exist in s3",
+            bucket_name="test-bucket",
+            file_rel_path="some_file",
+            status=StatusCodes.Not_found
+        )
+        self.mock_data_replication_service.try_delete_file.return_value = transfer_summary
         # Act
-        response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == action_summary
+        assert error.value.response.code == 404

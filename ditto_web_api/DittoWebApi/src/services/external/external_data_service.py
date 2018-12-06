@@ -3,6 +3,7 @@ import dateutil.parser
 from DittoWebApi.src.models.s3_object_information import S3ObjectInformation
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
+from DittoWebApi.src.utils.return_status import StatusCodes
 
 
 class ExternalDataService:
@@ -122,7 +123,6 @@ class ExternalDataService:
         return S3ObjectInformation.create(
             boto_object.name,
             boto_object.bucket.name,
-            False,
             boto_object.size,
             boto_object.etag,
             dateutil.parser.parse(boto_object.last_modified)
@@ -143,4 +143,5 @@ class ExternalDataService:
                 "new_files_uploaded": len(file_summary.new_files),
                 "files_updated": len(file_summary.updated_files),
                 "files_skipped": len(file_summary.files_to_be_skipped()),
-                "data_transferred": data_transferred}
+                "data_transferred": data_transferred,
+                "status": StatusCodes.Okay}

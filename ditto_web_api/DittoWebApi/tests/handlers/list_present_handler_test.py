@@ -1,6 +1,10 @@
+import pytest
+
 from tornado.testing import gen_test
+from tornado.httpclient import HTTPClientError
 
 from DittoWebApi.src.handlers.list_present import ListPresentHandler
+from DittoWebApi.src.utils.return_status import StatusCodes
 from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
@@ -37,7 +41,11 @@ class ListPresentHandlerTest(BaseHandlerTest):
 
     @gen_test
     def test_post_returns_200_when_credentials_accepted(self):
-        self.mock_data_replication_service.retrieve_object_dicts.return_value = {'message': 'success', 'objects': []}
+        self.mock_data_replication_service.retrieve_object_dicts.return_value = {
+            'message': 'success',
+            'objects': [],
+            'status': StatusCodes.Okay
+        }
         yield self.assert_request_returns_200_when_credentials_accepted(self.standard_body)
 
     # Coupling with Data Replication Service
@@ -49,7 +57,8 @@ class ListPresentHandlerTest(BaseHandlerTest):
             "message": "objects returned successfully",
             "objects": [
                 {"object": "file_1.txt", "bucket": "test-bucket"}
-            ]
+            ],
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.retrieve_object_dicts.return_value = object_dicts
         self.set_authentication_authorisation_ok()
@@ -69,7 +78,8 @@ class ListPresentHandlerTest(BaseHandlerTest):
             "objects": [
                 {"object": "file_1.txt", "bucket": "test-bucket"},
                 {"object": "file_2.txt", "bucket": "test-bucket"}
-            ]
+            ],
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.retrieve_object_dicts.return_value = object_dicts
         self.set_authentication_authorisation_ok()
@@ -86,7 +96,8 @@ class ListPresentHandlerTest(BaseHandlerTest):
         # Arrange
         object_dicts = {
             "message": "no objects in S3 bucket",
-            "objects": []
+            "objects": [],
+            "status": StatusCodes.Okay
         }
         self.mock_data_replication_service.retrieve_object_dicts.return_value = object_dicts
         self.set_authentication_authorisation_ok()
@@ -98,16 +109,16 @@ class ListPresentHandlerTest(BaseHandlerTest):
         assert response_body['status'] == 'success'
         assert response_body['data'] == object_dicts
 
-    @gen_test
-    def test_post_returns_warning_when_nonexistent_bucket_name_provided(self):
+    @gen_test()
+    def test_list_present_returns_404_when_bucket_does_not_exist_in_s3(self):
         # Arrange
-        object_dicts = {"message": "test-bucket does not exist in S3", "objects": []}
-        self.mock_data_replication_service.retrieve_object_dicts.return_value = object_dicts
         self.set_authentication_authorisation_ok()
+        object_dicts = {"message": "Bucket does not exist in s3",
+                        "objects": [],
+                        "status": StatusCodes.Not_found}
+        self.mock_data_replication_service.retrieve_object_dicts.return_value = object_dicts
         # Act
-        response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
-        self.mock_data_replication_service.retrieve_object_dicts.assert_called_once_with("test-bucket", None)
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == object_dicts
+        assert error.value.response.code == 404

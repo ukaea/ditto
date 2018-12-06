@@ -2,6 +2,7 @@ from base64 import b64decode
 
 from tornado_json import exceptions
 from tornado_json.requesthandlers import APIHandler
+from tornado_json import exceptions
 
 
 class DittoHandler(APIHandler):
@@ -19,19 +20,17 @@ class DittoHandler(APIHandler):
         if key in self.body:
             return self.body[key]
         if required:
-            raise ValueError('Attribute missing')
+            raise exceptions.APIError(400, 'Attribute missing')
         return default
 
     def check_current_user_authorised_for_bucket(self, bucket_name):
         if not self._bucket_settings_service.is_bucket_recognised(bucket_name):
-            self.set_status(404)
-            self.finish({'reason': 'Bucket name not recognised'})
+            raise exceptions.APIError(404, 'Bucket name not recognised')
         permitted_groups = self._bucket_settings_service.bucket_permitted_groups(bucket_name)
         for group_name in permitted_groups:
             if self._security_service.is_in_group(self._current_user, group_name):
                 return
-        self.set_status(403)
-        self.finish({'reason': 'Not authorised for this bucket'})
+        raise exceptions.APIError(403, 'Not authorised for this bucket')
 
     def check_current_user_is_admin(self):
         for group_name in self._bucket_settings_service.admin_groups:
@@ -56,6 +55,12 @@ class DittoHandler(APIHandler):
         else:
             self._authentication_failed()
 
-    def _authentication_failed(self):
-        self.set_status(401)
-        self.finish({'reason': 'Authentication required'})
+    @staticmethod
+    def check_request_was_completed_successfully(result):
+        exceptions.api_assert(result["status"].value == 200,
+                              result["status"].value,
+                              result['message'])
+
+    @staticmethod
+    def _authentication_failed():
+        raise exceptions.APIError(401, 'Authentication required')
