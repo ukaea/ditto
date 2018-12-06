@@ -50,7 +50,11 @@ class DittoApiServer:
             '\n' \
             '[OtherUser]\n' \
             'password = password\n' \
-            'groups = othergroup'
+            'groups = othergroup\n' \
+            '\n' \
+            '[AdminUser]\n' \
+            'password = IamAdmin\n' \
+            'groups = dittoadmin'
 
         security_file_path = os.path.join(
             self._context.ditto_web_api_folder_path,

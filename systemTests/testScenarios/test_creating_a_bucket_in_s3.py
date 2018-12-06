@@ -2,25 +2,35 @@ from testScenarios.context import BaseSystemTest
 
 
 class CreateBucket(BaseSystemTest):
-    def test_create_bucket_succeeds(self):
+    def test_create_bucket_as_admin_succeeds(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
-        self.when.authenticated_create_bucket_called_for_simple_bucket()
+        self.when.admin_create_bucket_called_for_simple_bucket()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
         self.then.standard_s3_bucket_exists()
 
-    def test_create_bucket_fails_when_invalid_name_given(self):
+    def test_create_bucket_fails_as_admin_when_invalid_name_given(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()
 
-        self.when.authenticated_create_bucket_called_with_name('BAD')
+        self.when.admin_create_bucket_called_with_name('BAD')
 
         self.then.response_shows_error_that_bad_bucket_name_given()
         self.then.response_shows_request_failed()
         self.then.response_status_is(400)
+
+    def test_create_bucket_as_non_admin_fails(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+
+        self.when.authenticated_create_bucket_called_for_simple_bucket()
+
+        self.then.response_shows_failed_as_not_admin()
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(403)
 
     def test_create_bucket_fails_when_invalid_authentication(self):
         self.given.s3_interface_is_running()
