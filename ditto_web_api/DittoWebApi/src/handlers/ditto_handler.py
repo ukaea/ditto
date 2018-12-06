@@ -48,10 +48,12 @@ class DittoHandler(APIHandler):
         else:
             self._authentication_failed()
 
-    def check_request_was_completed_successfully(self, result):
+    @staticmethod
+    def check_request_was_completed_successfully(result):
         exceptions.api_assert(result["status"].value == 200,
                               result["status"].value,
                               result['message'])
 
-    def _authentication_failed(self):
+    @staticmethod
+    def _authentication_failed():
         raise exceptions.APIError(401, 'Authentication required')
