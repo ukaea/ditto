@@ -20,7 +20,7 @@ class DittoHandler(APIHandler):
     def get_body_attribute(self, key, default=None, required=False):
         # pylint: disable=no-member
         if key in self.body:
-            self._check_attribute_is_valid(self.body[key])
+            self._check_attribute_is_not_empty(key, default, required)
             return self.body[key]
         if required:
             raise exceptions.APIError(400, 'Attribute missing')
@@ -62,12 +62,14 @@ class DittoHandler(APIHandler):
     def _authentication_failed():
         raise exceptions.APIError(401, 'Authentication required')
 
-    @staticmethod
-    def _check_attribute_is_valid(attribute):
-        if is_str_empty(attribute) is True:
-            raise exceptions.APIError(400, 'Attribute provided is empty')
-        if '..' in attribute:
-            raise exceptions.APIError(400, 'Can not access data outside root directory')
+    def _check_attribute_is_not_empty(self, key, default, required):
+        if is_str_empty(self.body[key]) is True:
+            raise exceptions.APIError(400, 'Attribute provided is empty') \
+                if required \
+                else self._set_attribute_value_to_default(key, default)
+
+    def _set_attribute_value_to_default(self, key, default=False):
+        self.body[key] = default
 
     def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path_to_data):
         if rel_path_to_data is not None:
