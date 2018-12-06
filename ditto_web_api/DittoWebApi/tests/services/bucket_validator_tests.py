@@ -23,7 +23,9 @@ class TestBucketValidator:
                                              "test!!",
                                              "",
                                              "test-",
-                                             "tests-..bucketname"])
+                                             "tests-..bucketname",
+                                             "test-bucket-.name",
+                                             "test-bucket.-name"])
     def test_check_bucket_returns_warning_when_bucket_name_invalid(self, bucket_name):
         # Act
         bucket_warning = self.test_validator.check_bucket(bucket_name)
