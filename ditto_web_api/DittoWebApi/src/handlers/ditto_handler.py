@@ -1,6 +1,5 @@
 from base64 import b64decode
 
-from tornado_json import exceptions
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import exceptions
 

@@ -36,6 +36,7 @@ class SampleSettingsCreator:
         if os.path.exists(file_path):
             os.remove(file_path)
 
+
 def get_mock_configuration(admin_groups):
     mock_configuration = mock.create_autospec(Configuration)
     mock_configuration.admin_groups = admin_groups

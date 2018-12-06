@@ -65,7 +65,6 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         self.mock_security_service.is_in_group.return_value = True
         self.mock_bucket_settings_service.admin_groups = [self.user_group]
 
-
     # Request methods
 
     async def _request(self, method, body, username, password):
