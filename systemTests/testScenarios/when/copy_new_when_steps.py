@@ -21,3 +21,8 @@ class CopyNewWhenSteps(BaseWhenStep):
         handler = 'copynew'
         body = {'bucket': self._context.standard_bucket_name}
         self._make_request_with_no_user_credentials(handler, body)
+
+    def authorised_copy_new_called_for_directory_up_from_root(self):
+        handler = 'copynew'
+        body = {'bucket': self._context.standard_bucket_name, 'directory': '../data2'}
+        self._make_authorised_request(handler, body)
