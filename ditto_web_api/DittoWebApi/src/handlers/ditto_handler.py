@@ -31,6 +31,12 @@ class DittoHandler(APIHandler):
                 return
         raise exceptions.APIError(403, 'Not authorised for this bucket')
 
+    def check_current_user_is_admin(self):
+        for group_name in self._bucket_settings_service.admin_groups:
+            if self._security_service.is_in_group(self._current_user, group_name):
+                return
+        raise exceptions.APIError(403, 'Administrator authorisation required')
+
     def _check_credentials(self):
         auth_header = self.request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Basic '):

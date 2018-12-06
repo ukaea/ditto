@@ -137,6 +137,9 @@ class ThenSteps:
     def response_shows_failed_as_unauthorised(self):
         assert self._context.http_client_response.json()['data'] == 'Not authorised for this bucket'
 
+    def response_shows_failed_as_not_admin(self):
+        assert self._context.http_client_response.json()['data'] == 'Administrator authorisation required'
+
     def response_status_is(self, status_code):
         assert self._context.http_client_response.status_code == status_code
 
