@@ -183,4 +183,3 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         self.mock_security_service.is_in_group.assert_called_once_with(self.auth_username, self.user_group)
         assert response.code == 200
         assert response_body['status'] == 'success'
-
