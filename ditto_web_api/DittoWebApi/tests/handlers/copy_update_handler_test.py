@@ -122,7 +122,6 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         assert response_body['status'] == 'success'
         assert response_body['data'] == transfer_summary
 
-
     @gen_test
     def test_post_returns_400_when_directory_empty_or_nonexistent(self):
         # Arrange

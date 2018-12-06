@@ -64,10 +64,3 @@ def bucket_not_exists(bucket_name):
 
 def no_new_or_updates(directory):
     return "No new or updated files found in directory ({})".format(directory)
-
-
-def positive_responses(dir_path):
-    directory = dir_path if dir_path else "root"
-    return [no_new_or_updates(directory),
-            transfer_success(),
-            no_new_files(directory)]

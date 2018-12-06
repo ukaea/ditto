@@ -137,4 +137,4 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         with pytest.raises(HTTPClientError) as error:
             yield self.send_authorised_DELETE_request(body)
         # Assert
-        error.value.response.code == 404
+        assert error.value.response.code == 404

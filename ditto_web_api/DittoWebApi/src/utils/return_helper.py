@@ -1,7 +1,13 @@
 from DittoWebApi.src.utils.return_status import StatusCodes
 
 
-def return_transfer_summary(new_files_uploaded=0, files_updated=0, files_skipped=0, data_transferred=0, status=StatusCodes.Okay, message=""):
+def return_transfer_summary(
+        new_files_uploaded=0,
+        files_updated=0,
+        files_skipped=0,
+        data_transferred=0,
+        status=StatusCodes.Okay,
+        message=""):
     return {"message": message,
             "new files uploaded": new_files_uploaded,
             "files updated": files_updated,

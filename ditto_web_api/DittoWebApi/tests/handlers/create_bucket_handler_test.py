@@ -65,7 +65,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_create_bucket_reports_warning_as_json(self):
         # Arrange
-        action_summary = {"message": "Bucket already exists", "bucket": "some-bucket", "status": StatusCodes.Bad_request}
+        action_summary = {"message": "Bucket already exists",
+                          "bucket": "some-bucket",
+                          "status": StatusCodes.Bad_request}
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
         self.mock_security_service.is_in_group.return_value = True
@@ -74,5 +76,3 @@ class CreateBucketHandlerTest(BaseHandlerTest):
             yield self.send_authorised_POST_request(self.standard_body)
         # Assert
         assert error.value.response.code == 400
-
-
