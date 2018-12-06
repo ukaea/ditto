@@ -45,6 +45,29 @@ class CopyNewHandlerTest(BaseHandlerTest):
         self.mock_data_replication_service.copy_new.return_value = return_transfer_summary()
         yield self.assert_request_returns_200_when_credentials_accepted(self.standard_body)
 
+    # Arguments
+
+    @gen_test
+    def test_post_returns_400_when_bucket_name_is_missing(self):
+        body = {'directory': "test_dir/test_sub_dir"}
+        yield self.assert_request_returns_400_when_required_argument_is_missing(body)
+
+    @gen_test
+    def test_post_returns_400_when_bucket_name_is_blank(self):
+        body = {'bucket': '  ', 'directory': "test_dir/test_sub_dir"}
+        yield self.assert_request_returns_400_when_required_argument_is_missing(body)
+
+    @gen_test
+    def test_post_returns_200_when_directory_is_blank(self):
+        body = {'bucket': 'test-bucket', 'directory': '   '}
+        self.mock_data_replication_service.copy_new.return_value = return_transfer_summary()
+        yield self.assert_request_returns_200_when_optional_argument_is_blank(body)
+
+    @gen_test
+    def test_post_returns_403_when_directory_is_outside_path_from_root(self):
+        body = {'bucket': 'test-bucket', 'directory': '../some_files'}
+        yield self.assert_request_returns_403_when_trying_to_access_data_outside_root(body)
+
     # Coupling with Data Replication Service
 
     @gen_test
