@@ -14,6 +14,8 @@ from DittoWebApi.src.services.bucket_settings_service import BucketSettingsServi
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.internal.internal_data_service import InternalDataService
 from DittoWebApi.src.utils.return_helper import return_transfer_summary
+from DittoWebApi.src.utils.bucket_warning import BucketWarning
+from DittoWebApi.src.utils.return_status import StatusCodes
 from DittoWebApi.tests.helpers_for_tests import build_mock_file_information
 from DittoWebApi.tests.helpers_for_tests import build_mock_file_summary
 from DittoWebApi.tests.helpers_for_tests import build_transfer_return
@@ -84,11 +86,12 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.get_objects.assert_not_called()
         self.mock_internal_data_service.archive_file_transfer.assert_not_called()
         assert output['message'] == 'Warning message'
-        assert not any([output[key] for key in [x for x in output if not x == 'message']])
+        assert output['status'] == StatusCodes.Bad_request
+        assert not any([output[key] for key in [x for x in output if not x == 'message' and not x == 'status']])
 
     def test_retrieve_objects_dicts_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
+        self.mock_bucket_validator.check_bucket.return_value = BucketWarning('Warning message', StatusCodes.Bad_request)
         # Act
         output = self.test_service.retrieve_object_dicts('test-bucket', None)
         # Assert
@@ -149,7 +152,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"message": "Bucket breaks local naming standard (test-1234-)",
-                                    "bucket": "test-1234-"})
+                                    "bucket": "test-1234-",
+                                    "status": StatusCodes.Bad_request})
 
     def test_create_bucket_return_correct_when_bucket_not_given(self):
         # Arrange
@@ -159,7 +163,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"message": "No bucket name provided",
-                                    "bucket": ""})
+                                    "bucket": "",
+                                    "status": StatusCodes.Bad_request})
 
     def test_create_bucket_return_correct_when_bucket_already_exists(self):
         # Arrange
@@ -171,7 +176,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"message": "Warning, bucket already exists (test-12345)",
-                                    "bucket": "test-12345"})
+                                    "bucket": "test-12345",
+                                    "status": StatusCodes.Bad_request})
 
     def test_create_bucket_returns_correctly_when_successful(self):
         # Arrange
@@ -183,13 +189,14 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         self.mock_external_data_service.create_bucket.assert_called_once_with(bucket_name)
         self.assertEqual(response, {"message": "Bucket Created (test-12345)",
-                                    "bucket": "test-12345"})
+                                    "bucket": "test-12345",
+                                    "status": StatusCodes.Okay})
 
     # copy_dir
 
     def test_copy_dir_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
+        self.mock_bucket_validator.check_bucket.return_value = BucketWarning('Warning message', StatusCodes.Bad_request)
         # Act
         output = self.test_service.copy_dir('test-bucket', 'testdir/testsubdir/')
         # Assert
@@ -212,7 +219,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_logger.warning.assert_called_with("No files found in directory or directory"
                                                     " does not exist (testdir/testsubdir/)")
         assert response == return_transfer_summary(
-            message='No files found in directory or directory does not exist (testdir/testsubdir/)'
+            message='No files found in directory or directory does not exist (testdir/testsubdir/)',
+            status=StatusCodes.Not_found
         )
         self.mock_internal_data_service.archive_file_transfer.assert_not_called()
 
@@ -284,11 +292,14 @@ class DataReplicationServiceTest(unittest.TestCase):
 
     def test_try_delete_file_returns_warning_message_when_bucket_doesnt_exist(self):
         # Arrange
-        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
+        self.mock_bucket_validator.check_bucket.return_value = BucketWarning('Warning message', StatusCodes.Bad_request)
         # Act
         output = self.test_service.try_delete_file('test-bucket', 'test.txt')
         # Assert
-        assert output == {'bucket': 'test-bucket', 'file': 'test.txt', 'message': 'Warning message'}
+        assert output == {'bucket': 'test-bucket',
+                          'file': 'test.txt',
+                          'message': 'Warning message',
+                          'status': StatusCodes.Bad_request}
 
     def test_try_delete_file_returns_error_message_when_file_doesnt_exist(self):
         # Arrange
@@ -300,7 +311,8 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_logger.warning.assert_called_with('File unknown_file does not exist in bucket some-bucket')
         assert response == {'bucket': 'some-bucket',
                             'file': 'unknown_file',
-                            'message': 'File unknown_file does not exist in bucket some-bucket'}
+                            'message': 'File unknown_file does not exist in bucket some-bucket',
+                            'status': StatusCodes.Not_found}
 
     def test_try_delete_file_returns_confirmation_message_when_file_does_exist(self):
         # Arrange
@@ -311,13 +323,14 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Assert
         assert response == {'bucket': 'some-bucket',
                             'file': 'known_file',
-                            'message': 'File known_file successfully deleted from bucket some-bucket'}
+                            'message': 'File known_file successfully deleted from bucket some-bucket',
+                            'status': StatusCodes.Okay}
 
     # copy_new
 
     def test_copy_new_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
+        self.mock_bucket_validator.check_bucket.return_value = BucketWarning('Warning message', StatusCodes.Bad_request)
         # Act
         output = self.test_service.copy_new('test-bucket', 'testdir/testsubdir/')
         # Assert
@@ -348,7 +361,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 0,
                             'files updated': 0,
                             'files skipped': 1,
-                            'data transferred (bytes)': 0}
+                            'data transferred (bytes)': 0,
+                            'status': StatusCodes.Okay}
 
     def test_copy_new_return_message_directory_does_not_exist(self):
         # Arrange
@@ -366,7 +380,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 0,
                             'files updated': 0,
                             'files skipped': 0,
-                            'data transferred (bytes)': 0}
+                            'data transferred (bytes)': 0,
+                            'status': StatusCodes.Not_found}
 
     def test_copy_new_transfers_all_files_when_no_objects_in_s3(self):
         # Arrange
@@ -394,7 +409,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 2,
                             'files updated': 0,
                             'files skipped': 0,
-                            'data transferred (bytes)': 52}
+                            'data transferred (bytes)': 52,
+                            'status': StatusCodes.Okay}
 
     def test_copy_new_return_message_when_new_files_transferred(self):
         # Arrange
@@ -426,13 +442,14 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 2,
                             'files updated': 0,
                             'files skipped': 1,
-                            'data transferred (bytes)': 46}
+                            'data transferred (bytes)': 46,
+                            'status': StatusCodes.Okay}
 
     # copy_new_and_update
 
     def test_copy_new_and_update_passes_warning_from_bucket_validator(self):
         # Arrange
-        self.mock_bucket_validator.check_bucket.return_value = 'Warning message'
+        self.mock_bucket_validator.check_bucket.return_value = BucketWarning('Warning message', StatusCodes.Bad_request)
         # Act
         output = self.test_service.copy_new_and_update('test-bucket', 'testdir/testsubdir/')
         # Assert
@@ -464,7 +481,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 0,
                             'files updated': 0,
                             'files skipped': 1,
-                            'data transferred (bytes)': 0}
+                            'data transferred (bytes)': 0,
+                            'status': StatusCodes.Okay}
 
     def test_copy_new_and_update_return_message_directory_does_not_exist(self):
         # Arrange
@@ -482,7 +500,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 0,
                             'files updated': 0,
                             'files skipped': 0,
-                            'data transferred (bytes)': 0}
+                            'data transferred (bytes)': 0,
+                            'status': StatusCodes.Not_found}
 
     def test_copy_new_and_update_return_message_when_new_files_transferred_and_files_updated(self):
         # Arrange
@@ -516,7 +535,8 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 1,
                             'files updated': 1,
                             'files skipped': 1,
-                            'data transferred (bytes)': 46}
+                            'data transferred (bytes)': 46,
+                            'status': StatusCodes.Okay}
 
     def test_copy_new_and_update_transfers_all_files_when_no_objects_already_in_bucket(self):
         # Arrange
@@ -544,4 +564,5 @@ class DataReplicationServiceTest(unittest.TestCase):
                             'new files uploaded': 2,
                             'files updated': 0,
                             'files skipped': 0,
-                            'data transferred (bytes)': 46}
+                            'data transferred (bytes)': 46,
+                            'status': StatusCodes.Okay}

@@ -12,6 +12,7 @@ from DittoWebApi.src.models.file_information import FileInformation
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.utils.configurations import Configuration
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
+from DittoWebApi.src.utils.return_status import StatusCodes
 
 
 class TestExternalDataServices:
@@ -383,7 +384,8 @@ class TestExternalDataServices:
                           "new_files_uploaded": 1,
                           "files_updated": 1,
                           "files_skipped": 1,
-                          "data_transferred": 26}
+                          "data_transferred": 26,
+                          "status": StatusCodes.Okay}
         self.mock_logger.debug.assert_any_call("New files transferred: ['test_file_1.txt']")
         self.mock_logger.debug.assert_any_call("Files updated: ['test_file_2.txt']")
         self.mock_logger.debug.assert_any_call("Files not uploaded or updated: ['test_file_3.txt']")

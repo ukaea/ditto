@@ -24,4 +24,6 @@ class DeleteFileHandler(DittoHandler):
         self.check_current_user_authorised_for_bucket(bucket_name)
         file_rel_path = self.get_body_attribute("file", required=True)
         result = self._data_replication_service.try_delete_file(bucket_name, file_rel_path)
+        self.check_request_was_completed_successfully(result)
+        del result['status']
         return result

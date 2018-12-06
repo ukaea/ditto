@@ -10,6 +10,8 @@ class TestCopyDir(BaseSystemTest):
         # Try copy_dir before bucket is created
         self.when.authorised_copy_dir_called_for_whole_directory()
 
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(404)
         self.then.standard_s3_bucket_does_not_exist()
         self.then.response_shows_warning_as_bucket_does_not_exist()
 
@@ -22,7 +24,8 @@ class TestCopyDir(BaseSystemTest):
         # try copy dir before directory formed
         self.when.authorised_copy_dir_called_for_whole_directory()
 
-        self.then.response_message_reports_directory_does_not_exist()
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(404)
 
     def test_copy_dir_copies_whole_directory_into_s3_bucket(self):
         # Create a basic file
@@ -35,6 +38,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.authorised_copy_dir_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.simple_file_exists_in_s3_bucket()
 
@@ -50,6 +54,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.authorised_copy_dir_called_for_sub_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.file_exists_in_sub_dir_of_s3_bucket()
         self.then.simple_file_does_not_exist_in_s3_bucket()
@@ -67,6 +72,7 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_indicates_no_files_updated()
         self.then.response_shows_one_file_skipped()
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
 
     def test_copy_dir_fails_when_user_not_authorised_for_bucket(self):
         # Start the api
@@ -79,6 +85,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.unauthorised_copy_dir_called_for_whole_directory()
 
         self.then.response_shows_failed_as_unauthorised()
+        self.then.response_status_is(403)
         self.then.simple_file_does_not_exist_in_s3_bucket()
 
     def test_copy_dir_fails_when_authentication_is_not_valid(self):
@@ -90,6 +97,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.unauthenticated_copy_dir_called_for_whole_directory()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_copy_dir_fails_when_authentication_credentials_not_provided(self):
         self.given.s3_interface_is_running()
@@ -100,6 +108,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.copy_dir_called_with_no_authorisation_credentials()
 
         self.then.response_fails_with_reason_authentication_required()
+        self.then.response_status_is(401)
 
     def test_archive_file_is_created_when_copy_dir_called_for_whole_dir(self):
         self.given.s3_interface_is_running()
@@ -110,6 +119,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.authorised_copy_dir_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
         self.then.simple_file_is_in_root_archive_file_as_new_upload()
@@ -124,6 +134,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.authorised_copy_dir_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_exists_in_sub_dir()
         self.then.simple_file_is_in_root_archive_file_as_new_upload()
@@ -139,6 +150,7 @@ class TestCopyDir(BaseSystemTest):
         self.when.authorised_copy_dir_called_for_whole_directory()
 
         self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
         self.then.archive_file_exists_in_root_dir()
         self.then.archive_file_does_not_exist_in_s3_bucket()

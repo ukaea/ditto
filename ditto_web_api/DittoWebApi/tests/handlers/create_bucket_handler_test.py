@@ -1,7 +1,10 @@
+import pytest
+from tornado.httpclient import HTTPClientError
 from tornado.testing import gen_test
 
 from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.utils.return_helper import return_bucket_message
+from DittoWebApi.src.utils.return_status import StatusCodes
 from DittoWebApi.tests.handlers.base_handler_test import BaseHandlerTest
 
 
@@ -33,7 +36,7 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_create_bucket_returns_summary_of_new_bucket_when_successful(self):
         # Arrange
-        action_summary = {"message": "Bucket created", "bucket": "some-bucket"}
+        action_summary = {"message": "Bucket created", "bucket": "some-bucket", "status": StatusCodes.Okay}
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
         self.mock_security_service.is_in_group.return_value = True
@@ -48,7 +51,7 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_create_bucket_successful_return_helper_coupled_with_method_schema(self):
         # Arrange
-        action_summary = return_bucket_message("Bucket created", "some-bucket")
+        action_summary = return_bucket_message("Bucket created", "some-bucket", StatusCodes.Okay)
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
         self.mock_security_service.is_in_group.return_value = True
@@ -62,28 +65,14 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_create_bucket_reports_warning_as_json(self):
         # Arrange
-        action_summary = {"message": "Bucket already exists", "bucket": "some-bucket"}
+        action_summary = {"message": "Bucket already exists",
+                          "bucket": "some-bucket",
+                          "status": StatusCodes.Bad_request}
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self.mock_security_service.check_credentials.return_value = True
         self.mock_security_service.is_in_group.return_value = True
         # Act
-        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
+        with pytest.raises(HTTPClientError) as error:
+            yield self.send_authorised_POST_request(self.standard_body)
         # Assert
-        self.mock_data_replication_service.create_bucket.assert_called_once_with("test-bucket")
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == action_summary
-
-    @gen_test
-    def test_post_create_bucket_reports_warning_coupled_with_method_schema(self):
-        # Arrange
-        action_summary = return_bucket_message("Bucket already exists", "some-bucket")
-        self.mock_data_replication_service.create_bucket.return_value = action_summary
-        self.mock_security_service.check_credentials.return_value = True
-        self.mock_security_service.is_in_group.return_value = True
-        # Act
-        response_body, response_code = yield self.send_authorised_POST_request(self.standard_body)
-        # Assert
-        assert response_code == 200
-        assert response_body['status'] == 'success'
-        assert response_body['data'] == action_summary
+        assert error.value.response.code == 400

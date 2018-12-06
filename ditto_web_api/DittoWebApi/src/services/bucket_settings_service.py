@@ -1,6 +1,7 @@
 import configparser
 import os
 
+from tornado_json import exceptions
 from DittoWebApi.src.utils.parse_strings import str2list
 
 
@@ -39,10 +40,10 @@ class BucketSettingsService:
         if bucket_name in self._settings:
             return self._settings[bucket_name].root_dir
         self._logger.warning(f'Root directory requested for non-existent bucket "{bucket_name}"')
-        raise ValueError(f'Bucket "{bucket_name}" does not exist')
+        raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
     def bucket_permitted_groups(self, bucket_name):
         if bucket_name in self._settings:
             return self._settings[bucket_name].groups
         self._logger.warning(f'Permitted groups requested for non-existent bucket "{bucket_name}"')
-        raise ValueError(f'Bucket "{bucket_name}" does not exist')
+        raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
