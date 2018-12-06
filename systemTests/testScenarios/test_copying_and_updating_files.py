@@ -25,6 +25,16 @@ class TestCopyUpdate(BaseSystemTest):
         self.then.response_shows_request_failed()
         self.then.response_data_reports_directory_does_not_exist()
 
+    def test_copy_update_fails_when_tyring_to_access_data_outside_of_root_for_bucket(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.authorised_copy_update_called_for_directory_up_from_root()
+
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(403)
+
     def test_copy_update_copies_across_whole_dir_that_is_new(self):
         self.given.s3_interface_is_running()
         self.given.ditto_web_api.is_started()

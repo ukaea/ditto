@@ -76,4 +76,4 @@ class DittoHandler(APIHandler):
         if rel_path_to_data is None:
             return
         if '..' in rel_path_to_data:
-            raise exceptions.APIError(400, 'Can not access data outside root directory!')
+            raise exceptions.APIError(403, 'Can not access data outside root directory!')

@@ -32,7 +32,7 @@ class TestCopyNew(BaseSystemTest):
         self.when.authorised_copy_new_called_for_directory_up_from_root()
 
         self.then.response_shows_request_failed()
-        self.then.response_status_is(400)
+        self.then.response_status_is(403)
 
     def test_copy_new_copies_whole_dir_not_on_s3_to_s3(self):
         self.given.s3_interface_is_running()
