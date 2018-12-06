@@ -63,20 +63,23 @@ class DittoHandler(APIHandler):
         raise exceptions.APIError(401, 'Authentication required')
 
     def _check_attribute_is_not_empty(self, key, default, required):
+        # pylint: disable=no-member
         if is_str_empty(self.body[key]) is True:
             raise exceptions.APIError(400, 'Attribute provided is empty') \
                 if required \
                 else self._set_attribute_value_to_default(key, default)
 
     def _set_attribute_value_to_default(self, key, default=False):
+        # pylint: disable=no-member
         self.body[key] = default
 
     def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path_to_data):
-        if rel_path_to_data is not None:
-            abs_bucket_root_dir = self._file_system_helper.absolute_file_path(
-                self._bucket_settings_service.bucket_root_directory(bucket_name))
-            abs_data_path = self._file_system_helper.absolute_file_path(rel_path_to_data)
-            relative_path_bucket_to_data = self._file_system_helper.relative_file_path(abs_data_path,
-                                                                                       abs_bucket_root_dir)
-            if '..' in relative_path_bucket_to_data:
-                raise exceptions.APIError(400, 'Can not access data outside root directory!')
+        if rel_path_to_data is None:
+            return
+        abs_bucket_root_dir = self._file_system_helper.absolute_file_path(
+            self._bucket_settings_service.bucket_root_directory(bucket_name))
+        abs_data_path = self._file_system_helper.absolute_file_path(rel_path_to_data)
+        relative_path_bucket_to_data = self._file_system_helper.relative_file_path(abs_data_path,
+                                                                                   abs_bucket_root_dir)
+        if '..' in relative_path_bucket_to_data:
+            raise exceptions.APIError(400, 'Can not access data outside root directory!')
