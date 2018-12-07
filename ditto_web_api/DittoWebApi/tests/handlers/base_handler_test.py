@@ -9,6 +9,7 @@ from tornado.web import Application
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.services.data_replication.data_replication_service import DataReplicationService
 from DittoWebApi.src.services.security.isecurity_service import ISecurityService
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.route_helper import format_route_specification
 
 
@@ -42,10 +43,12 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
     def get_app(self):
         self.mock_bucket_settings_service = mock.create_autospec(BucketSettingsService)
         self.mock_data_replication_service = mock.create_autospec(DataReplicationService)
+        self.mock_file_system_helper = mock.create_autospec(FileSystemHelper)
         self.mock_security_service = mock.create_autospec(ISecurityService)
         self.container = {
             'bucket_settings_service': self.mock_bucket_settings_service,
             'data_replication_service': self.mock_data_replication_service,
+            'file_system_helper': self.mock_file_system_helper,
             'security_service': self.mock_security_service
         }
         application = Application([

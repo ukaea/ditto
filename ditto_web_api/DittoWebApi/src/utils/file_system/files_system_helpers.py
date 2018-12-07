@@ -43,3 +43,6 @@ class FileSystemHelper:
 
     def file_directory(self, file_rel_path):
         return os.path.dirname(file_rel_path)
+
+    def canonical_path(self, path):
+        return os.path.realpath(path)

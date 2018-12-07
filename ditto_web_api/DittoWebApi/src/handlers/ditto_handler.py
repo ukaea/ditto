@@ -4,13 +4,15 @@ from tornado_json.requesthandlers import APIHandler
 from tornado_json import exceptions
 
 from DittoWebApi.src.utils.parse_strings import is_str_empty
-
+from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
+from DittoWebApi.src.utils.file_system.path_helpers import check_if_sub_dir_of_root
 
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
-    def initialize(self, bucket_settings_service, data_replication_service, security_service):
+    def initialize(self, bucket_settings_service, data_replication_service, file_system_helper, security_service):
         self._bucket_settings_service = bucket_settings_service
-        self._data_replication_service = data_replication_service
+        self._data_replication_service = data_replication_service,
+        self._file_system_helper = file_system_helper
         self._security_service = security_service
 
     def prepare(self):
@@ -73,12 +75,15 @@ class DittoHandler(APIHandler):
             return
         # If missing see if can use as default
         if required:
-            raise exceptions.APIError(400, 'Attribute provided is empty')
+            raise exceptions.APIError(400, f'Attribute {key} is empty')
         self.body[key] = default
 
-    @staticmethod
-    def check_not_trying_to_access_data_outside_root(rel_path_to_data):
-        if rel_path_to_data is None:
+    def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path):
+        if rel_path is None:
             return
-        if '..' in rel_path_to_data:
+        root = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        canonical_root_path = dir_path_as_prefix(self._file_system_helper.canonical_path(root))
+        full_path = self._file_system_helper.join_paths(canonical_root_path, rel_path)
+        canonical_full_path = self._file_system_helper.canonical_path(full_path)
+        if check_if_sub_dir_of_root(canonical_root_path, canonical_full_path) is False:
             raise exceptions.APIError(403, 'Can not access data outside root directory!')
