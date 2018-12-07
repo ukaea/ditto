@@ -83,7 +83,7 @@ class DittoHandler(APIHandler):
         if rel_path is None:
             return
         root = self._bucket_settings_service.bucket_root_directory(bucket_name)
-        canonical_root_path = dir_path_as_prefix(self._file_system_helper.canonical_path(root))
+        canonical_root_path = self._file_system_helper.canonical_path(root)
         full_path = self._file_system_helper.join_paths(canonical_root_path, rel_path)
         canonical_full_path = self._file_system_helper.canonical_path(full_path)
         if is_sub_dir_of_root(directory_path=canonical_full_path, root_path=canonical_root_path) is False:

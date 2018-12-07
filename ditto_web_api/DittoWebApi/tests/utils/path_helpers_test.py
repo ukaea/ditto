@@ -81,7 +81,8 @@ class TestPathHelpers:
                                       'path/to/file',
                                       'to/root/file',
                                       'path/to/newroot/',
-                                      'path/to/root'])  # Note should always be called with canonical paths
+                                      'path/to/root',
+                                      'path/to/root2/'])
     def test_check_if_sub_dir_of_root_returns_false_when_path_is_not_in_root(self, path):
         root = "path/to/root/"
         assert is_sub_dir_of_root(path, root) is False
