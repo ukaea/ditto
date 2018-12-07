@@ -4,7 +4,6 @@ from tornado_json.requesthandlers import APIHandler
 from tornado_json import exceptions
 
 from DittoWebApi.src.utils.parse_strings import is_str_empty
-from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 from DittoWebApi.src.utils.file_system.path_helpers import is_sub_dir_of_root
 
 
