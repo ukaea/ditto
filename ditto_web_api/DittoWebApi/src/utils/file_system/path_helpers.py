@@ -1,8 +1,5 @@
 from pathlib import PureWindowsPath
 from DittoWebApi.src.utils.parse_strings import is_str_empty
-from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
-
-_file_system_helper = FileSystemHelper()
 
 
 def to_posix(path):

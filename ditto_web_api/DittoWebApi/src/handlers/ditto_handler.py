@@ -7,6 +7,7 @@ from DittoWebApi.src.utils.parse_strings import is_str_empty
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 from DittoWebApi.src.utils.file_system.path_helpers import check_if_sub_dir_of_root
 
+
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
     def initialize(self, bucket_settings_service, data_replication_service, file_system_helper, security_service):

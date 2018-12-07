@@ -1,5 +1,6 @@
+# pylint: disable=R0201
 import pytest
-import unittest
+
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
 from DittoWebApi.src.utils.file_system.path_helpers import check_if_sub_dir_of_root
@@ -81,6 +82,6 @@ class TestPathHelpers:
                                       'to/root/file',
                                       'path/to/../to/root/',
                                       'path/to/root'])
-    def test_check_if_sub_dir_of_root_returns_true_when_path_is_in_root(self, path):
+    def test_check_if_sub_dir_of_root_returns_false_when_path_is_not_in_root(self, path):
         root = "path/to/root/"
         assert check_if_sub_dir_of_root(root, path) is False
