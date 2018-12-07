@@ -160,7 +160,7 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
 
     # valid arguments
 
-    async def assert_request_returns_400_when_required_argument_is_missing(self, body):
+    async def assert_request_returns_400_with_authorisation_okay(self, body):
         # Arrange
         self.set_authentication_authorisation_ok()
         method = self.standard_request_method
@@ -170,7 +170,7 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         # Assert
         assert error.value.response.code == 400
 
-    async def assert_request_returns_403_when_trying_to_access_data_outside_root(self, body):
+    async def assert_request_returns_403_with_authorisation_okay(self, body):
         # Arrange
         self.set_authentication_authorisation_ok()
         method = self.standard_request_method
@@ -179,16 +179,3 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
             await self._request(method, body, self.auth_username, self.auth_password)
         # Assert
         assert error.value.response.code == 403
-
-    async def assert_request_returns_200_when_optional_argument_is_blank(self, body):
-        # Arrange
-        self.set_authentication_authorisation_ok()
-        # Act
-        response = await self._request(self.standard_request_method, body, self.auth_username, self.auth_password)
-        response_body = BaseHandlerTest._get_body(response)
-        # Assert
-        self.mock_security_service.check_credentials.assert_called_once_with(self.auth_username, self.auth_password)
-        self.mock_bucket_settings_service.is_bucket_recognised.assert_called_once_with('test-bucket')
-        self.mock_security_service.is_in_group.assert_called_once_with(self.auth_username, self.user_group)
-        assert response.code == 200
-        assert response_body['status'] == 'success'

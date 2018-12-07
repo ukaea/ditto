@@ -15,7 +15,5 @@ def dir_path_as_prefix(dir_path):
         else prefix + "/"
 
 
-def check_if_sub_dir_of_root(root_path, directory_path):
-    if directory_path.startswith(root_path):
-        return True
-    return False
+def is_sub_dir_of_root(directory_path=None, root_path=None):
+    return directory_path.startswith(root_path)

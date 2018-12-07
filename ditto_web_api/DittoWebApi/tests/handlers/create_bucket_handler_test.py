@@ -113,10 +113,10 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_returns_400_when_bucket_name_is_missing(self):
         body = {'directory': "test_dir/test_sub_dir"}
-        yield self.assert_request_returns_400_when_required_argument_is_missing(body)
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
     def test_post_returns_400_when_bucket_name_is_blank(self):
         self._set_admin_user()
         body = {'bucket': '  ', 'directory': "test_dir/test_sub_dir"}
-        yield self.assert_request_returns_400_when_required_argument_is_missing(body)
+        yield self.assert_request_returns_400_with_authorisation_okay(body)

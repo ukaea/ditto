@@ -3,7 +3,7 @@ import pytest
 
 from DittoWebApi.src.utils.file_system.path_helpers import to_posix
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
-from DittoWebApi.src.utils.file_system.path_helpers import check_if_sub_dir_of_root
+from DittoWebApi.src.utils.file_system.path_helpers import is_sub_dir_of_root
 
 
 class TestPathHelpers:
@@ -75,13 +75,13 @@ class TestPathHelpers:
                                       'path/to/root/dir/sub_dir/file'])
     def test_check_if_sub_dir_of_root_returns_true_when_path_is_in_root(self, path):
         root = "path/to/root/"
-        assert check_if_sub_dir_of_root(root, path) is True
+        assert is_sub_dir_of_root(path, root) is True
 
     @pytest.mark.parametrize('path', ['path/root/file',
                                       'path/to/file',
                                       'to/root/file',
-                                      'path/to/../to/root/',
-                                      'path/to/root'])
+                                      'path/to/newroot/',
+                                      'path/to/root'])  # Note should always be called with canonical paths
     def test_check_if_sub_dir_of_root_returns_false_when_path_is_not_in_root(self, path):
         root = "path/to/root/"
-        assert check_if_sub_dir_of_root(root, path) is False
+        assert is_sub_dir_of_root(path, root) is False

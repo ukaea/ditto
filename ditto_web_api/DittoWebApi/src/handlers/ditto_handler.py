@@ -5,7 +5,7 @@ from tornado_json import exceptions
 
 from DittoWebApi.src.utils.parse_strings import is_str_empty
 from DittoWebApi.src.utils.file_system.path_helpers import dir_path_as_prefix
-from DittoWebApi.src.utils.file_system.path_helpers import check_if_sub_dir_of_root
+from DittoWebApi.src.utils.file_system.path_helpers import is_sub_dir_of_root
 
 
 class DittoHandler(APIHandler):
@@ -76,7 +76,7 @@ class DittoHandler(APIHandler):
             return
         # If missing see if can use as default
         if required:
-            raise exceptions.APIError(400, f'Attribute {key} is empty')
+            raise exceptions.APIError(400, f'Attribute "{key}" is empty')
         self.body[key] = default
 
     def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path):
@@ -86,5 +86,5 @@ class DittoHandler(APIHandler):
         canonical_root_path = dir_path_as_prefix(self._file_system_helper.canonical_path(root))
         full_path = self._file_system_helper.join_paths(canonical_root_path, rel_path)
         canonical_full_path = self._file_system_helper.canonical_path(full_path)
-        if check_if_sub_dir_of_root(canonical_root_path, canonical_full_path) is False:
+        if is_sub_dir_of_root(directory_path=canonical_full_path, root_path=canonical_root_path) is False:
             raise exceptions.APIError(403, 'Can not access data outside root directory!')
