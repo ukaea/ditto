@@ -42,6 +42,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
 
     @gen_test
     def test_post_returns_200_when_credentials_accepted(self):
+        self._set_data_in_root_dir()
         self.mock_data_replication_service.copy_new_and_update.return_value = return_transfer_summary()
         yield self.assert_request_returns_200_when_credentials_accepted(self.standard_body)
 
@@ -65,6 +66,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
 
     @gen_test
     def test_post_returns_403_when_directory_is_outside_path_from_root(self):
+        self._set_data_outside_root_dir()
         body = {'bucket': 'test-bucket', 'directory': '../some_files'}
         yield self.assert_request_returns_403_when_trying_to_access_data_outside_root(body)
 
@@ -83,6 +85,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -104,6 +107,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         )
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -124,6 +128,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -145,6 +150,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         )
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -161,6 +167,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.copy_new_and_update.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         with pytest.raises(HTTPClientError) as error:
             yield self.send_authorised_authenticated_request(self.standard_body)
@@ -170,6 +177,7 @@ class CopyUpdateHandlerTest(BaseHandlerTest):
     @gen_test()
     def test_copy_update_returns_404_when_bucket_does_not_exist_in_s3(self):
         # Arrange
+        self._set_data_in_root_dir()
         self.set_authentication_authorisation_ok()
         transfer_summary = return_transfer_summary(
             message="Bucket does not exist in s3",

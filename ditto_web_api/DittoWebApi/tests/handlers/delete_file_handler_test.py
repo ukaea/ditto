@@ -41,6 +41,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
 
     @gen_test
     def test_delete_returns_200_when_credentials_accepted(self):
+        self._set_data_in_root_dir()
         self.mock_data_replication_service.try_delete_file.return_value = {'message': 'File successfully deleted',
                                                                            'status': StatusCodes.Okay}
         yield self.assert_request_returns_200_when_credentials_accepted(self.standard_body)
@@ -70,6 +71,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
     @gen_test
     def test_delete_returns_403_when_file_is_outside_path_from_root(self):
         body = {'bucket': 'test-bucket', 'file': '../some_file.txt'}
+        self._set_data_outside_root_dir()
         yield self.assert_request_returns_403_when_trying_to_access_data_outside_root(body)
 
     # Coupling with Data Replication Service
@@ -85,6 +87,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -100,6 +103,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
             "File successfully deleted", "test.txt", "test-bucket", StatusCodes.Okay)
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -118,6 +122,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.try_delete_file.return_value = action_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         with pytest.raises(HTTPClientError) as error:
             yield self.send_authorised_authenticated_request(self.standard_body)
@@ -135,6 +140,7 @@ class DeleteFileHandlerTest(BaseHandlerTest):
             status=StatusCodes.Not_found
         )
         self.mock_data_replication_service.try_delete_file.return_value = transfer_summary
+        self._set_data_in_root_dir()
         # Act
         with pytest.raises(HTTPClientError) as error:
             yield self.send_authorised_authenticated_request(self.standard_body)

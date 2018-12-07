@@ -11,7 +11,7 @@ class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
     def initialize(self, bucket_settings_service, data_replication_service, file_system_helper, security_service):
         self._bucket_settings_service = bucket_settings_service
-        self._data_replication_service = data_replication_service,
+        self._data_replication_service = data_replication_service
         self._file_system_helper = file_system_helper
         self._security_service = security_service
 

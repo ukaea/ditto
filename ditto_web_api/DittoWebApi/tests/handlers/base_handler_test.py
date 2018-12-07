@@ -68,6 +68,12 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
         self.mock_security_service.is_in_group.return_value = True
         self.mock_bucket_settings_service.admin_groups = [self.user_group]
 
+    def _set_data_in_root_dir(self):
+        self.mock_file_system_helper.canonical_path.side_effect = ["root", "root/data"]
+
+    def _set_data_outside_root_dir(self):
+        self.mock_file_system_helper.canonical_path.side_effect = ["root", "data"]
+
     # Request methods
 
     async def _request(self, method, body, username, password):

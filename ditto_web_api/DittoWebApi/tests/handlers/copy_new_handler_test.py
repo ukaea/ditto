@@ -65,6 +65,7 @@ class CopyNewHandlerTest(BaseHandlerTest):
 
     @gen_test
     def test_post_returns_403_when_directory_is_outside_path_from_root(self):
+        self._set_data_outside_root_dir()
         body = {'bucket': 'test-bucket', 'directory': '../some_files'}
         yield self.assert_request_returns_403_when_trying_to_access_data_outside_root(body)
 
