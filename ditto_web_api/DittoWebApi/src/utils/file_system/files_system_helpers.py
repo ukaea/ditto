@@ -46,3 +46,6 @@ class FileSystemHelper:
 
     def canonical_path(self, path):
         return os.path.realpath(path)
+
+    def is_file(self, path):
+        return os.path.isfile(path)
