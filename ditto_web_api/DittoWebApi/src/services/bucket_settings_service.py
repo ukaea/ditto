@@ -11,12 +11,12 @@ class BucketSetting:
         self._root_dir = properties['root']
 
     @property
-    def root_dir(self):
-        return self._root_dir
-
-    @property
     def groups(self):
         return self._groups
+
+    @property
+    def root_dir(self):
+        return self._root_dir
 
 
 class BucketSettingsService:
@@ -38,8 +38,11 @@ class BucketSettingsService:
     def admin_groups(self):
         return self._admin_groups
 
-    def is_bucket_recognised(self, bucket_name):
-        return bucket_name in self._settings
+    def bucket_permitted_groups(self, bucket_name):
+        if bucket_name in self._settings:
+            return self._settings[bucket_name].groups
+        self._logger.warning(f'Permitted groups requested for non-existent bucket "{bucket_name}"')
+        raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
     def bucket_root_directory(self, bucket_name):
         if bucket_name in self._settings:
@@ -47,8 +50,5 @@ class BucketSettingsService:
         self._logger.warning(f'Root directory requested for non-existent bucket "{bucket_name}"')
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
-    def bucket_permitted_groups(self, bucket_name):
-        if bucket_name in self._settings:
-            return self._settings[bucket_name].groups
-        self._logger.warning(f'Permitted groups requested for non-existent bucket "{bucket_name}"')
-        raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
+    def is_bucket_recognised(self, bucket_name):
+        return bucket_name in self._settings
