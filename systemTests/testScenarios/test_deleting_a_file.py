@@ -70,3 +70,13 @@ class TestDeleteFile(BaseSystemTest):
 
         self.then.response_fails_with_reason_authentication_required()
         self.then.response_status_is(401)
+
+    def test_delete_file_fails_when_tyring_to_access_data_outside_of_root_for_bucket(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.authorised_delete_file_called_for_file_up_from_root()
+
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(403)

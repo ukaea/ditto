@@ -43,7 +43,31 @@ class CopyDirHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_returns_200_when_credentials_accepted(self):
         self.mock_data_replication_service.copy_dir.return_value = return_transfer_summary()
+        self._set_data_in_root_dir()
         yield self.assert_request_returns_200_when_credentials_accepted(self.standard_body)
+
+    # Arguments
+    @gen_test
+    def test_post_returns_400_when_bucket_name_is_missing(self):
+        body = {'directory': "test_dir/test_sub_dir"}
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
+
+    @gen_test
+    def test_post_returns_400_when_bucket_name_is_blank(self):
+        body = {'bucket': '  ', 'directory': "test_dir/test_sub_dir"}
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
+
+    @gen_test
+    def test_post_returns_200_when_directory_is_blank(self):
+        body = {'bucket': 'test-bucket', 'directory': '   '}
+        self.mock_data_replication_service.copy_dir.return_value = return_transfer_summary()
+        yield self.assert_request_returns_200_when_credentials_accepted(body)
+
+    @gen_test
+    def test_post_returns_403_when_directory_is_outside_path_from_root(self):
+        body = {'bucket': 'test-bucket', 'directory': '../some_files'}
+        self._set_data_outside_root_dir()
+        yield self.assert_request_returns_403_with_authorisation_okay(body)
 
     # Coupling with Data Replication Service
 
@@ -60,6 +84,7 @@ class CopyDirHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -81,6 +106,7 @@ class CopyDirHandlerTest(BaseHandlerTest):
         )
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -101,6 +127,7 @@ class CopyDirHandlerTest(BaseHandlerTest):
         }
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -122,6 +149,7 @@ class CopyDirHandlerTest(BaseHandlerTest):
         )
         self.mock_data_replication_service.copy_dir.return_value = transfer_summary
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
@@ -133,6 +161,7 @@ class CopyDirHandlerTest(BaseHandlerTest):
     def test_copy_dir_returns_404_when_bucket_does_not_exist_in_s3(self):
         # Arrange
         self.set_authentication_authorisation_ok()
+        self._set_data_in_root_dir()
         transfer_summary = return_transfer_summary(
             message="Bucket does not exist in s3",
             new_files_uploaded=0,

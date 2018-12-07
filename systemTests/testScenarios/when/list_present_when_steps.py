@@ -21,3 +21,8 @@ class ListPresentWhenSteps(BaseWhenStep):
         handler = 'listpresent'
         body = {'bucket': self._context.standard_bucket_name}
         self._make_unauthenticated_request(handler, body)
+
+    def authorised_list_present_called_for_directory_up_from_root(self):
+        handler = 'listpresent'
+        body = {'bucket': self._context.standard_bucket_name, 'directory': '../data2'}
+        self._make_authorised_request(handler, body)

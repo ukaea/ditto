@@ -26,3 +26,8 @@ class CopyDirWhenSteps(BaseWhenStep):
         handler = 'copydir'
         body = {'bucket': self._context.standard_bucket_name, 'directory': 'sub_dir_A'}
         self._make_authorised_request(handler, body)
+
+    def authorised_copy_dir_called_for_directory_up_from_root(self):
+        handler = 'copydir'
+        body = {'bucket': self._context.standard_bucket_name, 'directory': '../data2'}
+        self._make_authorised_request(handler, body)
