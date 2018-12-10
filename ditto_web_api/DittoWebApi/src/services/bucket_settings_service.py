@@ -52,7 +52,7 @@ class BucketSettingsService:
             settings[bucket_name]['groups'] = groups
             settings[bucket_name]['root'] = setting.root_dir
         text = config_to_string(settings)
-        self._file_read_write_helper.write_text_to_file_path(text, self._bucket_settings_path)
+        self._file_read_write_helper.write_text_to_file_path(self._bucket_settings_path, text)
 
     @property
     def admin_groups(self):
