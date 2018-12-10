@@ -9,7 +9,7 @@ from DittoWebApi.src.handlers.create_bucket import CreateBucketHandler
 from DittoWebApi.src.handlers.delete_file import DeleteFileHandler
 from DittoWebApi.src.handlers.copy_new import CopyNewHandler
 from DittoWebApi.src.handlers.copy_update import CopyUpdateHandler
-from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
+from DittoWebApi.src.services.bucket_settings_service import build_standard_bucket_settings_service
 from DittoWebApi.src.services.data_replication.data_replication_service import build_standard_data_replication_service
 from DittoWebApi.src.services.external.external_data_service import ExternalDataService
 from DittoWebApi.src.services.external.storage_adapters.boto_adapter import BotoAdapter
@@ -53,7 +53,7 @@ def launch():
 
     # Bucket settings
     bucket_settings_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bucket_settings.ini'))
-    bucket_settings_service = BucketSettingsService(bucket_settings_path, configuration, logger)
+    bucket_settings_service = build_standard_bucket_settings_service(bucket_settings_path, configuration, logger)
 
     # Security (PLACEHOLDER CODE)
     security_configuration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'security_configuration.ini'))
