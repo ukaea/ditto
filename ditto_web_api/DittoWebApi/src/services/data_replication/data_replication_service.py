@@ -48,7 +48,7 @@ class DataReplicationService:
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
 
-        root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
         files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
 
         directory = dir_path if dir_path else "root"
@@ -121,7 +121,7 @@ class DataReplicationService:
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
         directory = dir_path if dir_path else "root"
-        root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
         files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
 
         if not files_in_directory:
@@ -149,7 +149,7 @@ class DataReplicationService:
             return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
 
         directory = dir_path if dir_path else "root"
-        root_dir = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
         files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
 
         if not files_in_directory:

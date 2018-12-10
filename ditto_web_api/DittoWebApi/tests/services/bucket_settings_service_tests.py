@@ -86,7 +86,7 @@ class BucketSettingsServiceTest(unittest.TestCase):
         assert len(self.test_service._settings) == 1
         assert self.test_service.is_bucket_recognised('test-bucket')
         assert self.test_service.bucket_permitted_groups('test-bucket') == ['group']
-        assert self.test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_data_root_directory('test-bucket') == '/usr/tmp/ditto'
 
     def test_settings_loads_single_bucket_settings_with_multiple_groups(self):
         # Arrange
@@ -98,7 +98,7 @@ class BucketSettingsServiceTest(unittest.TestCase):
         assert len(self.test_service._settings) == 1
         assert self.test_service.is_bucket_recognised('test-bucket')
         assert self.test_service.bucket_permitted_groups('test-bucket') == ['group1', 'group2']
-        assert self.test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_data_root_directory('test-bucket') == '/usr/tmp/ditto'
 
     def test_settings_loads_multiple_bucket_settings(self):
         # Arrange
@@ -111,10 +111,10 @@ class BucketSettingsServiceTest(unittest.TestCase):
         assert len(self.test_service._settings) == 2
         assert self.test_service.is_bucket_recognised('test-bucket')
         assert self.test_service.bucket_permitted_groups('test-bucket') == ['group1', 'group2']
-        assert self.test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_data_root_directory('test-bucket') == '/usr/tmp/ditto'
         assert self.test_service.is_bucket_recognised('test-other')
         assert self.test_service.bucket_permitted_groups('test-other') == ['admin']
-        assert self.test_service.bucket_root_directory('test-other') == '/usr/tmp/other'
+        assert self.test_service.bucket_data_root_directory('test-other') == '/usr/tmp/other'
 
     def test_add_bucket_appends_new_settings_to_file(self):
         # Arrange

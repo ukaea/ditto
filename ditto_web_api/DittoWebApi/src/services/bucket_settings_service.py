@@ -10,15 +10,20 @@ from DittoWebApi.src.utils.parse_strings import str2list
 class BucketSetting:
     def __init__(self, properties):
         self._groups = str2list(properties['groups']) if isinstance(properties['groups'], str) else properties['groups']
-        self._root_dir = properties['root']
+        self._archive_root_dir = properties['archive_root']
+        self._data_root_dir = properties['data_root']
 
     @property
     def groups(self):
         return self._groups
 
     @property
-    def root_dir(self):
-        return self._root_dir
+    def data_root_dir(self):
+        return self._data_root_dir
+
+    @property
+    def archive_root_dir(self):
+        return self._archive_root_dir
 
 
 class BucketSettingsService:
@@ -51,7 +56,8 @@ class BucketSettingsService:
             settings[bucket_name] = {}
             groups = ','.join(setting.groups)
             settings[bucket_name]['groups'] = groups
-            settings[bucket_name]['root'] = setting.root_dir
+            settings[bucket_name]['archive_root'] = setting.archive_root_dir
+            settings[bucket_name]['data_root'] = setting.data_root_dir
         text = config_to_string(settings)
         self._file_read_write_helper.write_text_to_file_path(self._bucket_settings_path, text)
 
@@ -59,11 +65,11 @@ class BucketSettingsService:
     def admin_groups(self):
         return self._admin_groups
 
-    def add_bucket(self, bucket_name, groups, root_dir):
+    def add_bucket(self, bucket_name, groups, archive_root_dir, data_root_dir):
         if self.is_bucket_recognised(bucket_name):
             raise exceptions.APIError(404, f'Bucket "{bucket_name}" already exists')
         self._logger.info(f'Adding new bucket "{bucket_name}" to settings')
-        new_setting = BucketSetting({'groups': groups, 'root': root_dir})
+        new_setting = BucketSetting({'groups': groups, 'archive_root': archive_root_dir, 'data_root': data_root_dir})
         self._settings[bucket_name] = new_setting
         self._write_settings()
 
@@ -73,9 +79,15 @@ class BucketSettingsService:
         self._logger.warning(f'Permitted groups requested for non-existent bucket "{bucket_name}"')
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
-    def bucket_root_directory(self, bucket_name):
+    def bucket_data_root_directory(self, bucket_name):
         if bucket_name in self._settings:
-            return self._settings[bucket_name].root_dir
+            return self._settings[bucket_name].data_root_dir
+        self._logger.warning(f'Root directory requested for non-existent bucket "{bucket_name}"')
+        raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
+
+    def bucket_archive_root_directory(self, bucket_name):
+        if bucket_name in self._settings:
+            return self._settings[bucket_name].archive_root_dir
         self._logger.warning(f'Root directory requested for non-existent bucket "{bucket_name}"')
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
