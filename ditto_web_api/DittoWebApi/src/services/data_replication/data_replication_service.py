@@ -48,8 +48,8 @@ class DataReplicationService:
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
 
-        root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
-        files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
+        data_root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
+        files_in_directory = self._internal_data_service.find_files(data_root_dir, dir_path)
 
         directory = dir_path if dir_path else "root"
 
@@ -66,7 +66,8 @@ class DataReplicationService:
 
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary)
-        self._internal_data_service.archive_file_transfer(file_summary, root_dir)
+        archive_root_dir = self._bucket_settings_service.bucket_archive_root_directory(bucket_name)
+        self._internal_data_service.archive_file_transfer(file_summary, archive_root_dir)
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name, groups, archive_root_dir, data_root_dir):
@@ -121,8 +122,8 @@ class DataReplicationService:
         if bucket_warning is not None:
             return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
         directory = dir_path if dir_path else "root"
-        root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
-        files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
+        data_root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
+        files_in_directory = self._internal_data_service.find_files(data_root_dir, dir_path)
 
         if not files_in_directory:
             warning = messages.no_files_found(directory)
@@ -139,7 +140,8 @@ class DataReplicationService:
             return return_transfer_summary(message=message,
                                            files_skipped=len(files_in_directory))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
-        self._internal_data_service.archive_file_transfer(files_summary, root_dir)
+        archive_root_dir = self._bucket_settings_service.bucket_archive_root_directory(bucket_name)
+        self._internal_data_service.archive_file_transfer(files_summary, archive_root_dir)
         return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
@@ -149,8 +151,8 @@ class DataReplicationService:
             return return_transfer_summary(message=bucket_warning.message, status=bucket_warning.status)
 
         directory = dir_path if dir_path else "root"
-        root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
-        files_in_directory = self._internal_data_service.find_files(root_dir, dir_path)
+        data_root_dir = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
+        files_in_directory = self._internal_data_service.find_files(data_root_dir, dir_path)
 
         if not files_in_directory:
             warning = messages.no_files_found(directory)
@@ -167,7 +169,8 @@ class DataReplicationService:
             return return_transfer_summary(message=message,
                                            files_skipped=len(files_summary.files_to_be_skipped()))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
-        self._internal_data_service.archive_file_transfer(files_summary, root_dir)
+        archive_root_dir = self._bucket_settings_service.bucket_archive_root_directory(bucket_name)
+        self._internal_data_service.archive_file_transfer(files_summary, archive_root_dir)
         return return_transfer_summary(**transfer_summary)
 
 
