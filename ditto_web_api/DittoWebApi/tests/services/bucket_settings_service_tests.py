@@ -32,23 +32,23 @@ class BucketSettingsServiceTest(unittest.TestCase):
 
     def test_settings_raises_when_path_is_not_correct(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.return_value = False
+        self.mock_file_system_helper.does_path_exist.return_value = False
         # Act
         with pytest.raises(RuntimeError) as exception_info:
             self.initialise_service_with_admin_groups(['admin'])
         # Assert
-        self.mock_file_system_helper.does_file_exist.assert_called_once_with(self.mock_bucket_settings_path)
+        self.mock_file_system_helper.does_path_exist.assert_called_once_with(self.mock_bucket_settings_path)
         assert 'The bucket settings file "/path/to/file/bucket_settings.ini" does not seem to exist.' \
                in str(exception_info.value)
 
     def test_settings_loads_empty_file(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.return_value = True
+        self.mock_file_system_helper.does_path_exist.return_value = True
         self.mock_file_read_write_helper.read_file_path_as_text.return_value = ''
         # Act
         self.initialise_service_with_admin_groups(['admin'])
         # Assert
-        self.mock_file_system_helper.does_file_exist.assert_called_once_with(self.mock_bucket_settings_path)
+        self.mock_file_system_helper.does_path_exist.assert_called_once_with(self.mock_bucket_settings_path)
         self.mock_file_read_write_helper.read_file_path_as_text.assert_called_once_with(self.mock_bucket_settings_path)
         assert isinstance(self.test_service._settings, dict)
         assert not self.test_service._settings

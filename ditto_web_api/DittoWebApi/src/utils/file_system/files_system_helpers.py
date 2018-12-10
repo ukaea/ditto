@@ -16,8 +16,8 @@ class FileSystemHelper:
     def create_and_open_file_for_writing(self, file_path):
         return open(file_path, "w")
 
-    def does_file_exist(self, file_path):
-        return os.path.exists(file_path)
+    def does_path_exist(self, path):
+        return os.path.exists(path)
 
     def file_directory(self, file_rel_path):
         return os.path.dirname(file_rel_path)

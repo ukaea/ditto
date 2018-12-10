@@ -39,7 +39,7 @@ class InternalDataService:
             archive_file_path = self._file_system_helper.join_paths(full_sub_dir_path, self._archive_file_name)
             sub_dir_file_summary = sub_directory_file_summaries[sub_dir]
 
-            if self._file_system_helper.does_file_exist(archive_file_path):
+            if self._file_system_helper.does_path_exist(archive_file_path):
                 self._archiver.update_archive(archive_file_path, sub_dir_file_summary)
             else:
                 self._archiver.write_archive(archive_file_path, sub_dir_file_summary)
