@@ -13,7 +13,8 @@ class CreateBucketHandler(DittoHandler):
             "properties": {
                 "bucket": "test-bucket-name",
                 "groups": ["group1", "group2"],
-                "root": "/path/to/root"
+                "archive_root": "/path/to/archive_root",
+                "data_root": "/path/to/data_root"
             },
         },
         output_schema=create_object_schema_with_string_properties(["message", "bucket"]),
@@ -27,8 +28,9 @@ class CreateBucketHandler(DittoHandler):
         self.check_current_user_is_admin()
         bucket_name = self.get_body_attribute("bucket", required=True)
         groups = self.get_body_attribute("groups", required=True, value_type=list)
-        root = self.get_body_attribute("root", required=True)
-        result = self._data_replication_service.create_bucket(bucket_name, groups, root)
+        data_root = self.get_body_attribute("data_root", required=True)
+        archive_root = self.get_body_attribute("archive_root", required=True)
+        result = self._data_replication_service.create_bucket(bucket_name, groups, archive_root, data_root)
         self.check_request_was_completed_successfully(result)
         del result['status']
         return result
