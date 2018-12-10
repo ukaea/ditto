@@ -60,4 +60,7 @@ class Archiver:
         if self._file_system_helper.does_path_exist(archive_file_directory_path) is True:
             return
         else:
-            self._file_system_helper.make_directory(archive_file_directory_path)
+            try:
+                self._file_system_helper.make_directory(archive_file_directory_path)
+            except OSError:
+                raise
