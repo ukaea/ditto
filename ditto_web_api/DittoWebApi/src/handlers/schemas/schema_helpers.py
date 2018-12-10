@@ -21,7 +21,6 @@ def create_bucket_input_schema():
                     "items": {"type": "string"}
                 }
             },
-            # "groups": {"type": "string"},
             "root": {"type": "string"}
         },
     }
