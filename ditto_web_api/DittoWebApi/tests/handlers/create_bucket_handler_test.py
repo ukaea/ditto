@@ -119,9 +119,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     # Arguments
 
     @gen_test
-    def test_post_returns_403_when_bucket_name_is_missing(self):
+    def test_post_returns_400_when_bucket_name_is_missing(self):
         body = {'groups': ['testgroup'], 'root': '/usr/tmp/data'}
-        yield self.assert_request_returns_403_with_authorisation_okay(body)
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
     def test_post_returns_400_when_bucket_name_is_blank(self):
@@ -130,9 +130,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
-    def test_post_returns_403_when_groups_is_missing(self):
+    def test_post_returns_400_when_groups_is_missing(self):
         body = {'bucket': 'test-bucket', 'root': '/usr/tmp/data'}
-        yield self.assert_request_returns_403_with_authorisation_okay(body)
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
     def test_post_returns_400_when_groups_is_empty(self):
@@ -141,9 +141,9 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
-    def test_post_returns_403_when_root_is_missing(self):
+    def test_post_returns_400_when_root_is_missing(self):
         body = {'bucket': 'test-bucket', 'groups': ['testgroup']}
-        yield self.assert_request_returns_403_with_authorisation_okay(body)
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
     def test_post_returns_400_when_root_is_blank(self):

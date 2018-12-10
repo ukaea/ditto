@@ -23,6 +23,7 @@ def create_bucket_input_schema():
             },
             "root": {"type": "string"}
         },
+        "required": ["bucket", "groups", "root"]
     }
 
 
