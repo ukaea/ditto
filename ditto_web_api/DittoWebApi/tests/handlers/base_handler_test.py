@@ -78,10 +78,11 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
 
     async def _request(self, method, body, username, password):
         allow_nonstandard_methods = self.standard_request_method == "DELETE"
+        json_body = json.dumps(body)
         response = await self.http_client.fetch(
             self.url,
             method=method,
-            body=json.dumps(body),
+            body=json_body,
             auth_username=username,
             auth_password=password,
             allow_nonstandard_methods=allow_nonstandard_methods

@@ -10,6 +10,23 @@ def create_object_schema_with_string_properties(list_of_properties, required=Non
     return schema
 
 
+def create_bucket_input_schema():
+    return {
+        "type": "object",
+        "properties": {
+            "bucket": {"type": "string"},
+            "groups": {
+                "type": "array",
+                "properties": {
+                    "items": {"type": "string"}
+                }
+            },
+            # "groups": {"type": "string"},
+            "root": {"type": "string"}
+        },
+    }
+
+
 def create_list_present_output_schema():
     return {
         "type": "object",

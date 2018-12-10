@@ -142,10 +142,13 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         self.mock_external_data_service.does_bucket_match_standard.return_value = False
         bucket_name = "test-1234-"
+        groups = ['testgroup']
+        root = '/usr/tmp/data'
         # Act
-        response = self.test_service.create_bucket(bucket_name)
+        response = self.test_service.create_bucket(bucket_name, groups, root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
+        self.mock_bucket_settings_service.add_bucket.assert_not_called()
         self.assertEqual(response, {"message": "Bucket breaks local naming standard (test-1234-)",
                                     "bucket": "test-1234-",
                                     "status": StatusCodes.Bad_request})
@@ -153,21 +156,43 @@ class DataReplicationServiceTest(unittest.TestCase):
     def test_create_bucket_return_correct_when_bucket_not_given(self):
         # Arrange
         bucket_name = None
+        groups = ['testgroup']
+        root = '/usr/tmp/data'
         # Act
-        response = self.test_service.create_bucket(bucket_name)
+        response = self.test_service.create_bucket(bucket_name, groups, root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
+        self.mock_bucket_settings_service.add_bucket.assert_not_called()
         self.assertEqual(response, {"message": "No bucket name provided",
                                     "bucket": "",
                                     "status": StatusCodes.Bad_request})
 
-    def test_create_bucket_return_correct_when_bucket_already_exists(self):
+    def test_create_bucket_return_warning_when_bucket_already_exists_in_s3(self):
         # Arrange
         bucket_name = 'test-12345'
+        groups = ['testgroup']
+        root = '/usr/tmp/data'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = True
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = False
         # Act
-        response = self.test_service.create_bucket(bucket_name)
+        response = self.test_service.create_bucket(bucket_name, groups, root)
+        # Assert
+        self.mock_external_data_service.create_bucket.assert_not_called()
+        self.assertEqual(response, {"message": "Warning, bucket already exists (test-12345)",
+                                    "bucket": "test-12345",
+                                    "status": StatusCodes.Bad_request})
+
+    def test_create_bucket_return_warning_when_bucket_already_exists_in_bucket_settings_service(self):
+        # Arrange
+        bucket_name = 'test-12345'
+        groups = ['testgroup']
+        root = '/usr/tmp/data'
+        self.mock_external_data_service.does_bucket_match_standard.return_value = True
+        self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = True
+        # Act
+        response = self.test_service.create_bucket(bucket_name, groups, root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"message": "Warning, bucket already exists (test-12345)",
@@ -177,10 +202,13 @@ class DataReplicationServiceTest(unittest.TestCase):
     def test_create_bucket_returns_correctly_when_successful(self):
         # Arrange
         bucket_name = 'test-12345'
+        groups = ['testgroup']
+        root = '/usr/tmp/data'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = False
+        self.mock_bucket_settings_service.is_bucket_recognised.return_value = False
         # Act
-        response = self.test_service.create_bucket(bucket_name)
+        response = self.test_service.create_bucket(bucket_name, groups, root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_called_once_with(bucket_name)
         self.assertEqual(response, {"message": "Bucket Created (test-12345)",
