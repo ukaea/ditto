@@ -31,7 +31,8 @@ class BucketSettingsService:
         self._settings = {}
         if self._file_system_helper.does_path_exist(self._bucket_settings_path):
             self._parse(self._bucket_settings_path)
-        elif self._file_system_helper.does_path_exist(self._file_system_helper.file_directory(self._bucket_settings_path)):
+        elif self._file_system_helper.does_path_exist(
+                self._file_system_helper.file_directory(self._bucket_settings_path)):
             self._logger.info(f'The bucket settings file "{self._bucket_settings_path}" does not seem to exist.'
                               ' Will write settings into that path once buckets are added.')
         else:
