@@ -174,6 +174,19 @@ class ThenSteps:
             content = file.read()
         assert content == expected_content
 
+    def bucket_settings_includes_standard_bucket(self):
+        file_path = os.path.join(self._context.ditto_web_api_folder_path, 'DittoWebApi', 'bucket_settings.ini')
+        expected_content = f'[{self._context.standard_bucket_name}]\n'\
+            'groups = group1,group2\n'\
+            f'root = {self._context.local_data_folder_path}\n'
+        with open(file_path, 'r') as file:
+            content = file.read()
+        assert expected_content in content
+
+    def bucket_settings_file_does_not_exist(self):
+        file_path = os.path.join(self._context.ditto_web_api_folder_path, 'DittoWebApi', 'bucket_settings.ini')
+        assert not os.path.isfile(file_path)
+
     def simple_file_is_in_root_archive_file_as_new_upload(self):
         file_name = self._context.simple_file_name
         assert self._file_in_archive_file_at_folder_with_specified_type(file_name, None, 'new upload') is True

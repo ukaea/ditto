@@ -20,7 +20,11 @@ class CreateBucketHandlerTest(BaseHandlerTest):
 
     @property
     def standard_body(self):
-        return {'bucket': "test-bucket"}
+        return {
+            'bucket': 'test-bucket',
+            'groups': ['testgroup'],
+            'root': '/usr/tmp/data'
+        }
 
     # Security
 
@@ -82,13 +86,17 @@ class CreateBucketHandlerTest(BaseHandlerTest):
     @gen_test
     def test_post_create_bucket_returns_summary_of_new_bucket_when_successful(self):
         # Arrange
-        action_summary = {"message": "Bucket created", "bucket": "some-bucket", "status": StatusCodes.Okay}
+        action_summary = {"message": "Bucket created", "bucket": "test-bucket", "status": StatusCodes.Okay}
         self.mock_data_replication_service.create_bucket.return_value = action_summary
         self._set_admin_user()
         # Act
         response_body, response_code = yield self.send_authorised_authenticated_request(self.standard_body)
         # Assert
-        self.mock_data_replication_service.create_bucket.assert_called_once_with("test-bucket")
+        self.mock_data_replication_service.create_bucket.assert_called_once_with(
+            "test-bucket",
+            ['testgroup'],
+            "/usr/tmp/data"
+        )
         assert response_code == 200
         assert response_body['status'] == 'success'
         assert response_body['data'] == action_summary
@@ -112,11 +120,33 @@ class CreateBucketHandlerTest(BaseHandlerTest):
 
     @gen_test
     def test_post_returns_400_when_bucket_name_is_missing(self):
-        body = {'directory': "test_dir/test_sub_dir"}
+        body = {'groups': ['testgroup'], 'root': '/usr/tmp/data'}
         yield self.assert_request_returns_400_with_authorisation_okay(body)
 
     @gen_test
     def test_post_returns_400_when_bucket_name_is_blank(self):
         self._set_admin_user()
-        body = {'bucket': '  ', 'directory': "test_dir/test_sub_dir"}
+        body = {'bucket': '  ', 'groups': ['testgroup'], 'root': '/usr/tmp/data'}
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
+
+    @gen_test
+    def test_post_returns_400_when_groups_is_missing(self):
+        body = {'bucket': 'test-bucket', 'root': '/usr/tmp/data'}
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
+
+    @gen_test
+    def test_post_returns_400_when_groups_is_empty(self):
+        self._set_admin_user()
+        body = {'bucket': 'test-bucket', 'groups': [], 'root': '/usr/tmp/data'}
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
+
+    @gen_test
+    def test_post_returns_400_when_root_is_missing(self):
+        body = {'bucket': 'test-bucket', 'groups': ['testgroup']}
+        yield self.assert_request_returns_400_with_authorisation_okay(body)
+
+    @gen_test
+    def test_post_returns_400_when_root_is_blank(self):
+        self._set_admin_user()
+        body = {'bucket': 'test-bucket', 'groups': ['testgroup'], 'root': ' '}
         yield self.assert_request_returns_400_with_authorisation_okay(body)

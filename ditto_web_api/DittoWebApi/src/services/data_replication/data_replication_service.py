@@ -69,7 +69,7 @@ class DataReplicationService:
         self._internal_data_service.archive_file_transfer(file_summary, root_dir)
         return return_transfer_summary(**transfer_summary)
 
-    def create_bucket(self, bucket_name):
+    def create_bucket(self, bucket_name, groups, root_dir):
         self._logger.debug("Called create-bucket handler")
         if not bucket_name:
             warning = messages.no_bucket_name()
@@ -81,7 +81,8 @@ class DataReplicationService:
             self._logger.info(message)
             return return_bucket_message(message, bucket_name, status=StatusCodes.Bad_request)
 
-        if self._external_data_service.does_bucket_exist(bucket_name):
+        if self._external_data_service.does_bucket_exist(bucket_name) or \
+                self._bucket_settings_service.is_bucket_recognised(bucket_name):
             warning = messages.bucket_already_exists(bucket_name)
             self._logger.warning(warning)
             return return_bucket_message(warning, bucket_name, status=StatusCodes.Bad_request)
@@ -90,6 +91,7 @@ class DataReplicationService:
             return return_bucket_message(
                 messages.bucket_breaks_s3_convention(bucket_name), bucket_name, status=StatusCodes.Bad_request)
         self._external_data_service.create_bucket(bucket_name)
+        self._bucket_settings_service.add_bucket(bucket_name, groups, root_dir)
         return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
 
     def try_delete_file(self, bucket_name, file_rel_path):

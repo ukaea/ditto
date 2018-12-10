@@ -207,7 +207,7 @@ class TestInternalDataServices(unittest.TestCase):
 
     def test_create_archive_file_called_for_each_subdir_for_files_transferred_when_archive_file_does_not_exist(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.return_value = False
+        self.mock_file_system_helper.does_path_exist.return_value = False
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
         self.mock_file_summary.new_files = [self.mock_file_1, self.mock_file_2]
         self.mock_file_summary.updated_files = []
@@ -219,7 +219,7 @@ class TestInternalDataServices(unittest.TestCase):
 
     def test_create_archive_file_calls_archiver_with_updated_content_when_archive_file_exists(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.return_value = True
+        self.mock_file_system_helper.does_path_exist.return_value = True
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
         self.mock_file_summary.new_files = []
         self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
@@ -231,7 +231,7 @@ class TestInternalDataServices(unittest.TestCase):
 
     def test_create_archive_file_calls_archiver_with_updated_content_when_archive_file_exist(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.return_value = True
+        self.mock_file_system_helper.does_path_exist.return_value = True
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
         self.mock_archiver.update_archive.return_value = "Some old content test_content"
         self.mock_file_summary.new_files = []
@@ -244,7 +244,7 @@ class TestInternalDataServices(unittest.TestCase):
 
     def test_create_archive_file_updates_archive_when_exists_and_creates_new_when_not(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.side_effect = [False, True]
+        self.mock_file_system_helper.does_path_exist.side_effect = [False, True]
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
         self.mock_file_system_helper.file_directory.side_effect = ["path_1", "path_2"]
         self.mock_archiver.update_archive.return_value = "Some old content test_content"
@@ -258,7 +258,7 @@ class TestInternalDataServices(unittest.TestCase):
 
     def test_create_archive_file_updates_archive_when_exists_even_when_all_files_are_new(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.side_effect = [True, True]
+        self.mock_file_system_helper.does_path_exist.side_effect = [True, True]
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
         self.mock_archiver.update_archive.return_value = "Some old content test_content"
         self.mock_file_summary.new_files = [self.mock_file_1, self.mock_file_2]
@@ -271,7 +271,7 @@ class TestInternalDataServices(unittest.TestCase):
 
     def test_create_archive_file_creates_archive_that_do_not_exist_even_when_all_files_are_updating_files_on_s3(self):
         # Arrange
-        self.mock_file_system_helper.does_file_exist.side_effect = [False, False]
+        self.mock_file_system_helper.does_path_exist.side_effect = [False, False]
         self.mock_file_system_helper.join_paths.return_value = "/usr/tmp/data/.ditto_archived"
         self.mock_archiver.update_archive.return_value = "Some old content test_content"
         self.mock_file_summary.new_files = []
