@@ -25,13 +25,18 @@ class BucketSettingsService:
     def __init__(self, bucket_settings_path, configuration, file_read_write_helper, file_system_helper, logger):
         self._bucket_settings_path = bucket_settings_path
         self._file_system_helper = file_system_helper
-        if not self._file_system_helper.does_file_exist(self._bucket_settings_path):
-            raise RuntimeError(f'The bucket settings file "{self._bucket_settings_path}" does not seem to exist.')
         self._admin_groups = configuration.admin_groups
         self._file_read_write_helper = file_read_write_helper
         self._logger = logger
         self._settings = {}
-        self._parse(self._bucket_settings_path)
+        if self._file_system_helper.does_path_exist(self._bucket_settings_path):
+            self._parse(self._bucket_settings_path)
+        elif self._file_system_helper.does_path_exist(self._file_system_helper.file_directory(self._bucket_settings_path)):
+            self._logger.info(f'The bucket settings file "{self._bucket_settings_path}" does not seem to exist.'
+                              ' Will write settings into that path once buckets are added.')
+        else:
+            raise RuntimeError(f'Neither the bucket settings file "{self._bucket_settings_path}",'
+                               ' nor its directory seem to exist.')
 
     def _parse(self, bucket_settings_path):
         settings = configparser.ConfigParser()

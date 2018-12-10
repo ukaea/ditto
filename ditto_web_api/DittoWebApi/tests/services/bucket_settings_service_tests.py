@@ -1,5 +1,6 @@
 import logging
 import mock
+from mock import call
 import pytest
 import unittest
 
@@ -30,15 +31,37 @@ class BucketSettingsServiceTest(unittest.TestCase):
             self.mock_logger
         )
 
-    def test_settings_raises_when_path_is_not_correct(self):
+    def test_settings_logs_when_file_does_not_exist(self):
         # Arrange
-        self.mock_file_system_helper.does_path_exist.return_value = False
+        self.mock_file_system_helper.file_directory.return_value = '/path/to/file/'
+        self.mock_file_system_helper.does_path_exist.side_effect = [False, True]
+        # Act
+        self.initialise_service_with_admin_groups(['admin'])
+        # Assert
+        self.mock_file_system_helper.file_directory.assert_called_once_with(self.mock_bucket_settings_path)
+        self.mock_file_system_helper.does_path_exist.assert_has_calls([
+            call(self.mock_bucket_settings_path),
+            call('/path/to/file/')
+        ])
+        self.mock_logger.info.assert_called_once_with(
+            'The bucket settings file "/path/to/file/bucket_settings.ini" does not seem to exist.'
+            ' Will write settings into that path once buckets are added.'
+        )
+
+    def test_settings_logs_when_directory_does_not_exist(self):
+        # Arrange
+        self.mock_file_system_helper.file_directory.return_value = '/path/to/file/'
+        self.mock_file_system_helper.does_path_exist.side_effect = [False, False]
         # Act
         with pytest.raises(RuntimeError) as exception_info:
             self.initialise_service_with_admin_groups(['admin'])
         # Assert
-        self.mock_file_system_helper.does_path_exist.assert_called_once_with(self.mock_bucket_settings_path)
-        assert 'The bucket settings file "/path/to/file/bucket_settings.ini" does not seem to exist.' \
+        self.mock_file_system_helper.file_directory.assert_called_once_with(self.mock_bucket_settings_path)
+        self.mock_file_system_helper.does_path_exist.assert_has_calls([
+            call(self.mock_bucket_settings_path),
+            call('/path/to/file/')
+        ])
+        assert 'Neither the bucket settings file "/path/to/file/bucket_settings.ini", nor its directory seem to exist.'\
                in str(exception_info.value)
 
     def test_settings_loads_empty_file(self):
