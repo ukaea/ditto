@@ -9,6 +9,7 @@ class Archiver:
 
     def write_archive(self, archive_file_path, file_summary):
         try:
+            self._create_directory_for_archive(archive_file_path)
             content = {}
             new_archive_file = self._file_system_helper.create_and_open_file_for_writing(archive_file_path)
 
@@ -53,3 +54,10 @@ class Archiver:
 
         for file in file_summary.updated_files:
             content[file.file_name] = self._archive_file(file, time_of_transfer, "file update")
+
+    def _create_directory_for_archive(self, archive_file_path):
+        archive_file_directory_path = self._file_system_helper.file_directory(archive_file_path)
+        if self._file_system_helper.does_path_exist(archive_file_directory_path) is True:
+            return
+        else:
+            self._file_system_helper.make_directory(archive_file_directory_path)
