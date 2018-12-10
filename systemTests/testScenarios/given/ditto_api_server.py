@@ -18,6 +18,7 @@ class DittoApiServer:
     def is_started_without_bucket_settings(self):
         self._write_configuration()
         self._write_security()
+        self._clear_bucket_settings()
         self._start_ditto()
 
     def is_started_without_configuration(self):
@@ -84,6 +85,16 @@ class DittoApiServer:
 
         with open(settings_file_path, 'w') as settings_file:
             settings_file.write(file_contents)
+
+    def _clear_bucket_settings(self):
+        settings_file_path = os.path.join(
+            self._context.ditto_web_api_folder_path,
+            'DittoWebApi',
+            'bucket_settings.ini'
+        )
+
+        if os.path.exists(settings_file_path):
+            os.remove(settings_file_path)
 
     def _start_ditto(self):
         path_of_file = os.path.dirname(os.path.realpath(__file__))
