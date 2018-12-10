@@ -3,6 +3,7 @@ from tornado_json import exceptions
 
 from DittoWebApi.src.utils.config_helper import config_to_string
 from DittoWebApi.src.utils.file_read_write_helper import FileReadWriteHelper
+from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.utils.parse_strings import str2list
 
 
@@ -78,5 +79,12 @@ class BucketSettingsService:
 
 def build_standard_bucket_settings_service(bucket_settings_path, configuration, logger):
     file_read_write_helper = FileReadWriteHelper()
-    service = BucketSettingsService(bucket_settings_path, configuration, file_read_write_helper, logger)
+    file_system_helper = FileSystemHelper()
+    service = BucketSettingsService(
+        bucket_settings_path,
+        configuration,
+        file_read_write_helper,
+        file_system_helper,
+        logger
+    )
     return service
