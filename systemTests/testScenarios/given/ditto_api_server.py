@@ -15,6 +15,11 @@ class DittoApiServer:
         self._write_bucket_settings()
         self._start_ditto()
 
+    def is_started_without_bucket_settings(self):
+        self._write_configuration()
+        self._write_security()
+        self._start_ditto()
+
     def is_started_without_configuration(self):
         self._start_ditto()
 

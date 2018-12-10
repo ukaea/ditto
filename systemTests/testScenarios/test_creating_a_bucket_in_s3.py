@@ -2,15 +2,37 @@ from testScenarios.context import BaseSystemTest
 
 
 class CreateBucket(BaseSystemTest):
-    def test_create_bucket_as_admin_succeeds(self):
+    def test_create_bucket_as_admin_succeeds_when_bucket_nonexistent(self):
         self.given.s3_interface_is_running()
-        self.given.ditto_web_api.is_started()
+        self.given.ditto_web_api.is_started_without_bucket_settings()
 
         self.when.admin_create_bucket_called_for_simple_bucket()
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
         self.then.standard_s3_bucket_exists()
+        self.then.bucket_settings_includes_standard_bucket()
+
+    def test_create_bucket_as_admin_fails_when_bucket_exists_in_s3(self):
+        self.given.s3_interface_is_running()
+        self.given.standard_bucket_exists_in_s3()
+        self.given.ditto_web_api.is_started_without_bucket_settings()
+
+        self.when.admin_create_bucket_called_for_simple_bucket()
+
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(400)
+        self.then.standard_s3_bucket_exists()
+
+    def test_create_bucket_as_admin_fails_when_bucket_exists_in_bucket_settings(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+
+        self.when.admin_create_bucket_called_for_simple_bucket()
+
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(400)
+        self.then.standard_s3_bucket_does_not_exist()
 
     def test_create_bucket_fails_as_admin_when_invalid_name_given(self):
         self.given.s3_interface_is_running()
