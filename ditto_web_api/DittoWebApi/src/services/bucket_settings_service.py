@@ -9,7 +9,7 @@ from DittoWebApi.src.utils.parse_strings import str2list
 
 class BucketSetting:
     def __init__(self, properties):
-        self._groups = str2list(properties['groups'])
+        self._groups = str2list(properties['groups']) if isinstance(properties['groups'], str) else properties['groups']
         self._root_dir = properties['root']
 
     @property
