@@ -143,9 +143,10 @@ class DataReplicationServiceTest(unittest.TestCase):
         self.mock_external_data_service.does_bucket_match_standard.return_value = False
         bucket_name = "test-1234-"
         groups = ['testgroup']
-        root = '/usr/tmp/data'
+        archive_root = '/usr/tmp/archive'
+        data_root = '/usr/tmp/data'
         # Act
-        response = self.test_service.create_bucket(bucket_name, groups, root)
+        response = self.test_service.create_bucket(bucket_name, groups, archive_root, data_root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.mock_bucket_settings_service.add_bucket.assert_not_called()
@@ -157,9 +158,10 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = None
         groups = ['testgroup']
-        root = '/usr/tmp/data'
+        archive_root = '/usr/tmp/data'
+        data_root = '/usr/tmp/data'
         # Act
-        response = self.test_service.create_bucket(bucket_name, groups, root)
+        response = self.test_service.create_bucket(bucket_name, groups, archive_root, data_root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.mock_bucket_settings_service.add_bucket.assert_not_called()
@@ -171,12 +173,13 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         groups = ['testgroup']
-        root = '/usr/tmp/data'
+        archive_root = '/usr/tmp/archive'
+        data_root = '/usr/tmp/data'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = True
         self.mock_bucket_settings_service.is_bucket_recognised.return_value = False
         # Act
-        response = self.test_service.create_bucket(bucket_name, groups, root)
+        response = self.test_service.create_bucket(bucket_name, groups, archive_root, data_root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"message": "Warning, bucket already exists (test-12345)",
@@ -187,12 +190,13 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         groups = ['testgroup']
-        root = '/usr/tmp/data'
+        archive_root = '/usr/tmp/archive'
+        data_root = '/usr/tmp/data'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = False
         self.mock_bucket_settings_service.is_bucket_recognised.return_value = True
         # Act
-        response = self.test_service.create_bucket(bucket_name, groups, root)
+        response = self.test_service.create_bucket(bucket_name, groups, archive_root, data_root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_not_called()
         self.assertEqual(response, {"message": "Warning, bucket already exists (test-12345)",
@@ -203,12 +207,13 @@ class DataReplicationServiceTest(unittest.TestCase):
         # Arrange
         bucket_name = 'test-12345'
         groups = ['testgroup']
-        root = '/usr/tmp/data'
+        archive_root = 'usr/tmp/data'
+        data_root = '/usr/tmp/data'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
         self.mock_external_data_service.does_bucket_exist.return_value = False
         self.mock_bucket_settings_service.is_bucket_recognised.return_value = False
         # Act
-        response = self.test_service.create_bucket(bucket_name, groups, root)
+        response = self.test_service.create_bucket(bucket_name, groups, archive_root, data_root)
         # Assert
         self.mock_external_data_service.create_bucket.assert_called_once_with(bucket_name)
         self.assertEqual(response, {"message": "Bucket Created (test-12345)",
