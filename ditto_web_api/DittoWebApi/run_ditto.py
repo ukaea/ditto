@@ -75,6 +75,7 @@ def launch():
     container = dict(
         bucket_settings_service=bucket_settings_service,
         data_replication_service=data_replication_service,
+        file_system_helper=file_system_helper,
         security_service=security_service
     )
     app = tornado.web.Application([

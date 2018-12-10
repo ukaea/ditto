@@ -6,6 +6,9 @@ class FileSystemHelper:
     def absolute_file_path(self, file_path):
         return os.path.abspath(file_path)
 
+    def canonical_path(self, path):
+        return os.path.realpath(path)
+
     def close_file(self, open_file):
         if not open_file.closed:
             open_file.close()
@@ -31,6 +34,9 @@ class FileSystemHelper:
             for name in files:
                 list_of_files.append(self.join_paths(path, name))
         return list_of_files
+
+    def is_file(self, path):
+        return os.path.isfile(path)
 
     def join_paths(self, directory, file_name):
         return os.path.join(directory, file_name)

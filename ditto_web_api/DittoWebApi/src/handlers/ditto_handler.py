@@ -3,12 +3,16 @@ from base64 import b64decode
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import exceptions
 
+from DittoWebApi.src.utils.parse_strings import is_str_empty
+from DittoWebApi.src.utils.file_system.path_helpers import is_sub_dir_of_root
+
 
 class DittoHandler(APIHandler):
     # pylint: disable=arguments-differ
-    def initialize(self, bucket_settings_service, data_replication_service, security_service):
+    def initialize(self, bucket_settings_service, data_replication_service, file_system_helper, security_service):
         self._bucket_settings_service = bucket_settings_service
         self._data_replication_service = data_replication_service
+        self._file_system_helper = file_system_helper
         self._security_service = security_service
 
     def prepare(self):
@@ -17,6 +21,7 @@ class DittoHandler(APIHandler):
     def get_body_attribute(self, key, default=None, required=False):
         # pylint: disable=no-member
         if key in self.body:
+            self._check_attribute_is_not_empty(key, default, required)
             return self.body[key]
         if required:
             raise exceptions.APIError(400, 'Attribute missing')
@@ -63,3 +68,25 @@ class DittoHandler(APIHandler):
     @staticmethod
     def _authentication_failed():
         raise exceptions.APIError(401, 'Authentication required')
+
+    def _check_attribute_is_not_empty(self, key, default, required):
+        # pylint: disable=no-member
+        if is_str_empty(self.body[key]) is False:
+            return
+        # If missing see if can use as default
+        if required:
+            raise exceptions.APIError(400, f'Attribute "{key}" is empty')
+        self.body[key] = default
+
+    def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path):
+        if rel_path is None:
+            return
+        root = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        canonical_root_path = self._file_system_helper.canonical_path(root)
+        full_path = self._file_system_helper.join_paths(canonical_root_path, rel_path)
+        directory_path = self._file_system_helper.file_directory(full_path) \
+            if self._file_system_helper.is_file(full_path) \
+            else full_path
+        canonical_full_path = self._file_system_helper.canonical_path(directory_path)
+        if is_sub_dir_of_root(directory_path=canonical_full_path, root_path=canonical_root_path) is False:
+            raise exceptions.APIError(403, 'Can not access data outside root directory!')

@@ -21,3 +21,8 @@ class DeleteFileWhenSteps(BaseWhenStep):
         handler = 'deletefile'
         body = {'bucket': self._context.standard_bucket_name, 'file': 'testA.txt'}
         self._make_request_with_no_user_credentials(handler, body)
+
+    def authorised_delete_file_called_for_file_up_from_root(self):
+        handler = 'deletefile'
+        body = {'bucket': self._context.standard_bucket_name, 'file': '../file2.txt'}
+        self._make_authorised_request(handler, body)

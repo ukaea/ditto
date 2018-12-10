@@ -27,6 +27,16 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_shows_request_failed()
         self.then.response_status_is(404)
 
+    def test_copy_dir_fails_when_tyring_to_access_data_outside_of_root_for_bucket(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started()
+        self.given.standard_bucket_exists_in_s3()
+
+        self.when.authorised_copy_dir_called_for_directory_up_from_root()
+
+        self.then.response_shows_request_failed()
+        self.then.response_status_is(403)
+
     def test_copy_dir_copies_whole_directory_into_s3_bucket(self):
         # Create a basic file
         self.given.s3_interface_is_running()
