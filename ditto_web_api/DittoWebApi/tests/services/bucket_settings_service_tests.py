@@ -106,4 +106,3 @@ class BucketSettingsServiceTest(unittest.TestCase):
             '[test-other]\ngroups = admin\nroot = /usr/tmp/other\n',
             self.mock_bucket_settings_path
         )
-

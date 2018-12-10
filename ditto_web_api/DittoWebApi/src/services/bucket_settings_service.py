@@ -80,4 +80,3 @@ def build_standard_bucket_settings_service(bucket_settings_path, configuration, 
     file_read_write_helper = FileReadWriteHelper()
     service = BucketSettingsService(bucket_settings_path, configuration, file_read_write_helper, logger)
     return service
-
