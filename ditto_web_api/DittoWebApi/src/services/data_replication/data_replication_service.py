@@ -69,7 +69,7 @@ class DataReplicationService:
         self._internal_data_service.archive_file_transfer(file_summary, root_dir)
         return return_transfer_summary(**transfer_summary)
 
-    def create_bucket(self, bucket_name, groups, root_dir):
+    def create_bucket(self, bucket_name, groups, archive_root_dir, data_root_dir):
         self._logger.debug("Called create-bucket handler")
         if not bucket_name:
             warning = messages.no_bucket_name()
@@ -91,7 +91,7 @@ class DataReplicationService:
             return return_bucket_message(
                 messages.bucket_breaks_s3_convention(bucket_name), bucket_name, status=StatusCodes.Bad_request)
         self._external_data_service.create_bucket(bucket_name)
-        self._bucket_settings_service.add_bucket(bucket_name, groups, root_dir)
+        self._bucket_settings_service.add_bucket(bucket_name, groups, archive_root_dir, data_root_dir)
         return return_bucket_message(messages.bucket_created(bucket_name), bucket_name)
 
     def try_delete_file(self, bucket_name, file_rel_path):
