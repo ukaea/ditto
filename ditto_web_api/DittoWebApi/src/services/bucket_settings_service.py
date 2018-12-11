@@ -64,8 +64,8 @@ class BucketSettingsService:
             settings[bucket_name] = {}
             groups = ','.join(setting.groups)
             settings[bucket_name]['groups'] = groups
-            settings[bucket_name]['data_root'] = setting.data_root_dir
             settings[bucket_name]['archive_root'] = setting.archive_root_dir
+            settings[bucket_name]['data_root'] = setting.data_root_dir
         text = config_to_string(settings)
         self._file_read_write_helper.write_text_to_file_path(self._bucket_settings_path, text)
 
@@ -94,7 +94,7 @@ class BucketSettingsService:
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
     def bucket_archive_root_directory(self, bucket_name):
-        if bucket_name not in self._settings:
+        if bucket_name in self._settings:
             return self._settings[bucket_name].archive_root_dir
         self._logger.warning(f'Root directory requested for non-existent bucket "{bucket_name}"')
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
