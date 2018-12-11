@@ -148,7 +148,7 @@ class ThenSteps:
         assert os.path.exists(file_path)
 
     def archive_file_has_been_updated(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         last_modified = os.path.getmtime(file_path)
         assert last_modified > self._context.archive_creation_time
 
@@ -157,7 +157,7 @@ class ThenSteps:
         assert os.path.exists(file_path)
 
     def archive_content_is_as_expected(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         expected_content = "test"
         with open(file_path, 'rt') as file:
             content = file.read()
@@ -168,7 +168,7 @@ class ThenSteps:
         assert os.path.exists(file_path) is False
 
     def updated_archive_file_content_is_as_expected(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         expected_content = "test test"
         with open(file_path, 'rt') as file:
             content = file.read()
@@ -222,7 +222,7 @@ class ThenSteps:
 
     def old_content_in_archive_file_is_untouched(self):
         file_name = self._context.file_in_sub_dir_name
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         print(file_path)
         with open(file_path, 'r') as file:
             content = json.load(file)
