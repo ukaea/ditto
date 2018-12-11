@@ -75,7 +75,8 @@ class DittoApiServer:
         file_contents = \
             f'[{self._context.standard_bucket_name}]\n' \
                 f'groups = {self._context.authentication_groups}\n'\
-                f'root = {self._context.local_data_folder_path}\n'
+                f'data_root = {self._context.local_data_folder_path}\n'\
+                f'archive_root = {self._context.local_archive_root_path}\n'
 
         settings_file_path = os.path.join(
             self._context.ditto_web_api_folder_path,

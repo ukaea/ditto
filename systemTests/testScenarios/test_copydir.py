@@ -131,7 +131,7 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_file_exists_in_archive_root_dir()
         self.then.simple_file_is_in_root_archive_file_as_new_upload()
 
     def test_seperate_archive_file_is_created_in_each_dir_when_copy_dir_called_for_whole_dir(self):
@@ -145,8 +145,8 @@ class TestCopyDir(BaseSystemTest):
 
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
-        self.then.archive_file_exists_in_root_dir()
-        self.then.archive_file_exists_in_sub_dir()
+        self.then.archive_file_exists_in_archive_root_dir()
+        self.then.archive_file_exists_in_sub_dir_of_archive_root()
         self.then.simple_file_is_in_root_archive_file_as_new_upload()
         self.then.file_in_sub_dir_is_in_archive_in_sub_dir_as_new_upload()
 
@@ -162,7 +162,7 @@ class TestCopyDir(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_file_exists_in_archive_root_dir()
         self.then.archive_file_does_not_exist_in_s3_bucket()
         self.then.archive_file_has_been_updated()
         self.then.simple_file_exists_in_s3_bucket()
