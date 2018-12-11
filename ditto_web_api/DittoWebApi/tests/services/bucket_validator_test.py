@@ -26,7 +26,7 @@ class TestBucketValidator:
                                              "tests-..bucketname",
                                              "test-bucket-.name",
                                              "test-bucket.-name"])
-    def test_check_bucket_returns_warning_when_bucket_name_invalid(self, bucket_name):
+    def test_check_bucket_returns_warning_with_400_when_bucket_name_invalid(self, bucket_name):
         # Act
         bucket_warning = self.test_validator.check_bucket(bucket_name)
         # Assert
@@ -34,9 +34,10 @@ class TestBucketValidator:
             f'About to check for warning to do with bucket name {bucket_name}')
         self.mock_logger.warning.assert_called_once_with(
             f'Bucket name breaks S3 naming convention ({bucket_name})')
-        assert bucket_warning == f'Bucket name breaks S3 naming convention ({bucket_name})'
+        assert bucket_warning.message == f'Bucket name breaks S3 naming convention ({bucket_name})'
+        assert bucket_warning.status.value == 400
 
-    def test_check_bucket_returns_warning_when_bucket_name_not_standard(self):
+    def test_check_bucket_returns_warning_with_400_when_bucket_name_not_standard(self):
         # Arrange
         bucket_name = 'wrong-bucket'
         self.mock_external_data_service.does_bucket_match_standard.return_value = False
@@ -46,9 +47,10 @@ class TestBucketValidator:
         self.mock_logger.debug.assert_called_once_with('About to check for warning to do with bucket name wrong-bucket')
         self.mock_external_data_service.does_bucket_match_standard.assert_called_once_with('wrong-bucket')
         self.mock_logger.warning.assert_called_once_with('Bucket breaks local naming standard (wrong-bucket)')
-        assert bucket_warning == 'Bucket breaks local naming standard (wrong-bucket)'
+        assert bucket_warning.message == 'Bucket breaks local naming standard (wrong-bucket)'
+        assert bucket_warning.status.value == 400
 
-    def test_check_bucket_returns_warning_when_bucket_does_not_exist(self):
+    def test_check_bucket_returns_warning_with_404_when_bucket_does_not_exist(self):
         # Arrange
         bucket_name = 'wrong-bucket'
         self.mock_external_data_service.does_bucket_match_standard.return_value = True
@@ -60,7 +62,8 @@ class TestBucketValidator:
         self.mock_external_data_service.does_bucket_match_standard.assert_called_once_with('wrong-bucket')
         self.mock_external_data_service.does_bucket_exist.assert_called_once_with('wrong-bucket')
         self.mock_logger.warning.assert_called_once_with('Warning, bucket does not exist (wrong-bucket)')
-        assert bucket_warning == 'Warning, bucket does not exist (wrong-bucket)'
+        assert bucket_warning.message == 'Warning, bucket does not exist (wrong-bucket)'
+        assert bucket_warning.status.value == 404
 
     def test_check_bucket_validator_returns_none_when_bucket_exists(self):
         # Arrange

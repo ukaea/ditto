@@ -24,7 +24,7 @@ class BucketValidator:
             bucket_warning = BucketWarning(messages.bucket_not_exists(bucket_name), StatusCodes.Not_found)
 
         if bucket_warning is not None:
-            self._logger.warning(bucket_warning)
+            self._logger.warning(bucket_warning.message)
             return bucket_warning
 
         self._logger.debug("No bucket related warnings found")
