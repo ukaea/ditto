@@ -10,7 +10,7 @@ from DittoWebApi.src.utils.parse_strings import str2list
 class BucketSetting:
     def __init__(self, properties):
         self._groups = str2list(properties['groups']) if isinstance(properties['groups'], str) else properties['groups']
-        self._archive_root_dir = properties['archive_root']
+        self._archive_root_dir = self.get_archive_root(properties)
         self._data_root_dir = properties['data_root']
 
     @property
@@ -24,6 +24,14 @@ class BucketSetting:
     @property
     def archive_root_dir(self):
         return self._archive_root_dir
+
+    @staticmethod
+    def get_archive_root(properties):
+        try:
+            archive_root = properties['archive_root']
+        except KeyError:
+            archive_root = properties['data_root']
+        return archive_root
 
 
 class BucketSettingsService:
@@ -56,8 +64,8 @@ class BucketSettingsService:
             settings[bucket_name] = {}
             groups = ','.join(setting.groups)
             settings[bucket_name]['groups'] = groups
-            settings[bucket_name]['archive_root'] = setting.archive_root_dir
             settings[bucket_name]['data_root'] = setting.data_root_dir
+            settings[bucket_name]['archive_root'] = setting.archive_root_dir
         text = config_to_string(settings)
         self._file_read_write_helper.write_text_to_file_path(self._bucket_settings_path, text)
 
@@ -86,7 +94,7 @@ class BucketSettingsService:
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
 
     def bucket_archive_root_directory(self, bucket_name):
-        if bucket_name in self._settings:
+        if bucket_name not in self._settings:
             return self._settings[bucket_name].archive_root_dir
         self._logger.warning(f'Root directory requested for non-existent bucket "{bucket_name}"')
         raise exceptions.APIError(404, f'Bucket "{bucket_name}" does not exist')
