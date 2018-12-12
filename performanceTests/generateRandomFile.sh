@@ -26,5 +26,5 @@ generateFile "${rootdir}/single1gb" "1GB.bin" 64M 16
 generateFile "${rootdir}/single2gb" "2GB.bin" 64M 32
 generateFile "${rootdir}/single4gb" "4GB.bin" 64M 64
 for n in {1..8}; do {
-  generateFile "${rootdir}/ten50mb" "1GB_${n}.bin" 64M 1
+  generateFile "${rootdir}/eight50mb" "1GB_${n}.bin" 64M 1
 } done
