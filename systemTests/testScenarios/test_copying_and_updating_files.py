@@ -127,7 +127,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_file_exists_in_archive_root_dir()
 
     def test_when_archive_file_exists_it_is_not_copied_but_is_updated(self):
         self.given.s3_interface_is_running()
@@ -142,7 +142,7 @@ class TestCopyUpdate(BaseSystemTest):
         self.then.response_shows_request_was_completed_successfully()
         self.then.response_status_is(200)
         self.then.response_message_body_indicates_one_new_file_uploaded()
-        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_file_exists_in_archive_root_dir()
         self.then.archive_file_has_been_updated()
         self.then.simple_file_is_in_root_archive_file_as_new_upload()
         self.then.archive_file_does_not_exist_in_s3_bucket()
@@ -153,7 +153,7 @@ class TestCopyUpdate(BaseSystemTest):
 
         self.when.authorised_copy_update_called_for_whole_directory()
 
-        self.then.archive_file_exists_in_root_dir()
+        self.then.archive_file_exists_in_archive_root_dir()
         self.then.archive_file_has_been_updated()
         self.then.old_content_in_archive_file_is_untouched()
         self.then.simple_file_content_is_updated_on_s3()

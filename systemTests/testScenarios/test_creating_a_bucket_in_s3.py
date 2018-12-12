@@ -79,3 +79,15 @@ class CreateBucket(BaseSystemTest):
         self.then.response_status_is(401)
         self.then.standard_s3_bucket_does_not_exist()
         self.then.bucket_settings_file_does_not_exist()
+
+
+    def test_create_bucket_creates_archive_with_data_if_root_not_specified(self):
+        self.given.s3_interface_is_running()
+        self.given.ditto_web_api.is_started_without_bucket_settings()
+
+        self.when.admin_create_bucket_called_for_simple_bucket_without_archive_root()
+
+        self.then.response_shows_request_was_completed_successfully()
+        self.then.response_status_is(200)
+        self.then.standard_s3_bucket_exists()
+        self.then.bucket_settings_includes_standard_bucket_with_archive_root_in_data()

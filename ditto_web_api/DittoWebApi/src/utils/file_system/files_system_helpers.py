@@ -44,6 +44,9 @@ class FileSystemHelper:
     def last_modified(self, file_path):
         return os.path.getmtime(file_path)
 
+    def make_directory(self, directory_path):
+        return os.makedirs(directory_path)
+
     def open_file_for_reading_and_writing(self, file_path):
         return open(file_path, 'r+')
 

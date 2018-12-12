@@ -115,6 +115,10 @@ class SystemTestContext:
         return '/opt/minio/data'
 
     @property
+    def local_archive_root_path(self):
+        return "/usr/tmp/archive"
+
+    @property
     def authentication_username(self):
         return 'Tom'
 

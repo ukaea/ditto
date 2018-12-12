@@ -83,7 +83,7 @@ class DittoHandler(APIHandler):
     def check_not_trying_to_access_data_outside_root(self, bucket_name, rel_path):
         if rel_path is None:
             return
-        root = self._bucket_settings_service.bucket_root_directory(bucket_name)
+        root = self._bucket_settings_service.bucket_data_root_directory(bucket_name)
         canonical_root_path = self._file_system_helper.canonical_path(root)
         full_path = self._file_system_helper.join_paths(canonical_root_path, rel_path)
         directory_path = self._file_system_helper.file_directory(full_path) \

@@ -1,8 +1,8 @@
 import logging
+import unittest
 import mock
 from mock import call
 import pytest
-import unittest
 
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.utils.configurations import Configuration
@@ -79,53 +79,57 @@ class BucketSettingsServiceTest(unittest.TestCase):
     def test_settings_loads_single_bucket_settings_with_single_group(self):
         # Arrange
         self.mock_file_read_write_helper.read_file_path_as_text.return_value = \
-            '[test-bucket]\ngroups = group\nroot = /usr/tmp/ditto\n'
+            '[test-bucket]\ngroups = group\narchive_root = /usr/tmp/archive\ndata_root = /usr/tmp/ditto\n'
         # Act
         self.initialise_service_with_admin_groups(['admin'])
         # Assert
         assert len(self.test_service._settings) == 1
         assert self.test_service.is_bucket_recognised('test-bucket')
         assert self.test_service.bucket_permitted_groups('test-bucket') == ['group']
-        assert self.test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_data_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_archive_root_directory('test-bucket') == '/usr/tmp/archive'
 
     def test_settings_loads_single_bucket_settings_with_multiple_groups(self):
         # Arrange
         self.mock_file_read_write_helper.read_file_path_as_text.return_value = \
-            '[test-bucket]\ngroups = group1,group2\nroot = /usr/tmp/ditto\n'
+            '[test-bucket]\ngroups = group1,group2\narchive_root = /usr/tmp/archive\ndata_root = /usr/tmp/ditto\n'
         # Act
         self.initialise_service_with_admin_groups(['admin'])
         # Assert
         assert len(self.test_service._settings) == 1
         assert self.test_service.is_bucket_recognised('test-bucket')
         assert self.test_service.bucket_permitted_groups('test-bucket') == ['group1', 'group2']
-        assert self.test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_data_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_archive_root_directory('test-bucket') == '/usr/tmp/archive'
 
     def test_settings_loads_multiple_bucket_settings(self):
         # Arrange
         self.mock_file_read_write_helper.read_file_path_as_text.return_value = \
-            '[test-bucket]\ngroups = group1,group2\nroot = /usr/tmp/ditto\n\n' \
-            '[test-other]\ngroups = admin\nroot = /usr/tmp/other'
+            '[test-bucket]\ngroups = group1,group2\narchive_root = /usr/tmp/archive\ndata_root = /usr/tmp/ditto\n\n' \
+            '[test-other]\ngroups = admin\narchive_root = /usr/tmp/archive2\ndata_root = /usr/tmp/other'
         # Act
         self.initialise_service_with_admin_groups(['admin'])
         # Assert
         assert len(self.test_service._settings) == 2
         assert self.test_service.is_bucket_recognised('test-bucket')
         assert self.test_service.bucket_permitted_groups('test-bucket') == ['group1', 'group2']
-        assert self.test_service.bucket_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_data_root_directory('test-bucket') == '/usr/tmp/ditto'
+        assert self.test_service.bucket_archive_root_directory('test-bucket') == '/usr/tmp/archive'
         assert self.test_service.is_bucket_recognised('test-other')
         assert self.test_service.bucket_permitted_groups('test-other') == ['admin']
-        assert self.test_service.bucket_root_directory('test-other') == '/usr/tmp/other'
+        assert self.test_service.bucket_data_root_directory('test-other') == '/usr/tmp/other'
+        assert self.test_service.bucket_archive_root_directory('test-other') == '/usr/tmp/archive2'
 
     def test_add_bucket_appends_new_settings_to_file(self):
         # Arrange
         self.mock_file_read_write_helper.read_file_path_as_text.return_value = \
-            '[test-bucket]\ngroups = group1,group2\nroot = /usr/tmp/ditto\n'
+            '[test-bucket]\ngroups = group1,group2\narchive_root = /usr/tmp/archive\ndata_root = /usr/tmp/ditto\n'
         # Act
         self.initialise_service_with_admin_groups(['admin'])
-        self.test_service.add_bucket('test-other', 'admin', '/usr/tmp/other')
+        self.test_service.add_bucket('test-other', 'admin', '/usr/tmp/archive2', '/usr/tmp/other')
         # Assert
         self.mock_file_read_write_helper.write_text_to_file_path.assert_called_once_with(
-            '[test-bucket]\ngroups = group\nroot = /usr/tmp/ditto\n\n'
-            '[test-other]\ngroups = admin\nroot = /usr/tmp/other\n',
-            self.mock_bucket_settings_path
+            self.mock_bucket_settings_path,
+            '[test-bucket]\ngroups = group1,group2\narchive_root = /usr/tmp/archive\ndata_root = /usr/tmp/ditto\n\n'
+            '[test-other]\ngroups = admin\narchive_root = /usr/tmp/archive2\ndata_root = /usr/tmp/other\n\n'
         )

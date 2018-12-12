@@ -23,7 +23,8 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         return {
             'bucket': 'test-bucket',
             'groups': ['testgroup'],
-            'root': '/usr/tmp/data'
+            'data_root': '/usr/tmp/data',
+            'archive_root': '/usr/tmp/archive'
         }
 
     # Security
@@ -95,6 +96,31 @@ class CreateBucketHandlerTest(BaseHandlerTest):
         self.mock_data_replication_service.create_bucket.assert_called_once_with(
             "test-bucket",
             ['testgroup'],
+            "/usr/tmp/archive",
+            "/usr/tmp/data"
+        )
+        assert response_code == 200
+        assert response_body['status'] == 'success'
+        assert response_body['data'] == action_summary
+
+    @gen_test
+    def test_post_create_bucket_archive_root_is_taken_as_data_root_when_missing(self):
+        # Arrange
+        action_summary = {"message": "Bucket created", "bucket": "test-bucket", "status": StatusCodes.Okay}
+        self.mock_data_replication_service.create_bucket.return_value = action_summary
+        self._set_admin_user()
+        body = {
+            'bucket': 'test-bucket',
+            'groups': ['testgroup'],
+            'data_root': '/usr/tmp/data',
+        }
+        # Act
+        response_body, response_code = yield self.send_authorised_authenticated_request(body)
+        # Assert
+        self.mock_data_replication_service.create_bucket.assert_called_once_with(
+            "test-bucket",
+            ['testgroup'],
+            "/usr/tmp/data",
             "/usr/tmp/data"
         )
         assert response_code == 200

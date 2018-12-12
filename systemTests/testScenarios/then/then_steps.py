@@ -143,21 +143,21 @@ class ThenSteps:
     def response_status_is(self, status_code):
         assert self._context.http_client_response.status_code == status_code
 
-    def archive_file_exists_in_root_dir(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+    def archive_file_exists_in_archive_root_dir(self):
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         assert os.path.exists(file_path)
 
     def archive_file_has_been_updated(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         last_modified = os.path.getmtime(file_path)
         assert last_modified > self._context.archive_creation_time
 
-    def archive_file_exists_in_sub_dir(self):
-        file_path = os.path.join(self._context.local_data_folder_path, "sub_dir_A", ".ditto_archived")
+    def archive_file_exists_in_sub_dir_of_archive_root(self):
+        file_path = os.path.join(self._context.local_archive_root_path, "sub_dir_A", ".ditto_archived")
         assert os.path.exists(file_path)
 
     def archive_content_is_as_expected(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         expected_content = "test"
         with open(file_path, 'rt') as file:
             content = file.read()
@@ -168,7 +168,7 @@ class ThenSteps:
         assert os.path.exists(file_path) is False
 
     def updated_archive_file_content_is_as_expected(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         expected_content = "test test"
         with open(file_path, 'rt') as file:
             content = file.read()
@@ -178,7 +178,19 @@ class ThenSteps:
         file_path = os.path.join(self._context.ditto_web_api_folder_path, 'DittoWebApi', 'bucket_settings.ini')
         expected_content = f'[{self._context.standard_bucket_name}]\n'\
             'groups = group1,group2\n'\
-            f'root = {self._context.local_data_folder_path}\n'
+            f'archive_root = {self._context.local_archive_root_path}\n'\
+            f'data_root = {self._context.local_data_folder_path}\n'
+        with open(file_path, 'r') as file:
+            content = file.read()
+            print(content)
+        assert expected_content in content
+
+    def bucket_settings_includes_standard_bucket_with_archive_root_in_data(self):
+        file_path = os.path.join(self._context.ditto_web_api_folder_path, 'DittoWebApi', 'bucket_settings.ini')
+        expected_content = f'[{self._context.standard_bucket_name}]\n'\
+            'groups = group1,group2\n'\
+            f'archive_root = {self._context.local_data_folder_path}\n'\
+            f'data_root = {self._context.local_data_folder_path}\n'
         with open(file_path, 'r') as file:
             content = file.read()
         assert expected_content in content
@@ -206,14 +218,13 @@ class ThenSteps:
         assert self._file_in_archive_file_at_folder_with_specified_type(file_name, directory, 'file update') is True
 
     def _file_in_archive_file_at_folder_with_specified_type(self, file_name, directory, type_of_transfer):
-        root_to_directory = os.path.join(self._context.local_data_folder_path, directory) \
+        root_to_directory = os.path.join(self._context.local_archive_root_path, directory) \
             if directory \
-            else self._context.local_data_folder_path
+            else self._context.local_archive_root_path
         file_path = os.path.join(root_to_directory, ".ditto_archived")
         print(file_path)
         with open(file_path, 'r') as file:
             content = json.load(file)
-            print(content)
         try:
             content[file_name]
         except KeyError:
@@ -222,7 +233,7 @@ class ThenSteps:
 
     def old_content_in_archive_file_is_untouched(self):
         file_name = self._context.file_in_sub_dir_name
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         print(file_path)
         with open(file_path, 'r') as file:
             content = json.load(file)

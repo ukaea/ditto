@@ -21,9 +21,10 @@ def create_bucket_input_schema():
                     "items": {"type": "string"}
                 }
             },
-            "root": {"type": "string"}
+            "data_root": {"type": "string"},
+            "archive_root": {"type": "string"}
         },
-        "required": ["bucket", "groups", "root"]
+        "required": ["bucket", "groups", "data_root"]
     }
 
 

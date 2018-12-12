@@ -41,7 +41,12 @@ class GivenSteps:
     # Public methods
 
     def archive_file_already_exists_in_local_root(self):
-        self._write_file_locally(".ditto_archived", "test")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
+        dir_path = os.path.dirname(file_path)
+        if not os.path.isdir(dir_path):
+            os.makedirs(dir_path)
+        with open(file_path, 'w') as file:
+            file.write("{}")
 
     @staticmethod
     def s3_interface_is_running():
@@ -79,14 +84,14 @@ class GivenSteps:
                                 'example test content B')
 
     def archive_file_already_exists_in_local_root(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         content = '{}'
         with open(file_path, 'w') as file:
             file.write(content)
         self._context.archive_creation_time = time.time()
 
     def old_transfer_in_archive_file(self):
-        file_path = os.path.join(self._context.local_data_folder_path, ".ditto_archived")
+        file_path = os.path.join(self._context.local_archive_root_path, ".ditto_archived")
         content = {"testB.txt":
                        {"file": "testB.txt",
                         "size": 22,
