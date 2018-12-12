@@ -70,19 +70,19 @@ class TestPathHelpers:
         prefix = dir_path_as_prefix(dir_path)
         assert prefix == "testdir/testsubdir/"
 
-    @pytest.mark.parametrize('path', ['path/to/root/file',
-                                      'path/to/root/',
-                                      'path/to/root/dir/sub_dir/file'])
+    @pytest.mark.parametrize('path', ['/path/to/root/file',
+                                      '/path/to/root/',
+                                      '/path/to/root',
+                                      '/path/to/root/dir/sub_dir/file'])
     def test_check_if_sub_dir_of_root_returns_true_when_path_is_in_root(self, path):
-        root = "path/to/root/"
+        root = "/path/to/root"
         assert is_sub_dir_of_root(directory_path=path, root_path=root) is True
 
-    @pytest.mark.parametrize('path', ['path/root/file',
-                                      'path/to/file',
-                                      'to/root/file',
-                                      'path/to/newroot/',
-                                      'path/to/root',
-                                      'path/to/root2/'])
+    @pytest.mark.parametrize('path', ['/path/root/file',
+                                      '/path/to/file',
+                                      '/to/root/file',
+                                      '/path/to/newroot/',
+                                      '/path/to/root2/'])
     def test_check_if_sub_dir_of_root_returns_false_when_path_is_not_in_root(self, path):
-        root = "path/to/root/"
+        root = "/path/to/root"
         assert is_sub_dir_of_root(directory_path=path, root_path=root) is False

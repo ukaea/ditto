@@ -18,4 +18,5 @@ def dir_path_as_prefix(dir_path):
 def is_sub_dir_of_root(directory_path=None, root_path=None):
     # Note should always use canonical paths to ensure correct results
     root_path_as_prefix = dir_path_as_prefix(root_path)
-    return directory_path.startswith(root_path_as_prefix)
+    directory_path_as_prefix = dir_path_as_prefix(directory_path)
+    return directory_path_as_prefix.startswith(root_path_as_prefix)
