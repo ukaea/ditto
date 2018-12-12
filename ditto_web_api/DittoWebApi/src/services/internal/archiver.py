@@ -62,5 +62,6 @@ class Archiver:
         else:
             try:
                 self._file_system_helper.make_directory(archive_file_directory_path)
-            except OSError:
+            except OSError as error:
+                self._logger.debug(f"Error caused trying to make directory for archive file: {error}")
                 raise
