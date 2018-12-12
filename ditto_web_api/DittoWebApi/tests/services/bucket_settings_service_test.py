@@ -1,6 +1,6 @@
 import logging
-import mock
 import unittest
+import mock
 from mock import call
 import pytest
 

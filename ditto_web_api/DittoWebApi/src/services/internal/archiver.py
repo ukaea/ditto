@@ -59,9 +59,8 @@ class Archiver:
         archive_file_directory_path = self._file_system_helper.file_directory(archive_file_path)
         if self._file_system_helper.does_path_exist(archive_file_directory_path) is True:
             return
-        else:
-            try:
-                self._file_system_helper.make_directory(archive_file_directory_path)
-            except OSError as error:
-                self._logger.debug(f"Error caused trying to make directory for archive file: {error}")
-                raise
+        try:
+            self._file_system_helper.make_directory(archive_file_directory_path)
+        except OSError as error:
+            self._logger.error(f"Error caused trying to make directory for archive file: {error}")
+            raise
