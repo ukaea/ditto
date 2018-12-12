@@ -1,8 +1,8 @@
 import logging
 import mock
+import unittest
 from mock import call
 import pytest
-import unittest
 
 from DittoWebApi.src.services.bucket_settings_service import BucketSettingsService
 from DittoWebApi.src.utils.configurations import Configuration
