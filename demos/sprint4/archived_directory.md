@@ -49,6 +49,7 @@ In Minio browser view, create buckets `ditto-normal` and `ditto-readonly`
 
 In PostMan, run a `copydir` for `ditto-normal`:
 * POST to `http://172.28.129.160:8888/copydir/`
+* username `a.u.thorised`, password `foo`
 * body `{"bucket":"ditto-normal"}`
 
 Show that files copied to Minio in browser and that `.ditto-archived` files have been written as before:
@@ -59,6 +60,7 @@ cat /usr/tmp/data/ditto_normal/subdir/.ditto_archived
 
 In PostMan, run a `copydir` for `ditto-readonly`:
 * POST to `http://172.28.129.160:8888/copydir/`
+* username `a.u.thorised`, password `foo`
 * body `{"bucket":"ditto-readonly"}`
 
 Show that files copied to Minio in browser and that `.ditto-archived` files have been written in `ditto_readonly_archive` but not in `ditto_readonly_data`:

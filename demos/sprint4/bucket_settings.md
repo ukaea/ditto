@@ -31,7 +31,7 @@ Connect to the Minio server GUI in a host machine browser:
 
 Create a bucket _without_ an `archive_root` specified:
 * POST to `http://172.28.129.160:8888/createbucket/`
-* show with non-admin user first (fails), then with admin user
+* show with non-admin user (username `a.u.thorised`, password `foo`) first (fails), then with admin user (username `a.d.ministrator`, password `IAmAdmin`)
 * body:
 ```
 {
@@ -47,7 +47,7 @@ Show that bucket created in Minio web view
 
 Create a bucket _with_ an `archive_root` specified:
 * POST to `http://172.28.129.160:8888/createbucket/`
-* then with admin user
+* then with admin user (username `a.d.ministrator`, password `IAmAdmin`)
 * body:
 ```
 {
