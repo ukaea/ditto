@@ -1,7 +1,7 @@
 from DittoWebApi.src.utils.system_helper import current_time_in_utc
 try:
     from DittoWebApi.version import __version__
-except ModuleNotFoundError as error:
+except ModuleNotFoundError:
     import sys
     print("")
     print("Version not found, please follow instructions in GitHub wiki to build version number")
