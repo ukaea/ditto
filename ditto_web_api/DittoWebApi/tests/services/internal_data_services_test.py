@@ -212,7 +212,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_summary.new_files = [self.mock_file_1, self.mock_file_2]
         self.mock_file_summary.updated_files = []
         # Act
-        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        self.internal_data_services.archive_file_transfer("some_bucket", self.mock_file_summary, "/usr/tmp/data")
         # Assert
         assert self.mock_archiver.write_archive.call_count == 1
         assert self.mock_archiver.update_archive.call_count == 0
@@ -224,7 +224,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_summary.new_files = []
         self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
         # Act
-        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        self.internal_data_services.archive_file_transfer("some_bucket", self.mock_file_summary, "/usr/tmp/data")
         # Assert
         assert self.mock_archiver.write_archive.call_count == 0
         assert self.mock_archiver.update_archive.call_count == 1
@@ -237,7 +237,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_summary.new_files = []
         self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
         # Act
-        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        self.internal_data_services.archive_file_transfer("some_bucket", self.mock_file_summary, "/usr/tmp/data")
         # Assert
         assert self.mock_archiver.write_archive.call_count == 0
         assert self.mock_archiver.update_archive.call_count == 1
@@ -251,7 +251,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_summary.new_files = [self.mock_file_2]
         self.mock_file_summary.updated_files = [self.mock_file_1]
         # Act
-        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        self.internal_data_services.archive_file_transfer("some_bucket", self.mock_file_summary, "/usr/tmp/data")
         # Assert
         assert self.mock_archiver.write_archive.call_count == 1
         assert self.mock_archiver.update_archive.call_count == 1
@@ -264,7 +264,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_summary.new_files = [self.mock_file_1, self.mock_file_2]
         self.mock_file_summary.updated_files = []
         # Act
-        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        self.internal_data_services.archive_file_transfer("some_bucket", self.mock_file_summary, "/usr/tmp/data")
         # Assert
         assert self.mock_archiver.write_archive.call_count == 0
         assert self.mock_archiver.update_archive.call_count == 1
@@ -277,7 +277,7 @@ class TestInternalDataServices(unittest.TestCase):
         self.mock_file_summary.new_files = []
         self.mock_file_summary.updated_files = [self.mock_file_1, self.mock_file_2]
         # Act
-        self.internal_data_services.archive_file_transfer(self.mock_file_summary, "/usr/tmp/data")
+        self.internal_data_services.archive_file_transfer("some_bucket", self.mock_file_summary, "/usr/tmp/data")
         # Assert
         assert self.mock_archiver.write_archive.call_count == 1
         assert self.mock_archiver.update_archive.call_count == 0
