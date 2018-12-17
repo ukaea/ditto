@@ -29,7 +29,7 @@ class InternalDataService:
         file_name = self._file_system_helper.file_name(abs_path_to_file)
         return FileInformation(abs_path_to_file, rel_path_to_file, file_name)
 
-    def archive_file_transfer(self, file_summary, root_dir):
+    def archive_file_transfer(self, bucket_name, file_summary, root_dir):
         sub_directory_file_summaries = self._split_file_summary_by_sub_dir(file_summary)
 
         for sub_dir in sub_directory_file_summaries:
@@ -40,9 +40,9 @@ class InternalDataService:
             sub_dir_file_summary = sub_directory_file_summaries[sub_dir]
 
             if self._file_system_helper.does_path_exist(archive_file_path):
-                self._archiver.update_archive(archive_file_path, sub_dir_file_summary)
+                self._archiver.update_archive(archive_file_path, bucket_name, sub_dir_file_summary)
             else:
-                self._archiver.write_archive(archive_file_path, sub_dir_file_summary)
+                self._archiver.write_archive(archive_file_path, bucket_name, sub_dir_file_summary)
 
     def _split_file_summary_by_sub_dir(self, file_summary):
         dict_of_sub_dir_summaries = {}
