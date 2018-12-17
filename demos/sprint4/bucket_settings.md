@@ -1,8 +1,6 @@
 # Bucket settings
 
-Story covered: [#28](https://github.com/ukaea/ditto/issues/28), [#82](https://github.com/ukaea/ditto/issues/82)
-
-If a separate `archive_root` is specified for a given bucket, the `.ditto-archived` files are written to this directory (and matching sub-directories) instead of the `data_root` directory. If no `archive_root` is specified, `.ditto-archived` files are still written in the data directory.
+Story covered: [#82](https://github.com/ukaea/ditto/issues/82)
 
 When `createbucket` is called by an admin user, the arguments `groups` and `data_root` are now required. `archive_root` is optional. So long as the bucket does not already exist, it is created at the S3 end (as before) and added to the `bucket_settings.ini` file (new functionality). When `createbucket` is called by a non-admin user the request is refused.
 
@@ -30,3 +28,36 @@ Connect to the Minio server GUI in a host machine browser:
 * secret key `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
 
 ## Demo
+
+Create a bucket _without_ an `archive_root` specified:
+* POST to `http://172.28.129.160:8888/createbucket/`
+* show with non-admin user first (fails), then with admin user
+* body:
+```
+{
+	"bucket": "ditto-normal",
+  "groups": ["main"],
+  "data_root": "/usr/tmp/data/ditto_normal"
+}
+```
+
+Show that `ditto_web_api/DittoWebApi/bucket_settings.ini` exists and now contains the `ditto-normal` bucket settings.
+
+Show that bucket created in Minio web view
+
+Create a bucket _with_ an `archive_root` specified:
+* POST to `http://172.28.129.160:8888/createbucket/`
+* then with admin user
+* body:
+```
+{
+	"bucket": "ditto-readonly",
+  "groups": ["main"],
+  "data_root": "/usr/tmp/data/ditto_readonly_data",
+  "archive_root": "/usr/tmp/data/ditto_readonly_archive"
+}
+```
+
+Show that `ditto_web_api/DittoWebApi/bucket_settings.ini` now also contains the `ditto-readonly` bucket settings.
+
+Show that bucket created in Minio web view
