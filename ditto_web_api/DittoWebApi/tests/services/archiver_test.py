@@ -4,6 +4,7 @@ import unittest
 import pytest
 import mock
 
+from DittoWebApi.version import __version__ as version
 from DittoWebApi.src.utils.file_system.files_system_helpers import FileSystemHelper
 from DittoWebApi.src.models.file_storage_summary import FilesStorageSummary
 from DittoWebApi.src.models.file_information import FileInformation
@@ -37,20 +38,24 @@ class TestArchive(unittest.TestCase):
         self.mock_file_summary.new_files = [self.mock_file_1]
         self.mock_file_summary.updated_files = [self.mock_file_2]
         # Act
-        self.test_archiver.write_archive("some_file_path", self.mock_file_summary)
+        self.test_archiver.write_archive("some_file_path", "some_bucket", self.mock_file_summary)
         # Assert
         self._logger.debug.assert_called_with("Archive file created: some_file_path")
         self._file_read_write_helper.write_json_to_file.assert_called_once_with(
             self.mock_open_file, {self.mock_file_1.file_name: {
                 'file': self.mock_file_1.file_name,
+                'bucket': "some_bucket",
                 'size': 100,
-                'latest update': '1970-01-01 03:25:45',
-                'type of transfer': 'new upload'},
+                'last archived': '1970-01-01 03:25:45',
+                'type of transfer': 'new upload',
+                'ditto version': version},
                                   self.mock_file_2.file_name: {
                                       'file': self.mock_file_2.file_name,
+                                      'bucket': "some_bucket",
                                       'size': 50,
-                                      'latest update': '1970-01-01 03:25:45',
-                                      'type of transfer': 'file update'}}
+                                      'last archived': '1970-01-01 03:25:45',
+                                      'type of transfer': 'file update',
+                                      'ditto version': version}}
         )
 
     @mock.patch('DittoWebApi.src.utils.system_helper.time.time', return_value=12345)
@@ -61,26 +66,32 @@ class TestArchive(unittest.TestCase):
         self._file_read_write_helper.read_file_as_json.return_value = {
             self.mock_file_2.file_name: {
                 'file': self.mock_file_2.file_name,
+                'bucket': "some_bucket",
                 'size': 50,
-                'latest update': '1970-01-01 03:25:45',
-                'type of transfer': 'file update'}
+                'last archived': '1970-01-01 03:25:45',
+                'type of transfer': 'file update',
+                'ditto version': version}
         }
         # Act
-        self.test_archiver.update_archive("some_file_path", self.mock_file_summary)
+        self.test_archiver.update_archive("some_file_path", "some_bucket", self.mock_file_summary)
         # Assert
         self._logger.debug.assert_called_with("Archive file updated: some_file_path")
         self._file_read_write_helper.write_json_to_file.assert_called_once_with(
             self.mock_open_file, {
                 self.mock_file_2.file_name: {
                     'file': self.mock_file_2.file_name,
+                    'bucket': "some_bucket",
                     'size': 50,
-                    'latest update': '1970-01-01 03:25:45',
-                    'type of transfer': 'file update'},
+                    'last archived': '1970-01-01 03:25:45',
+                    'type of transfer': 'file update',
+                    'ditto version': version},
                 self.mock_file_1.file_name: {
                     'file': self.mock_file_1.file_name,
+                    'bucket': "some_bucket",
                     'size': 100,
-                    'latest update': '1970-01-01 03:25:45',
-                    'type of transfer': 'new upload'}
+                    'last archived': '1970-01-01 03:25:45',
+                    'type of transfer': 'new upload',
+                    'ditto version': version}
             })
 
     @mock.patch('DittoWebApi.src.utils.system_helper.time.time', return_value=12345)
@@ -91,25 +102,30 @@ class TestArchive(unittest.TestCase):
         self._file_read_write_helper.read_file_as_json.return_value = {
             self.mock_file_2.file_name: {
                 'file': self.mock_file_2.file_name,
+                'bucket': "some_bucket",
                 'size': 50,
-                'latest update': '1970-01-01 03:25:45',
-                'type of transfer': 'new upload'}
+                'last archived': '1970-01-01 03:25:45',
+                'type of transfer': 'new upload',
+                'ditto version': version}
         }
         # Act
-        self.test_archiver.update_archive("some_file_path", self.mock_file_summary)
+        self.test_archiver.update_archive("some_file_path", "some_bucket", self.mock_file_summary)
         # Assert
         self._logger.debug.assert_called_with("Archive file updated: some_file_path")
         self._file_read_write_helper.write_json_to_file.assert_called_once_with(
             self.mock_open_file, {
                 self.mock_file_1.file_name: {
                     'file': self.mock_file_1.file_name,
+                    'bucket': "some_bucket",
                     'size': 100,
-                    'latest update': '1970-01-01 03:25:45',
-                    'type of transfer': 'file update'},
+                    'last archived': '1970-01-01 03:25:45',
+                    'type of transfer': 'file update',
+                    'ditto version': version},
                 self.mock_file_2.file_name: {
                     'file': self.mock_file_2.file_name,
+                    'bucket': "some_bucket",
                     'size': 50,
-                    'latest update': '1970-01-01 03:25:45',
-                    'type of transfer': 'file update'}
-
+                    'last archived': '1970-01-01 03:25:45',
+                    'type of transfer': 'file update',
+                    'ditto version': version}
             })

@@ -67,7 +67,7 @@ class DataReplicationService:
         file_summary = self._storage_difference_processor.return_difference_comparison([], files_in_directory)
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, file_summary)
         archive_root_dir = self._bucket_settings_service.bucket_archive_root_directory(bucket_name)
-        self._internal_data_service.archive_file_transfer(file_summary, archive_root_dir)
+        self._internal_data_service.archive_file_transfer(bucket_name, file_summary, archive_root_dir)
         return return_transfer_summary(**transfer_summary)
 
     def create_bucket(self, bucket_name, groups, archive_root_dir, data_root_dir):
@@ -141,7 +141,7 @@ class DataReplicationService:
                                            files_skipped=len(files_in_directory))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         archive_root_dir = self._bucket_settings_service.bucket_archive_root_directory(bucket_name)
-        self._internal_data_service.archive_file_transfer(files_summary, archive_root_dir)
+        self._internal_data_service.archive_file_transfer(bucket_name, files_summary, archive_root_dir)
         return return_transfer_summary(**transfer_summary)
 
     def copy_new_and_update(self, bucket_name, dir_path):
@@ -170,7 +170,7 @@ class DataReplicationService:
                                            files_skipped=len(files_summary.files_to_be_skipped()))
         transfer_summary = self._external_data_service.perform_transfer(bucket_name, files_summary)
         archive_root_dir = self._bucket_settings_service.bucket_archive_root_directory(bucket_name)
-        self._internal_data_service.archive_file_transfer(files_summary, archive_root_dir)
+        self._internal_data_service.archive_file_transfer(bucket_name, files_summary, archive_root_dir)
         return return_transfer_summary(**transfer_summary)
 
 
