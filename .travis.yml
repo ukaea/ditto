@@ -8,6 +8,7 @@ install:
   - pip install -r requirements.txt
 before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
+  - sh build_version_number.sh
 script:
   - flake8 ./DittoWebApi
   - python lint_threshold_check.py ./DittoWebApi
