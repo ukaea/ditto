@@ -14,6 +14,7 @@ class DittoHandler(APIHandler):
         self._data_replication_service = data_replication_service
         self._file_system_helper = file_system_helper
         self._security_service = security_service
+        self.clear_header("Server")
 
     def prepare(self):
         self._check_credentials()
