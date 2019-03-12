@@ -21,5 +21,6 @@ class HeartbeatHandlerTest(AsyncHTTPTestCase):
         )
         response_body = json.loads(response.body, encoding='utf-8')
         assert response.code == 200
+        assert "Server" not in response.headers
         assert response_body['status'] == 'success'
         assert response_body['data']['running'] == 'true'

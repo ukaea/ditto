@@ -87,6 +87,7 @@ class BaseHandlerTest(AsyncHTTPTestCase, metaclass=ABCMeta):
             auth_password=password,
             allow_nonstandard_methods=allow_nonstandard_methods
         )
+        assert "Server" not in response.headers
         return response
 
     @staticmethod
